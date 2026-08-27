@@ -1,0 +1,45 @@
+:root {
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #111827;
+  background: #f3f4f6;
+  font-synthesis: none;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; }
+button { font: inherit; touch-action: manipulation; }
+
+.app-shell {
+  width: min(900px, 100%);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(24px, env(safe-area-inset-top)) 20px max(32px, env(safe-area-inset-bottom));
+}
+
+.app-header, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.app-header { margin-bottom: 28px; }
+.eyebrow { margin: 0 0 4px; font-size: 11px; font-weight: 700; letter-spacing: .12em; opacity: .55; }
+h1, h2, p { margin-top: 0; }
+h1 { margin-bottom: 0; font-size: clamp(28px, 7vw, 42px); }
+
+.players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.player-card { padding: 24px; border-radius: 24px; background: white; box-shadow: 0 8px 30px rgb(0 0 0 / 7%); text-align: center; }
+.player-card h2 { margin-bottom: 12px; font-size: 18px; }
+.player-card strong { display: block; margin-bottom: 20px; font-size: clamp(64px, 16vw, 112px); line-height: .9; }
+.score-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.score-actions button { min-height: 64px; border: 0; border-radius: 16px; background: #e5e7eb; color: #111827; font-size: 32px; font-weight: 600; cursor: pointer; }
+.score-actions button:active { transform: scale(.97); }
+.secondary-button { min-height: 44px; padding: 0 16px; border: 1px solid #d1d5db; border-radius: 12px; background: white; cursor: pointer; }
+
+.history { margin-top: 24px; padding: 20px; border-radius: 20px; background: white; }
+.section-heading h2 { margin: 0; }
+.section-heading span { font-size: 13px; opacity: .55; }
+.empty-state { margin: 18px 0 0; color: #6b7280; }
+.history ol { margin: 16px 0 0; padding-left: 24px; }
+.history li { padding: 8px 0; }
+.history li strong { float: right; }
+
+@media (max-width: 560px) {
+  .players { grid-template-columns: 1fr; }
+  .player-card { padding: 20px; }
+}
