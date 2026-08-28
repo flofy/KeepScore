@@ -1,0 +1,32 @@
+/* Mobile-first interaction helpers for the scoring surface. */
+
+@media (max-width: 640px) {
+  .app-shell {
+    width: 100%;
+    min-height: 100dvh;
+    padding: max(1rem, env(safe-area-inset-top)) 1rem max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .score-actions button,
+  button {
+    min-width: 48px;
+    min-height: 48px;
+    touch-action: manipulation;
+  }
+
+  .players {
+    grid-template-columns: 1fr;
+  }
+
+  .player-card {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
