@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: false
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
       - run: npm install
       - run: npm run build
 
@@ -29,6 +29,6 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: false
+          cache: ${{ hashFiles('package-lock.json') != '' && 'npm' || '' }}
       - run: npm install
       - run: npm test -- --run
