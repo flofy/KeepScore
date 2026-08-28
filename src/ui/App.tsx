@@ -1,11 +1,35 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import type { TouchEvent } from 'react'
 import type { Game } from '../domain/game/types'
 import { GameSetup } from './GameSetup'
 import { localGameRepository } from '../infrastructure/persistence/gameRepository'
 import { useGameHistory } from './useGameHistory'
 
+function haptic() {
+  if ('vibrate' in navigator) navigator.vibrate(8)
+}
+
 function GameScreen({ initialGame, onNewGame }: { initialGame: Game; onNewGame: () => void }) {
   const { present: game, past, future, dispatch, undo, redo } = useGameHistory(initialGame)
+  const touchStart = useRef<{ x: number; y: number; playerId: string } | null>(null)
+
+  const onTouchStart = (event: TouchEvent<HTMLElement>, playerId: string) => {
+    const touch = event.changedTouches[0]
+    touchStart.current = { x: touch.clientX, y: touch.clientY, playerId }
+  }
+
+  const onTouchEnd = (event: TouchEvent<HTMLElement>) => {
+    const start = touchStart.current
+    if (!start) return
+    touchStart.current = null
+    const touch = event.changedTouches[0]
+    const dx = touch.clientX - start.x
+    const dy = touch.clientY - start.y
+    if (Math.abs(dx) < 64 || Math.abs(dx) < Math.abs(dy) * 1.25) return
+    dispatch({ type: 'ADD_SCORE', playerId: start.playerId, delta: dx > 0 ? 1 : -1 })
+    haptic()
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -18,12 +42,12 @@ function GameScreen({ initialGame, onNewGame }: { initialGame: Game; onNewGame: 
       </header>
       <section className="players" aria-label="Players">
         {game.players.map((player) => (
-          <article className="player-card" key={player.id}>
+          <article className="player-card" key={player.id} onTouchStart={(event) => onTouchStart(event, player.id)} onTouchEnd={onTouchEnd}>
             <input className="player-name" value={player.name} onChange={(event) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name: event.target.value })} aria-label={`${player.name} name`} />
             <strong>{player.score}</strong>
             <div className="score-actions">
-              <button type="button" onClick={() => dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: -1 })} aria-label={`Remove one point from ${player.name}`}>−</button>
-              <button type="button" onClick={() => dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: 1 })} aria-label={`Add one point to ${player.name}`}>+</button>
+              <button type="button" onClick={() => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: -1 }); haptic() }} aria-label={`Remove one point from ${player.name}`}>−</button>
+              <button type="button" onClick={() => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: 1 }); haptic() }} aria-label={`Add one point to ${player.name}`}>+</button>
             </div>
           </article>
         ))}
