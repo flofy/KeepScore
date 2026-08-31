@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
-import type { TouchEvent } from 'react'
+import type { ChangeEvent, TouchEvent } from 'react'
 import type { Game } from '../domain/game/types'
 import { GameSetup } from './GameSetup'
 import { SavedGames } from './SavedGames'
 import { localGameRepository } from '../infrastructure/persistence/gameRepository'
+import { downloadGames, importGames } from '../infrastructure/portability/gamesPortability'
 import { useGameHistory } from './useGameHistory'
 import './saved-games.css'
 
@@ -30,8 +31,27 @@ export function App() {
   const [screen, setScreen] = useState<Screen>('game')
   const [game, setGame] = useState<Game | undefined>(() => localGameRepository.list()[0])
   const [games, setGames] = useState<Game[]>(() => localGameRepository.list())
+  const [portabilityError, setPortabilityError] = useState('')
+  const importInput = useRef<HTMLInputElement>(null)
+
   useEffect(() => { if (screen === 'saved') setGames(localGameRepository.list()) }, [screen, game])
-  if (screen === 'saved') return <SavedGames games={games} onResume={(selected) => { setGame(selected); setScreen('game') }} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} onNewGame={() => { setGame(undefined); setScreen('game') }} />
+
+  const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    event.target.value = ''
+    if (!file) return
+    try {
+      const imported = importGames(await file.text())
+      imported.forEach((item) => localGameRepository.save(item))
+      setGames(localGameRepository.list())
+      setGame(imported[0] ?? game)
+      setPortabilityError('')
+    } catch (error) {
+      setPortabilityError(error instanceof Error ? error.message : 'Unable to import this file.')
+    }
+  }
+
+  if (screen === 'saved') return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>Saved games</h1></div><div className="toolbar"><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>Export</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>Import</button><button className="secondary-button" type="button" onClick={() => setScreen('game')}>Back</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={(selected) => { setGame(selected); setScreen('game') }} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} onNewGame={() => { setGame(undefined); setScreen('game') }} /></main>
   if (!game) return <GameSetup onCreate={setGame} />
   return <GameScreen initialGame={game} onNewGame={() => setGame(undefined)} onSavedGames={() => setScreen('saved')} />
 }
