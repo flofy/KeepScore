@@ -48,8 +48,11 @@ export function InstallButton() {
   if (standalone || !prompt) return null
 
   async function install() {
-    await prompt.prompt()
-    const choice = await prompt.userChoice
+    const installPrompt = prompt
+    if (!installPrompt) return
+
+    await installPrompt.prompt()
+    const choice = await installPrompt.userChoice
     if (choice.outcome === 'accepted') setPrompt(null)
   }
 
