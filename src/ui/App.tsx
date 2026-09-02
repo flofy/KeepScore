@@ -33,24 +33,28 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   const longPressTimer = useRef<number | null>(null)
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null)
   const [quickOpen, setQuickOpen] = useState(false)
+  const [forcedSign, setForcedSign] = useState<'positive' | 'negative' | undefined>(undefined)
   const clearLongPress = () => { if (longPressTimer.current !== null) { clearTimeout(longPressTimer.current); longPressTimer.current = null } longPressOrigin.current = null }
-  const startLongPress = (event: ReactPointerEvent<HTMLElement>) => {
+  const startLongPress = (event: ReactPointerEvent<HTMLElement>, sign?: 'positive' | 'negative') => {
+    event.stopPropagation()
     longPressOrigin.current = { x: event.clientX, y: event.clientY }
-    longPressTimer.current = window.setTimeout(() => { setQuickOpen(true); haptic() }, 500)
+    longPressTimer.current = window.setTimeout(() => { setForcedSign(sign); setQuickOpen(true); haptic() }, 500)
   }
   const moveLongPress = (event: ReactPointerEvent<HTMLElement>) => {
     if (!longPressOrigin.current) return
     if (Math.hypot(event.clientX - longPressOrigin.current.x, event.clientY - longPressOrigin.current.y) > 10) clearLongPress()
   }
-  const quick = (delta: number) => { onQuickDelta(delta); setQuickOpen(false) }
-  const showPositive = lastDelta === undefined || lastDelta > 0
-  const showNegative = lastDelta === undefined || lastDelta < 0
-  const popupClass = 'score-popup' + (lastDelta === undefined ? '' : lastDelta > 0 ? ' positive' : ' negative')
+  const quick = (delta: number) => { onQuickDelta(delta); setQuickOpen(false); setForcedSign(undefined) }
+  const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined) }
+  const effectiveSign = forcedSign ?? (lastDelta === undefined ? undefined : lastDelta > 0 ? 'positive' : 'negative')
+  const showPositive = effectiveSign === undefined || effectiveSign === 'positive'
+  const showNegative = effectiveSign === undefined || effectiveSign === 'negative'
+  const popupClass = 'score-popup' + (effectiveSign === undefined ? '' : effectiveSign === 'positive' ? ' positive' : ' negative')
   return (
     <article
       className={flipped ? 'player-card flipped' : 'player-card'}
       style={{ '--player-color': player.color ?? '#38bdf8' } as CSSProperties}
-      onPointerDown={startLongPress}
+      onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}
       onPointerLeave={clearLongPress}
@@ -65,8 +69,8 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
         </div>
       )}
       <div className="score-actions">
-        <button type="button" onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
-        <button type="button" onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
+        <button type="button" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
+        <button type="button" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
       </div>
       {quickOpen && (
         <div className={popupClass} role="menu" aria-label={`${t('quickScoreChange')} ${player.name}`}>
@@ -74,7 +78,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           {showNegative && <button type="button" role="menuitem" onClick={() => quick(-5)}>−5</button>}
           {showPositive && <button type="button" role="menuitem" onClick={() => quick(5)}>+5</button>}
           {showPositive && <button type="button" role="menuitem" onClick={() => quick(10)}>+10</button>}
-          <button type="button" className="score-cancel" role="menuitem" onClick={() => setQuickOpen(false)}>{t('cancel')}</button>
+          <button type="button" className="score-cancel" role="menuitem" onClick={closeQuick}>{t('cancel')}</button>
         </div>
       )}
     </article>
