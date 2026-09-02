@@ -7,13 +7,20 @@ import { localGameRepository } from '../infrastructure/persistence/gameRepositor
 import { downloadGames, importGames } from '../infrastructure/portability/gamesPortability'
 import { useGameHistory } from './useGameHistory'
 import { InstallButton } from './InstallButton'
+import { I18nProvider, useI18n } from './i18n'
 import './saved-games.css'
 
 function haptic() { if ('vibrate' in navigator) navigator.vibrate(8) }
 type Screen = 'game' | 'saved'
+const RECENT_DELTAS = 6
+
+function formatDelta(delta: number): string {
+  return delta > 0 ? `+${delta}` : `${delta}`
+}
 
 type PlayerCardProps = {
   player: Player
+  deltas: number[]
   flipped?: boolean
   lastDelta?: number
   onRename: (name: string) => void
@@ -21,7 +28,8 @@ type PlayerCardProps = {
   onQuickDelta: (delta: number) => void
 }
 
-function PlayerCard({ player, flipped = false, lastDelta, onRename, onDelta, onQuickDelta }: PlayerCardProps) {
+function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta }: PlayerCardProps) {
+  const { t } = useI18n()
   const longPressTimer = useRef<number | null>(null)
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null)
   const [quickOpen, setQuickOpen] = useState(false)
@@ -49,19 +57,24 @@ function PlayerCard({ player, flipped = false, lastDelta, onRename, onDelta, onQ
       onPointerCancel={clearLongPress}
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
-      <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} name`} />
+      <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <strong>{player.score}</strong>
+      {deltas.length > 0 && (
+        <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
+          {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
+        </div>
+      )}
       <div className="score-actions">
-        <button type="button" onClick={() => onDelta(-1)} aria-label={`Remove one point from ${player.name}`}>−</button>
-        <button type="button" onClick={() => onDelta(1)} aria-label={`Add one point to ${player.name}`}>+</button>
+        <button type="button" onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
+        <button type="button" onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
       </div>
       {quickOpen && (
-        <div className={popupClass} role="menu" aria-label={`Quick score change for ${player.name}`}>
+        <div className={popupClass} role="menu" aria-label={`${t('quickScoreChange')} ${player.name}`}>
           {showNegative && <button type="button" role="menuitem" onClick={() => quick(-10)}>−10</button>}
           {showNegative && <button type="button" role="menuitem" onClick={() => quick(-5)}>−5</button>}
           {showPositive && <button type="button" role="menuitem" onClick={() => quick(5)}>+5</button>}
           {showPositive && <button type="button" role="menuitem" onClick={() => quick(10)}>+10</button>}
-          <button type="button" className="score-cancel" role="menuitem" onClick={() => setQuickOpen(false)}>Cancel</button>
+          <button type="button" className="score-cancel" role="menuitem" onClick={() => setQuickOpen(false)}>{t('cancel')}</button>
         </div>
       )}
     </article>
@@ -70,6 +83,7 @@ function PlayerCard({ player, flipped = false, lastDelta, onRename, onDelta, onQ
 
 function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Game; onNewGame: () => void; onSavedGames: () => void }) {
   const { present: game, past, future, dispatch, undo, redo } = useGameHistory(initialGame)
+  const { t, lang, setLang } = useI18n()
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [topFlipped, setTopFlipped] = useState(true)
@@ -80,43 +94,40 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   useEffect(() => { localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0') }, [fullscreen])
   const beginEdit = (id: string, delta: number) => { setEditingEntry(id); setDraftDelta(String(delta)) }
   const saveEdit = () => { if (!editingEntry) return; const delta = Number(draftDelta); if (Number.isFinite(delta) && delta !== 0) dispatch({ type: 'EDIT_HISTORY_ENTRY', entryId: editingEntry, delta }); setEditingEntry(null) }
+  const recentDeltasFor = (playerId: string): number[] => game.history.filter((entry) => entry.playerId === playerId).slice(-RECENT_DELTAS).map((entry) => entry.delta).reverse()
   const lastDeltaFor = (playerId: string) => { for (let i = game.history.length - 1; i >= 0; i -= 1) { if (game.history[i].playerId === playerId) return game.history[i].delta } return undefined }
-  const historyContent = <section className="history" aria-label="Score history"><div className="section-heading"><h2>History</h2><span>{game.history.length} moves</span></div>{game.history.length === 0 ? <p className="empty-state">Score changes will appear here.</p> : <ol>{[...game.history].reverse().map((entry) => { const player = game.players.find((candidate) => candidate.id === entry.playerId); return <li key={entry.id}><span>{player?.name} <strong>{entry.delta > 0 ? '+' : ''}{entry.delta}</strong></span><span className="history-actions"><button type="button" className="secondary-button" onClick={() => beginEdit(entry.id, entry.delta)}>Edit</button><button type="button" className="secondary-button" onClick={() => dispatch({ type: 'DELETE_HISTORY_ENTRY', entryId: entry.id })}>Delete</button></span>{editingEntry === entry.id && <span className="history-editor"><input autoFocus type="number" value={draftDelta} onChange={(event) => setDraftDelta(event.target.value)} aria-label="New score delta"/><button type="button" className="secondary-button" onClick={saveEdit}>Save</button><button type="button" className="secondary-button" onClick={() => setEditingEntry(null)}>Cancel</button></span>}</li> })}</ol>}</section>
+  const historyContent = <section className="history" aria-label={t('history')}><div className="section-heading"><h2>{t('history')}</h2><span>{game.history.length} {t('moves')}</span></div>{game.history.length === 0 ? <p className="empty-state">{t('noMoves')}</p> : <ol>{[...game.history].reverse().map((entry) => { const player = game.players.find((candidate) => candidate.id === entry.playerId); return <li key={entry.id}><span>{player?.name} <strong className={entry.delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(entry.delta)}</strong></span><span className="history-actions"><button type="button" className="secondary-button" onClick={() => beginEdit(entry.id, entry.delta)}>{t('edit')}</button><button type="button" className="secondary-button" onClick={() => dispatch({ type: 'DELETE_HISTORY_ENTRY', entryId: entry.id })} aria-label={t('removeHistoryEntry')}>{t('delete')}</button></span>{editingEntry === entry.id && <span className="history-editor"><input autoFocus type="number" value={draftDelta} onChange={(event) => setDraftDelta(event.target.value)} aria-label={t('editHistoryDelta')}/><button type="button" className="secondary-button" onClick={saveEdit}>{t('save')}</button><button type="button" className="secondary-button" onClick={() => setEditingEntry(null)}>{t('cancel')}</button></span>}</li> })}</ol>}</section>
   return <main className={fullscreen ? 'app-shell fullscreen' : 'app-shell'}>
-    <header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{game.name || 'KeepScore'}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={undo} disabled={!past.length}>Undo</button><button className="secondary-button" type="button" onClick={redo} disabled={!future.length}>Redo</button><button className="secondary-button" type="button" onClick={onSavedGames}>Saved games</button><button className="secondary-button" type="button" onClick={onNewGame}>New game</button></div></header>
-    <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label="Open menu">☰</button>
+    <header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{game.name || t('appName')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={undo} disabled={!past.length}>{t('undo')}</button><button className="secondary-button" type="button" onClick={redo} disabled={!future.length}>{t('redo')}</button><button className="secondary-button" type="button" onClick={onSavedGames}>{t('savedGames')}</button><button className="secondary-button" type="button" onClick={onNewGame}>{t('newGame')}</button></div></header>
+    <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label={t('menu')}>☰</button>
     {menuOpen && (
       <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
-        <nav className="menu-drawer" aria-label="Main menu" onClick={(event) => event.stopPropagation()}>
-          <button className="menu-item menu-close" type="button" onClick={() => setMenuOpen(false)}>✕ Close</button>
-          <button className="menu-item" type="button" onClick={() => { setFullscreen((current) => !current); setMenuOpen(false) }}>{fullscreen ? '⤢ Exit fullscreen' : '⤢ Fullscreen'}</button>
-          <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 History</button>
-          <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ Undo</button>
-          <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ Redo</button>
-          <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 Saved games</button>
-          <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>➕ New game</button>
+        <nav className="menu-drawer" aria-label={t('menu')} onClick={(event) => event.stopPropagation()}>
+          <button className="menu-item menu-close" type="button" onClick={() => setMenuOpen(false)}>{t('closeMenu')}</button>
+          <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 {t('history')}</button>
+          <button className="menu-item" type="button" onClick={() => { setFullscreen((current) => !current); setMenuOpen(false) }}>{fullscreen ? t('exitFullscreen') : t('fullscreen')}</button>
+          <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
+          <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
+          <button className="menu-item" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
+          <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
+          <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label="Players">{game.players.map((player, index) => <PlayerCard key={player.id} player={player} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label="Toggle flipped score for the top player">⇅</button>}</section>
-    {!fullscreen && historyContent}
-    {fullscreen && historyOpen && (
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{game.players.map((player, index) => <PlayerCard key={player.id} player={player} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>⇅</button>}</section>
+    {historyOpen && (
       <div className="drawer-backdrop" onClick={() => setHistoryOpen(false)}>
-        <div className="history-drawer" role="dialog" aria-label="Score history" onClick={(event) => event.stopPropagation()}>{historyContent}</div>
+        <div className="history-drawer" role="dialog" aria-label={t('history')} onClick={(event) => event.stopPropagation()}>{historyContent}</div>
       </div>
     )}
   </main>
 }
 
-export function App() {
-  const [screen, setScreen] = useState<Screen>('game')
-  const [game, setGame] = useState<Game | undefined>(() => localGameRepository.list()[0])
+function SavedScreen({ onBack }: { onBack: () => void }) {
+  const { t, lang, setLang } = useI18n()
   const [games, setGames] = useState<Game[]>(() => localGameRepository.list())
   const [portabilityError, setPortabilityError] = useState('')
   const importInput = useRef<HTMLInputElement>(null)
-
-  useEffect(() => { if (screen === 'saved') setGames(localGameRepository.list()) }, [screen, game])
-
   const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ''
@@ -125,14 +136,19 @@ export function App() {
       const imported = importGames(await file.text())
       imported.forEach((item) => localGameRepository.save(item))
       setGames(localGameRepository.list())
-      setGame(imported[0] ?? game)
       setPortabilityError('')
     } catch (error) {
       setPortabilityError(error instanceof Error ? error.message : 'Unable to import this file.')
     }
   }
+  return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><button className="secondary-button" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onBack} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
+}
 
-  if (screen === 'saved') return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>Saved games</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>Export</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>Import</button><button className="secondary-button" type="button" onClick={() => setScreen('game')}>Back</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={(selected) => { setGame(selected); setScreen('game') }} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
+export function App() {
+  const [screen, setScreen] = useState<Screen>('game')
+  const [game, setGame] = useState<Game | undefined>(() => localGameRepository.list()[0])
+
+  if (screen === 'saved') return <SavedScreen onBack={() => setScreen('game')} />
   if (!game) return <GameSetup onCreate={setGame} />
-  return <GameScreen initialGame={game} onNewGame={() => setGame(undefined)} onSavedGames={() => setScreen('saved')} />
+  return <GameScreen key={game.id} initialGame={game} onNewGame={() => setGame(undefined)} onSavedGames={() => setScreen('saved')} />
 }

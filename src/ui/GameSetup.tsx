@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { createGame } from '../domain/game/gameFactory'
 import { PLAYER_COLORS, colorForIndex } from '../domain/game/colors'
 import type { Game } from '../domain/game/types'
+import { useI18n } from './i18n'
 
 type Props = { onCreate: (game: Game) => void }
 
 export function GameSetup({ onCreate }: Props) {
+  const { t, lang, setLang } = useI18n()
   const [names, setNames] = useState(['Alice', 'Bob'])
   const [colors, setColors] = useState<string[]>(() => names.map((_, index) => colorForIndex(index)))
   const [gameName, setGameName] = useState('')
@@ -39,26 +41,26 @@ export function GameSetup({ onCreate }: Props) {
       <div className="setup-card">
         <header className="setup-header">
           <p className="eyebrow">KEEP SCORE</p>
-          <h1>New game</h1>
-          <p className="muted">Set up your players, then let the score battle begin.</p>
+          <h1>{t('newGame')}</h1>
+          <p className="muted">{t('setupTagline')}</p>
         </header>
         <section className="setup-section">
-          <label className="field-label" htmlFor="game-name"><span>Game name</span><span className="optional">Optional</span></label>
+          <label className="field-label" htmlFor="game-name"><span>{t('gameName')}</span><span className="optional">{t('optional')}</span></label>
           <input id="game-name" className="setup-input" value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder="Friday night" />
         </section>
         <section className="setup-section">
-          <label className="field-label" htmlFor="starting-score"><span>Starting score</span><span className="optional">Default 0</span></label>
+          <label className="field-label" htmlFor="starting-score"><span>{t('startingScore')}</span><span className="optional">{t('startingScoreHint')}</span></label>
           <input id="starting-score" className="setup-input" type="number" inputMode="numeric" value={startingScore} onChange={(event) => setStartingScore(event.target.value)} placeholder="0" />
         </section>
         <section className="setup-section">
-          <div className="section-heading"><div><p className="field-kicker">PLAYERS</p><h2>Who's playing?</h2></div><span className="player-count">{names.length}</span></div>
+          <div className="section-heading"><div><p className="field-kicker">{t('players')}</p><h2>{t('whoIsPlaying')}</h2></div><span className="player-count">{names.length}</span></div>
           <div className="player-list">
             {names.map((name, index) => (
               <div className="player-editor" key={index}>
                 <span className="player-number">{index + 1}</span>
-                <input value={name} onChange={(event) => updateName(index, event.target.value)} aria-label={'Player ' + (index + 1) + ' name'} />
-                <button className="icon-button" type="button" onClick={() => removePlayer(index)} disabled={names.length <= 1} aria-label={'Remove player ' + (index + 1)}>×</button>
-                <div className="color-row" role="radiogroup" aria-label={'Color for player ' + (index + 1)}>
+                <input value={name} onChange={(event) => updateName(index, event.target.value)} aria-label={`${t('playerNumber')} ${index + 1} ${t('playerName')}`} />
+                <button className="icon-button" type="button" onClick={() => removePlayer(index)} disabled={names.length <= 1} aria-label={`${t('removePlayer')} ${index + 1}`}>×</button>
+                <div className="color-row" role="radiogroup" aria-label={`${t('colorForPlayer')} ${index + 1}`}>
                   {PLAYER_COLORS.map((color) => (
                     <button
                       key={color}
@@ -68,16 +70,17 @@ export function GameSetup({ onCreate }: Props) {
                       className={colors[index] === color ? 'color-dot selected' : 'color-dot'}
                       style={{ background: color }}
                       onClick={() => setColor(index, color)}
-                      aria-label={'Set color ' + color + ' for player ' + (index + 1)}
+                      aria-label={`${t('setPlayerColor')} ${color} ${t('playerNumber')} ${index + 1}`}
                     />
                   ))}
                 </div>
               </div>
             ))}
           </div>
-          <button className="add-player-button" type="button" onClick={addPlayer}>+ Add player</button>
+          <button className="add-player-button" type="button" onClick={addPlayer}>{t('addPlayer')}</button>
         </section>
-        <button className="primary-button" type="button" onClick={startGame}>Start game <span>→</span></button>
+        <button className="primary-button" type="button" onClick={startGame}>{t('startGame')} <span>→</span></button>
+        <button className="lang-toggle" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
       </div>
     </main>
   )

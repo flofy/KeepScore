@@ -52,6 +52,12 @@ h2 { letter-spacing: -.025em; }
 .score-popup button:nth-child(3), .score-popup button:nth-child(4) { background: linear-gradient(135deg, #2563eb, #7c3aed); }
 .score-popup button:hover { filter: brightness(1.15); }
 .score-popup button:active { transform: scale(.95); }
+
+.player-deltas { position: absolute; top: 14px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; font-weight: 800; line-height: 1.2; pointer-events: none; }
+.delta-plus { color: #4ade80; }
+.delta-minus { color: #f87171; }
+.lang-toggle { width: 100%; min-height: 44px; margin-top: 14px; border: 1px solid rgb(148 163 184 / 25%); border-radius: 12px; background: transparent; color: #94a3b8; font-weight: 700; cursor: pointer; }
+.lang-toggle:hover { background: rgb(255 255 255 / 6%); color: #e2e8f0; }
 .score-popup.positive, .score-popup.negative { grid-template-columns: 1fr 1fr; }
 .score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
 
