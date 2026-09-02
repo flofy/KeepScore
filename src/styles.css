@@ -46,23 +46,24 @@ h2 { letter-spacing: -.025em; }
 .rotate-toggle { left: calc(50% + 64px); }
 .score-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .score-actions button { min-height: 78px; border: 1px solid rgb(255 255 255 / 8%); border-radius: 20px; background: rgb(255 255 255 / 7%); color: #f8fafc; font-size: 38px; font-weight: 700; cursor: pointer; transition: transform .08s ease, background .15s ease; }
+.score-actions button:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .score-actions button:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
-.score-actions button:hover { background: rgb(255 255 255 / 13%); }
-.score-actions button:last-child:hover { background: linear-gradient(135deg, #3b82f6, #8b5cf6); }
+.score-actions button:hover { filter: brightness(1.15); }
 .score-actions button:active { transform: scale(.96); }
 
 .score-popup { position: absolute; inset: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; place-items: center; gap: 14px; padding: 24px; border-radius: 28px; background: rgb(2 6 23 / 86%); backdrop-filter: blur(10px); animation: popup-in .14s ease; }
 .score-popup button { min-width: 86px; min-height: 66px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 26px; font-weight: 800; cursor: pointer; }
-.score-popup button:nth-child(3), .score-popup button:nth-child(4) { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.score-popup .delta-neg { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+.score-popup .delta-pos { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(100 116 139 / 30%); color: #cbd5e1; font-size: 17px; font-weight: 700; }
 .score-popup button:hover { filter: brightness(1.15); }
 .score-popup button:active { transform: scale(.95); }
 
 .score-popup.score-editor { place-items: stretch; gap: 12px; }
 .score-popup.score-editor input { grid-column: 1 / -1; width: 100%; min-height: 72px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
-.score-popup.score-editor button { width: 100%; min-width: 0; min-height: 56px; font-size: 20px; background: rgb(255 255 255 / 8%); }
-.score-popup.score-editor button:nth-child(n) { background: rgb(255 255 255 / 8%); }
-.score-popup.score-editor button:last-child { background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
-.score-popup.score-editor .score-cancel { grid-column: auto; }
+.score-popup.score-editor button { width: 100%; min-width: 0; min-height: 56px; font-size: 20px; background: rgb(100 116 139 / 30%); }
+.score-popup.score-editor .editor-save { background: linear-gradient(135deg, #1d4ed8, #3b82f6); font-weight: 800; }
+.score-popup.score-editor .score-cancel { grid-column: auto; background: rgb(100 116 139 / 30%); color: #cbd5e1; }
 .score-popup.score-editor button:hover { filter: brightness(1.15); }
 
 .player-deltas { position: absolute; top: 14px; right: 12px; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; font-size: 12px; font-weight: 800; line-height: 1.2; pointer-events: none; }

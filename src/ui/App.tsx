@@ -97,16 +97,16 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       {scoreEditOpen && (
         <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
           <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />
-          <button type="button" onClick={saveScore}>{t('save')}</button>
+          <button type="button" className="editor-save" onClick={saveScore}>{t('save')}</button>
           <button type="button" className="score-cancel" onClick={() => setScoreEditOpen(false)}>{t('cancel')}</button>
         </div>
       )}
       {quickOpen && (
         <div className={popupClass} role="menu" aria-label={`${t('quickScoreChange')} ${player.name}`}>
-          {showNegative && <button type="button" role="menuitem" onClick={() => quick(-10)}>−10</button>}
-          {showNegative && <button type="button" role="menuitem" onClick={() => quick(-5)}>−5</button>}
-          {showPositive && <button type="button" role="menuitem" onClick={() => quick(5)}>+5</button>}
-          {showPositive && <button type="button" role="menuitem" onClick={() => quick(10)}>+10</button>}
+          {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-10)}>−10</button>}
+          {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-5)}>−5</button>}
+          {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(5)}>+5</button>}
+          {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(10)}>+10</button>}
           <button type="button" className="score-cancel" role="menuitem" onClick={closeQuick}>{t('cancel')}</button>
         </div>
       )}
