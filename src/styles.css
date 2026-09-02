@@ -34,7 +34,8 @@ h2 { letter-spacing: -.025em; }
 .score-value { width: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; }
 .score-value:hover { opacity: .85; }
 .score-editor input { grid-column: 1 / -1; min-height: 64px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
-.score-editor button { min-height: 56px; font-size: 20px; }
+.score-editor button { min-height: 56px; min-width: 0; font-size: 20px; }
+.score-editor .score-cancel { grid-column: auto; margin: 0; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
 .players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: center; }
