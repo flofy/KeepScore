@@ -12,7 +12,7 @@
 
 ## Domain rules
 
-- A game must contain at least two players.
+- A game must contain at least one player.
 - Blank player names fall back to `Player N` when creating a game.
 - Blank names are ignored when renaming an existing player.
 - Every non-zero score change creates a history entry.

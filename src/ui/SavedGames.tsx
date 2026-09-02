@@ -4,16 +4,11 @@ interface SavedGamesProps {
   games: Game[]
   onResume: (game: Game) => void
   onDelete: (id: string) => void
-  onNewGame: () => void
 }
 
-export function SavedGames({ games, onResume, onDelete, onNewGame }: SavedGamesProps) {
+export function SavedGames({ games, onResume, onDelete }: SavedGamesProps) {
   return (
-    <main className="app-shell">
-      <header className="app-header">
-        <div><p className="eyebrow">KEEP SCORE</p><h1>Saved games</h1></div>
-        <button className="secondary-button" type="button" onClick={onNewGame}>New game</button>
-      </header>
+    <>
       {games.length === 0 ? (
         <section className="history"><p className="empty-state">No saved games yet.</p></section>
       ) : (
@@ -32,6 +27,6 @@ export function SavedGames({ games, onResume, onDelete, onNewGame }: SavedGamesP
           ))}
         </section>
       )}
-    </main>
+    </>
   )
 }
