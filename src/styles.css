@@ -33,8 +33,9 @@ h2 { letter-spacing: -.025em; }
 .player-card > strong, .player-card > .score-value { display: block; margin: 30px 0; color: #fff; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; text-shadow: 0 8px 30px color-mix(in srgb, var(--player-color, #38bdf8) 40%, transparent); }
 .score-value { width: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; }
 .score-value:hover { opacity: .85; }
-.score-editor input { grid-column: 1 / -1; min-height: 64px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
-.score-editor button { min-height: 56px; min-width: 0; font-size: 20px; }
+.score-editor { place-items: stretch; }
+.score-editor input { grid-column: 1 / -1; width: 100%; min-height: 64px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
+.score-editor button { width: 100%; min-height: 56px; min-width: 0; font-size: 20px; }
 .score-editor .score-cancel { grid-column: auto; margin: 0; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
