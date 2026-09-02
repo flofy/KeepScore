@@ -30,7 +30,11 @@ h2 { letter-spacing: -.025em; }
 .player-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--player-color, linear-gradient(90deg, #38bdf8, #818cf8, #c084fc)); opacity: .9; }
 .player-name { width: 100%; border: 0; border-bottom: 1px solid transparent; padding: 6px 4px; background: transparent; color: #f8fafc; text-align: center; font-weight: 700; font-size: 18px; outline-offset: 4px; }
 .player-name:focus { border-bottom-color: var(--player-color, #7dd3fc); }
-.player-card > strong { display: block; margin: 30px 0; color: #fff; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; text-shadow: 0 8px 30px color-mix(in srgb, var(--player-color, #38bdf8) 40%, transparent); }
+.player-card > strong, .player-card > .score-value { display: block; margin: 30px 0; color: #fff; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; text-shadow: 0 8px 30px color-mix(in srgb, var(--player-color, #38bdf8) 40%, transparent); }
+.score-value { width: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; }
+.score-value:hover { opacity: .85; }
+.score-editor input { grid-column: 1 / -1; min-height: 64px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
+.score-editor button { min-height: 56px; font-size: 20px; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
 .players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: center; }

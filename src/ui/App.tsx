@@ -27,14 +27,18 @@ type PlayerCardProps = {
   onRename: (name: string) => void
   onDelta: (delta: number) => void
   onQuickDelta: (delta: number) => void
+  onSetScore: (value: number) => void
 }
 
-function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta }: PlayerCardProps) {
+function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta, onSetScore }: PlayerCardProps) {
   const { t } = useI18n()
   const longPressTimer = useRef<number | null>(null)
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null)
+  const longPressFired = useRef(false)
   const [quickOpen, setQuickOpen] = useState(false)
   const [forcedSign, setForcedSign] = useState<'positive' | 'negative' | undefined>(undefined)
+  const [scoreEditOpen, setScoreEditOpen] = useState(false)
+  const [scoreDraft, setScoreDraft] = useState(String(player.score))
   const clearLongPress = () => { if (longPressTimer.current !== null) { clearTimeout(longPressTimer.current); longPressTimer.current = null } longPressOrigin.current = null }
   const startLongPress = (event: ReactPointerEvent<HTMLElement>, sign?: 'positive' | 'negative') => {
     event.stopPropagation()
@@ -47,6 +51,14 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   }
   const quick = (delta: number) => { onQuickDelta(delta); setQuickOpen(false); setForcedSign(undefined) }
   const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined) }
+  const openScoreEditor = () => { setScoreDraft(String(player.score)); setScoreEditOpen(true) }
+  const saveScore = () => { const value = Number(scoreDraft); if (Number.isFinite(value)) onSetScore(Math.trunc(value)); setScoreEditOpen(false) }
+  const startScoreLongPress = (event: ReactPointerEvent<HTMLElement>) => {
+    event.stopPropagation()
+    longPressOrigin.current = { x: event.clientX, y: event.clientY }
+    longPressTimer.current = window.setTimeout(() => { longPressFired.current = true; openScoreEditor(); haptic() }, 500)
+  }
+  const onScoreClick = () => { if (longPressFired.current) { longPressFired.current = false; return } openScoreEditor() }
   const effectiveSign = forcedSign ?? (lastDelta === undefined ? undefined : lastDelta > 0 ? 'positive' : 'negative')
   const showPositive = effectiveSign === undefined || effectiveSign === 'positive'
   const showNegative = effectiveSign === undefined || effectiveSign === 'negative'
@@ -63,7 +75,16 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
-      <strong>{player.score}</strong>
+      <button
+        type="button"
+        className="score-value"
+        onPointerDown={startScoreLongPress}
+        onPointerMove={moveLongPress}
+        onPointerUp={clearLongPress}
+        onPointerCancel={clearLongPress}
+        onClick={onScoreClick}
+        aria-label={`${t('setScore')} — ${player.name}`}
+      >{player.score}</button>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
           {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
@@ -73,6 +94,13 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
         <button type="button" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
         <button type="button" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
       </div>
+      {scoreEditOpen && (
+        <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
+          <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />
+          <button type="button" onClick={saveScore}>{t('save')}</button>
+          <button type="button" className="score-cancel" onClick={() => setScoreEditOpen(false)}>{t('cancel')}</button>
+        </div>
+      )}
       {quickOpen && (
         <div className={popupClass} role="menu" aria-label={`${t('quickScoreChange')} ${player.name}`}>
           {showNegative && <button type="button" role="menuitem" onClick={() => quick(-10)}>−10</button>}
@@ -122,7 +150,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="duo-fab swap-toggle" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}{isDuo && <button className="duo-fab rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}</section>
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} />)}{isDuo && <button className="duo-fab swap-toggle" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}{isDuo && <button className="duo-fab rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}</section>
     {historyOpen && (
       <div className="drawer-backdrop" onClick={() => setHistoryOpen(false)}>
         <div className="history-drawer" role="dialog" aria-label={t('history')} onClick={(event) => event.stopPropagation()}>{historyContent}</div>
