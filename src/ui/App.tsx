@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ChangeEvent, CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import type { Game, Player } from '../domain/game/types'
+import { colorForIndex } from '../domain/game/colors'
 import { GameSetup } from './GameSetup'
 import { SavedGames } from './SavedGames'
 import { localGameRepository } from '../infrastructure/persistence/gameRepository'
@@ -118,7 +119,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{game.players.map((player, index) => <PlayerCard key={player.id} player={player} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>⇅</button>}</section>
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{game.players.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(index) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>⇅</button>}</section>
     {historyOpen && (
       <div className="drawer-backdrop" onClick={() => setHistoryOpen(false)}>
         <div className="history-drawer" role="dialog" aria-label={t('history')} onClick={(event) => event.stopPropagation()}>{historyContent}</div>
