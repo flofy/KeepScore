@@ -37,9 +37,11 @@ h2 { letter-spacing: -.025em; }
 .players.duo .player-card.flipped { transform: rotate(180deg); }
 .players.duo .player-card > strong { margin: 20px 0; font-size: clamp(96px, 26vw, 200px); }
 .players.duo .score-actions button { min-height: 64px; font-size: 30px; }
-.rotate-toggle { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
-.rotate-toggle:hover { background: rgb(30 41 59 / 96%); }
-.rotate-toggle:active { transform: translate(-50%, -50%) scale(.92); }
+.duo-fab { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
+.duo-fab:hover { background: rgb(30 41 59 / 96%); }
+.duo-fab:active { transform: translate(-50%, -50%) scale(.92); }
+.swap-toggle { left: 50%; }
+.rotate-toggle { left: calc(50% + 64px); }
 .score-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .score-actions button { min-height: 78px; border: 1px solid rgb(255 255 255 / 8%); border-radius: 20px; background: rgb(255 255 255 / 7%); color: #f8fafc; font-size: 38px; font-weight: 700; cursor: pointer; transition: transform .08s ease, background .15s ease; }
 .score-actions button:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }

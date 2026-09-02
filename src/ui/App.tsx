@@ -92,10 +92,12 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [topFlipped, setTopFlipped] = useState(true)
+  const [swapped, setSwapped] = useState(false)
   const [fullscreen, setFullscreen] = useState(() => localStorage.getItem('keepscore-fullscreen') === '1')
   const [menuOpen, setMenuOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
   const isDuo = game.players.length === 2
+  const orderedPlayers = isDuo && swapped ? [game.players[1], game.players[0]] : game.players
   useEffect(() => { localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0') }, [fullscreen])
   const beginEdit = (id: string, delta: number) => { setEditingEntry(id); setDraftDelta(String(delta)) }
   const saveEdit = () => { if (!editingEntry) return; const delta = Number(draftDelta); if (Number.isFinite(delta) && delta !== 0) dispatch({ type: 'EDIT_HISTORY_ENTRY', entryId: editingEntry, delta }); setEditingEntry(null) }
@@ -119,7 +121,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{game.players.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(index) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>⇅</button>}</section>
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} />)}{isDuo && <button className="duo-fab swap-toggle" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}{isDuo && <button className="duo-fab rotate-toggle" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}</section>
     {historyOpen && (
       <div className="drawer-backdrop" onClick={() => setHistoryOpen(false)}>
         <div className="history-drawer" role="dialog" aria-label={t('history')} onClick={(event) => event.stopPropagation()}>{historyContent}</div>
