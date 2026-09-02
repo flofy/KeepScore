@@ -66,7 +66,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   return (
     <article
       className={flipped ? 'player-card flipped' : 'player-card'}
-      style={{ '--player-color': player.color ?? '#38bdf8' } as CSSProperties}
+      style={{ '--player-color': player.color ?? '#38bdf8', '--digits': String(Math.abs(player.score)).length } as CSSProperties}
       onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}

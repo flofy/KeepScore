@@ -32,7 +32,7 @@ h2 { letter-spacing: -.025em; }
 .player-name:focus { border-bottom-color: var(--player-color, #7dd3fc); }
 .player-card > strong, .player-card > .score-value { display: block; margin: 30px 0; color: #fff; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; text-shadow: 0 8px 30px color-mix(in srgb, var(--player-color, #38bdf8) 40%, transparent); }
 .score-value { width: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; }
-.score-row .score-value { margin: 0; font-size: clamp(64px, 15vw, 110px); }
+.score-row .score-value { margin: 0; font-size: clamp(34px, min(110px, calc(110cqw / var(--digits, 3))), 110px); text-align: center; }
 .score-value:hover { opacity: .85; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
@@ -41,14 +41,14 @@ h2 { letter-spacing: -.025em; }
 .players.duo .player-card > strong { margin: 20px 0; font-size: clamp(96px, 26vw, 200px); }
 .players.duo .player-name { font-size: 34px; }
 .players.duo .inline-step { height: 80px; min-width: 80px; padding: 0 34px; font-size: 44px; }
-.players.duo .player-card .score-value { font-size: clamp(120px, 30vw, 240px); }
+.players.duo .player-card .score-value { font-size: clamp(44px, min(240px, calc(160cqw / var(--digits, 3))), 240px); }
 .players.duo .score-row { gap: 18px; }
 .duo-fab { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
 .duo-fab:hover { background: rgb(30 41 59 / 96%); }
 .duo-fab:active { transform: translate(-50%, -50%) scale(.92); }
 .swap-toggle { left: 50%; }
 .rotate-toggle { left: calc(50% + 64px); }
-.score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; container-type: inline-size; }
 .inline-step { height: 66px; min-width: 66px; padding: 0 28px; border: 0; border-radius: 999px; color: #fff; font-size: 38px; font-weight: 700; cursor: pointer; transition: transform .08s ease, filter .15s ease; }
 .inline-step:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .inline-step:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
