@@ -13,7 +13,7 @@ export function GameSetup({ onCreate }: Props) {
   const [colors, setColors] = useState<string[]>(() => names.map((_, index) => colorForIndex(index)))
   const [gameName, setGameName] = useState('')
   const [startingScore, setStartingScore] = useState('0')
-  const [presetId, setPresetId] = useState('custom')
+  const [presetId, setPresetId] = useState('default')
 
   function updateName(index: number, value: string) {
     setNames((current) => current.map((name, i) => (i === index ? value : name)))
@@ -35,7 +35,7 @@ export function GameSetup({ onCreate }: Props) {
     if (!preset) return
     setPresetId(id)
     setStartingScore(String(preset.startingScore))
-    if (preset.id !== 'custom' && !gameName.trim()) setGameName(preset.name)
+    if (preset.id !== 'default' && !gameName.trim()) setGameName(preset.name)
   }
   function startGame() {
     const parsedStartingScore = Number(startingScore)
@@ -59,7 +59,7 @@ export function GameSetup({ onCreate }: Props) {
         </section>
         <section className="setup-section">
           <label className="field-label" htmlFor="starting-score"><span>{t('startingScore')}</span><span className="optional">{t('startingScoreHint')}</span></label>
-          <input id="starting-score" className="setup-input" type="number" inputMode="numeric" value={startingScore} onChange={(event) => { setStartingScore(event.target.value); setPresetId('custom') }} placeholder="0" />
+          <input id="starting-score" className="setup-input" type="number" inputMode="numeric" value={startingScore} onChange={(event) => { setStartingScore(event.target.value); setPresetId('') }} placeholder="0" />
         </section>
         <section className="setup-section">
           <p className="field-kicker">{t('presets')}</p>

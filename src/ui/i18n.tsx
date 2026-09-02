@@ -12,7 +12,7 @@ export type TranslationKey =
   | 'addPoint' | 'removePoint' | 'quickScoreChange' | 'flippedToggle'
   | 'resume' | 'untitledGame' | 'noSavedGames' | 'export' | 'import' | 'back'
   | 'menu' | 'closeMenu' | 'fullscreen' | 'exitFullscreen' | 'language' | 'newGameMenuItem'
-  | 'swapPlayers'
+  | 'swapPlayers' | 'addPlayerMenuItem'
   | 'install' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
 
@@ -34,7 +34,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     menu: 'Open menu', closeMenu: '✕ Close', fullscreen: '⤢ Fullscreen', exitFullscreen: '⤢ Exit fullscreen',
     language: '🌐 Français', newGameMenuItem: '➕ New game',
     install: 'Install app', importError: 'The selected file is not a valid KeepScore export.', genericImportError: 'Unable to import this file.',
-    swapPlayers: 'Swap player positions',
+    swapPlayers: 'Swap player positions', addPlayerMenuItem: '👤 Add player',
     removeHistoryEntry: 'Remove this entry', editHistoryDelta: 'New score delta', playerNameLabel: 'name',
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
   },
@@ -55,7 +55,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     menu: 'Ouvrir le menu', closeMenu: '✕ Fermer', fullscreen: '⤢ Plein écran', exitFullscreen: '⤢ Quitter le plein écran',
     language: '🌐 English', newGameMenuItem: '➕ Nouvelle partie',
     install: "Installer l'app", importError: "Le fichier sélectionné n'est pas un export KeepScore valide.", genericImportError: "Impossible d'importer ce fichier.",
-    swapPlayers: 'Échanger la position des joueurs',
+    swapPlayers: 'Échanger la position des joueurs', addPlayerMenuItem: '👤 Ajouter un joueur',
     removeHistoryEntry: 'Supprimer cette entrée', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Définir la couleur', playerCardRegion: 'Carte du joueur',
   },

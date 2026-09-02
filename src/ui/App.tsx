@@ -116,6 +116,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
           <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
           <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
           <button className="menu-item" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
+          <button className="menu-item" type="button" onClick={() => { dispatch({ type: 'ADD_PLAYER' }); haptic(); setMenuOpen(false) }}>{t('addPlayerMenuItem')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
         </nav>
