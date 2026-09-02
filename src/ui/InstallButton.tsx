@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useI18n } from './i18n'
 
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>
@@ -19,6 +20,7 @@ function isStandalone() {
 }
 
 export function InstallButton() {
+  const { t } = useI18n()
   const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [standalone, setStandalone] = useState(() => isStandalone())
 
@@ -56,5 +58,5 @@ export function InstallButton() {
     if (choice.outcome === 'accepted') setPrompt(null)
   }
 
-  return <button className="install-button" type="button" onClick={install}>Install app</button>
+  return <button className="install-button" type="button" onClick={install}>{t('install')}</button>
 }

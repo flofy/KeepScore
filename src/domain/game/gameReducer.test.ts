@@ -25,4 +25,20 @@ describe('gameReducer', () => {
     const next = gameReducer(game, { type: 'RENAME_PLAYER', playerId: game.players[0].id, name: 'A' })
     expect(next.players[0].name).toBe('A')
   })
+
+  it('adds a player mid-game with next palette color and zero score', () => {
+    const game = createGame(['Alice', 'Bob'], undefined, 20)
+    const next = gameReducer(game, { type: 'ADD_PLAYER', name: 'Carol' })
+    expect(next.players).toHaveLength(3)
+    expect(next.players[2].name).toBe('Carol')
+    expect(next.players[2].score).toBe(0)
+    expect(next.players[2].color).toBeDefined()
+    expect(game.players).toHaveLength(2)
+  })
+
+  it('falls back to Player N when adding a player without a name', () => {
+    const game = createGame(['Alice', 'Bob'])
+    const next = gameReducer(game, { type: 'ADD_PLAYER' })
+    expect(next.players[2].name).toBe('Player 3')
+  })
 })
