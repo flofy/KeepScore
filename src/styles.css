@@ -39,7 +39,7 @@ h2 { letter-spacing: -.025em; }
 .players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: center; }
 .players.duo .player-card.flipped { transform: rotate(180deg); }
 .players.duo .player-card > strong { margin: 20px 0; font-size: clamp(96px, 26vw, 200px); }
-.players.duo .inline-step { width: 88px; height: 88px; font-size: 48px; }
+.players.duo .inline-step { height: 80px; min-width: 80px; padding: 0 34px; font-size: 44px; }
 .players.duo .player-card .score-value { font-size: clamp(120px, 30vw, 240px); }
 .players.duo .score-row { gap: 18px; }
 .duo-fab { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
@@ -48,7 +48,7 @@ h2 { letter-spacing: -.025em; }
 .swap-toggle { left: 50%; }
 .rotate-toggle { left: calc(50% + 64px); }
 .score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
-.inline-step { width: 72px; height: 72px; border: 0; border-radius: 22px; color: #fff; font-size: 42px; font-weight: 700; cursor: pointer; transition: transform .08s ease, filter .15s ease; }
+.inline-step { height: 66px; min-width: 66px; padding: 0 28px; border: 0; border-radius: 999px; color: #fff; font-size: 38px; font-weight: 700; cursor: pointer; transition: transform .08s ease, filter .15s ease; }
 .inline-step:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .inline-step:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
 .inline-step:hover { filter: brightness(1.15); }
