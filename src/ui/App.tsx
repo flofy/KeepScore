@@ -137,8 +137,8 @@ function SavedScreen({ onBack }: { onBack: () => void }) {
       imported.forEach((item) => localGameRepository.save(item))
       setGames(localGameRepository.list())
       setPortabilityError('')
-    } catch (error) {
-      setPortabilityError(error instanceof Error ? error.message : 'Unable to import this file.')
+    } catch {
+      setPortabilityError(t('importError'))
     }
   }
   return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><button className="secondary-button" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onBack} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>

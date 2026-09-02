@@ -26,7 +26,7 @@ h2 { letter-spacing: -.025em; }
 .secondary-button:disabled { opacity: .38; cursor: default; }
 
 .players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.player-card { position: relative; overflow: hidden; padding: 28px; border: 1px solid rgb(255 255 255 / 10%); border-radius: 28px; background: linear-gradient(145deg, rgb(30 41 72 / 96%), rgb(15 23 42 / 94%)); box-shadow: 0 22px 55px rgb(0 0 0 / 25%); text-align: center; user-select: none; touch-action: pan-y; }
+.player-card { position: relative; overflow: hidden; padding: 28px; border: 1px solid color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%)); border-radius: 28px; background: linear-gradient(150deg, color-mix(in srgb, var(--player-color, #38bdf8) 62%, #101828), color-mix(in srgb, var(--player-color, #38bdf8) 38%, #0a1020)); box-shadow: 0 22px 55px rgb(0 0 0 / 25%), inset 0 0 60px color-mix(in srgb, var(--player-color, #38bdf8) 18%, transparent); text-align: center; user-select: none; touch-action: pan-y; }
 .player-card::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--player-color, linear-gradient(90deg, #38bdf8, #818cf8, #c084fc)); opacity: .9; }
 .player-name { width: 100%; border: 0; border-bottom: 1px solid transparent; padding: 6px 4px; background: transparent; color: #f8fafc; text-align: center; font-weight: 700; font-size: 18px; outline-offset: 4px; }
 .player-name:focus { border-bottom-color: var(--player-color, #7dd3fc); }
@@ -58,6 +58,15 @@ h2 { letter-spacing: -.025em; }
 .delta-minus { color: #f87171; }
 .lang-toggle { width: 100%; min-height: 44px; margin-top: 14px; border: 1px solid rgb(148 163 184 / 25%); border-radius: 12px; background: transparent; color: #94a3b8; font-weight: 700; cursor: pointer; }
 .lang-toggle:hover { background: rgb(255 255 255 / 6%); color: #e2e8f0; }
+
+.preset-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.preset-chip { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 14px 10px; border: 1px solid rgb(255 255 255 / 10%); border-radius: 18px; background: rgb(255 255 255 / 4%); color: #e2e8f0; cursor: pointer; transition: border-color .15s ease, background .15s ease, transform .1s ease; }
+.preset-chip:hover { background: rgb(255 255 255 / 8%); }
+.preset-chip:active { transform: scale(.97); }
+.preset-chip.selected { border-color: #7dd3fc; background: rgb(125 211 252 / 12%); box-shadow: 0 0 0 1px #7dd3fc inset; }
+.preset-emoji { font-size: 26px; line-height: 1; }
+.preset-name { font-size: 14px; font-weight: 800; text-align: center; }
+.preset-score { color: #7dd3fc; font-size: 12px; font-weight: 800; }
 .score-popup.positive, .score-popup.negative { grid-template-columns: 1fr 1fr; }
 .score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
 

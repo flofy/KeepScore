@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { createGame } from '../domain/game/gameFactory'
 import { PLAYER_COLORS, colorForIndex } from '../domain/game/colors'
+import { GAME_PRESETS } from '../domain/game/presets'
 import type { Game } from '../domain/game/types'
 import { useI18n } from './i18n'
 
@@ -12,6 +13,7 @@ export function GameSetup({ onCreate }: Props) {
   const [colors, setColors] = useState<string[]>(() => names.map((_, index) => colorForIndex(index)))
   const [gameName, setGameName] = useState('')
   const [startingScore, setStartingScore] = useState('0')
+  const [presetId, setPresetId] = useState('custom')
 
   function updateName(index: number, value: string) {
     setNames((current) => current.map((name, i) => (i === index ? value : name)))
@@ -27,6 +29,13 @@ export function GameSetup({ onCreate }: Props) {
   }
   function setColor(index: number, color: string) {
     setColors((current) => current.map((current_color, i) => (i === index ? color : current_color)))
+  }
+  function selectPreset(id: string) {
+    const preset = GAME_PRESETS.find((candidate) => candidate.id === id)
+    if (!preset) return
+    setPresetId(id)
+    setStartingScore(String(preset.startingScore))
+    if (preset.id !== 'custom' && !gameName.trim()) setGameName(preset.name)
   }
   function startGame() {
     const parsedStartingScore = Number(startingScore)
@@ -46,11 +55,30 @@ export function GameSetup({ onCreate }: Props) {
         </header>
         <section className="setup-section">
           <label className="field-label" htmlFor="game-name"><span>{t('gameName')}</span><span className="optional">{t('optional')}</span></label>
-          <input id="game-name" className="setup-input" value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder="Friday night" />
+          <input id="game-name" className="setup-input" value={gameName} onChange={(event) => setGameName(event.target.value)} placeholder={t('gameNamePlaceholder')} />
         </section>
         <section className="setup-section">
           <label className="field-label" htmlFor="starting-score"><span>{t('startingScore')}</span><span className="optional">{t('startingScoreHint')}</span></label>
-          <input id="starting-score" className="setup-input" type="number" inputMode="numeric" value={startingScore} onChange={(event) => setStartingScore(event.target.value)} placeholder="0" />
+          <input id="starting-score" className="setup-input" type="number" inputMode="numeric" value={startingScore} onChange={(event) => { setStartingScore(event.target.value); setPresetId('custom') }} placeholder="0" />
+        </section>
+        <section className="setup-section">
+          <p className="field-kicker">{t('presets')}</p>
+          <div className="preset-row" role="radiogroup" aria-label={t('presets')}>
+            {GAME_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                role="radio"
+                aria-checked={presetId === preset.id}
+                className={presetId === preset.id ? 'preset-chip selected' : 'preset-chip'}
+                onClick={() => selectPreset(preset.id)}
+              >
+                <span className="preset-emoji" aria-hidden="true">{preset.emoji}</span>
+                <span className="preset-name">{preset.id === 'custom' ? t('presetCustom') : preset.name}</span>
+                <span className="preset-score">{preset.startingScore}</span>
+              </button>
+            ))}
+          </div>
         </section>
         <section className="setup-section">
           <div className="section-heading"><div><p className="field-kicker">{t('players')}</p><h2>{t('whoIsPlaying')}</h2></div><span className="player-count">{names.length}</span></div>

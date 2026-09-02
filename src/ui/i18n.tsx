@@ -3,7 +3,8 @@ import type { ReactNode } from 'react'
 
 export type Lang = 'en' | 'fr'
 export type TranslationKey =
-  | 'appName' | 'newGame' | 'gameName' | 'optional' | 'startingScore' | 'startingScoreHint'
+  | 'appName' | 'newGame' | 'gameName' | 'gameNamePlaceholder' | 'optional' | 'startingScore' | 'startingScoreHint'
+  | 'presets' | 'presetCustom'
   | 'players' | 'whoIsPlaying' | 'addPlayer' | 'startGame' | 'playerNumber' | 'playerName'
   | 'removePlayer' | 'colorForPlayer' | 'setupTagline'
   | 'undo' | 'redo' | 'savedGames' | 'history' | 'moves' | 'noMoves' | 'movesPlaceholder'
@@ -11,12 +12,14 @@ export type TranslationKey =
   | 'addPoint' | 'removePoint' | 'quickScoreChange' | 'flippedToggle'
   | 'resume' | 'untitledGame' | 'noSavedGames' | 'export' | 'import' | 'back'
   | 'menu' | 'closeMenu' | 'fullscreen' | 'exitFullscreen' | 'language' | 'newGameMenuItem'
+  | 'install' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
-    appName: 'KeepScore', newGame: 'New game', gameName: 'Game name', optional: 'Optional',
+    appName: 'KeepScore', newGame: 'New game', gameName: 'Game name', gameNamePlaceholder: 'Friday night', optional: 'Optional',
     startingScore: 'Starting score', startingScoreHint: 'Default 0',
+    presets: 'PRESETS', presetCustom: 'Custom',
     players: 'PLAYERS', whoIsPlaying: "Who's playing?", addPlayer: '+ Add player', startGame: 'Start game',
     playerNumber: 'Player', playerName: 'name', removePlayer: 'Remove player', colorForPlayer: 'Color for player',
     setupTagline: 'Set up your players, then let the score battle begin.',
@@ -29,12 +32,14 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: 'Export', import: 'Import', back: 'Back',
     menu: 'Open menu', closeMenu: '✕ Close', fullscreen: '⤢ Fullscreen', exitFullscreen: '⤢ Exit fullscreen',
     language: '🌐 Français', newGameMenuItem: '➕ New game',
+    install: 'Install app', importError: 'The selected file is not a valid KeepScore export.', genericImportError: 'Unable to import this file.',
     removeHistoryEntry: 'Remove this entry', editHistoryDelta: 'New score delta', playerNameLabel: 'name',
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
   },
   fr: {
-    appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', optional: 'Facultatif',
+    appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
     startingScore: 'Score de départ', startingScoreHint: 'Défaut : 0',
+    presets: 'PRÉRÉGLAGES', presetCustom: 'Personnalisé',
     players: 'JOUEURS', whoIsPlaying: 'Qui joue ?', addPlayer: '+ Ajouter un joueur', startGame: 'Lancer la partie',
     playerNumber: 'Joueur', playerName: 'nom', removePlayer: 'Retirer le joueur', colorForPlayer: 'Couleur du joueur',
     setupTagline: 'Configurez vos joueurs, puis que la bataille des scores commence.',
@@ -47,6 +52,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: 'Exporter', import: 'Importer', back: 'Retour',
     menu: 'Ouvrir le menu', closeMenu: '✕ Fermer', fullscreen: '⤢ Plein écran', exitFullscreen: '⤢ Quitter le plein écran',
     language: '🌐 English', newGameMenuItem: '➕ Nouvelle partie',
+    install: "Installer l'app", importError: "Le fichier sélectionné n'est pas un export KeepScore valide.", genericImportError: "Impossible d'importer ce fichier.",
     removeHistoryEntry: 'Supprimer cette entrée', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Définir la couleur', playerCardRegion: 'Carte du joueur',
   },
