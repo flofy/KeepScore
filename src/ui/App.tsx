@@ -75,25 +75,25 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
-      <button
-        type="button"
-        className="score-value"
-        onPointerDown={startScoreLongPress}
-        onPointerMove={moveLongPress}
-        onPointerUp={clearLongPress}
-        onPointerCancel={clearLongPress}
-        onClick={onScoreClick}
-        aria-label={`${t('setScore')} — ${player.name}`}
-      >{player.score}</button>
+      <div className="score-row">
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
+        <button
+          type="button"
+          className="score-value"
+          onPointerDown={startScoreLongPress}
+          onPointerMove={moveLongPress}
+          onPointerUp={clearLongPress}
+          onPointerCancel={clearLongPress}
+          onClick={onScoreClick}
+          aria-label={`${t('setScore')} — ${player.name}`}
+        >{player.score}</button>
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
+      </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
           {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
         </div>
       )}
-      <div className="score-actions">
-        <button type="button" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
-        <button type="button" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
-      </div>
       {scoreEditOpen && (
         <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
           <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />

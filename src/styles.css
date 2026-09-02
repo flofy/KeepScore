@@ -32,24 +32,27 @@ h2 { letter-spacing: -.025em; }
 .player-name:focus { border-bottom-color: var(--player-color, #7dd3fc); }
 .player-card > strong, .player-card > .score-value { display: block; margin: 30px 0; color: #fff; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; text-shadow: 0 8px 30px color-mix(in srgb, var(--player-color, #38bdf8) 40%, transparent); }
 .score-value { width: 100%; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; }
+.score-row .score-value { margin: 0; font-size: clamp(64px, 15vw, 110px); }
 .score-value:hover { opacity: .85; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
 .players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: center; }
 .players.duo .player-card.flipped { transform: rotate(180deg); }
 .players.duo .player-card > strong { margin: 20px 0; font-size: clamp(96px, 26vw, 200px); }
-.players.duo .score-actions button { min-height: 64px; font-size: 30px; }
+.players.duo .inline-step { width: 88px; height: 88px; font-size: 48px; }
+.players.duo .player-card .score-value { font-size: clamp(120px, 30vw, 240px); }
+.players.duo .score-row { gap: 18px; }
 .duo-fab { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
 .duo-fab:hover { background: rgb(30 41 59 / 96%); }
 .duo-fab:active { transform: translate(-50%, -50%) scale(.92); }
 .swap-toggle { left: 50%; }
 .rotate-toggle { left: calc(50% + 64px); }
-.score-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.score-actions button { min-height: 78px; border: 1px solid rgb(255 255 255 / 8%); border-radius: 20px; background: rgb(255 255 255 / 7%); color: #f8fafc; font-size: 38px; font-weight: 700; cursor: pointer; transition: transform .08s ease, background .15s ease; }
-.score-actions button:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
-.score-actions button:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
-.score-actions button:hover { filter: brightness(1.15); }
-.score-actions button:active { transform: scale(.96); }
+.score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; }
+.inline-step { width: 72px; height: 72px; border: 0; border-radius: 22px; color: #fff; font-size: 42px; font-weight: 700; cursor: pointer; transition: transform .08s ease, filter .15s ease; }
+.inline-step:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+.inline-step:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.inline-step:hover { filter: brightness(1.15); }
+.inline-step:active { transform: scale(.94); }
 
 .score-popup { position: absolute; inset: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; place-items: center; gap: 14px; padding: 24px; border-radius: 28px; background: rgb(2 6 23 / 86%); backdrop-filter: blur(10px); animation: popup-in .14s ease; }
 .score-popup button { min-width: 86px; min-height: 66px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 26px; font-weight: 800; cursor: pointer; }
