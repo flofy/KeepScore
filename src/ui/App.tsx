@@ -206,7 +206,9 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
           </div>
           <div className="menu-separator" />
           <button className="menu-item" type="button" onClick={() => { dispatch({ type: 'ADD_PLAYER' }); haptic(); setMenuOpen(false) }}>{t('addPlayerMenuItem')}</button>
+          <div className="menu-separator" />
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
+          <div className="menu-separator" />
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
         </nav>
       </div>
