@@ -63,8 +63,9 @@ h2 { letter-spacing: -.025em; }
 .inline-step:active { transform: scale(.94); }
 .step-icon { display: block; width: 1em; height: 1em; }
 
-.quick-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 14px; }
-.quick-step { height: clamp(38px, 8vw, 48px); border: 0; border-radius: 12px; color: #fff; font-size: clamp(15px, 3.6vw, 21px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
+.step-col { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.quick-stack { display: flex; flex-direction: column; gap: 4px; width: 100%; }
+.quick-step { width: 100%; min-height: 28px; border: 0; border-radius: 8px; font-size: clamp(12px, 3vw, 16px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
 .quick-step.neg { background: rgb(239 68 68 / 22%); color: #fecaca; }
 .quick-step.pos { background: rgb(59 130 246 / 22%); color: #bfdbfe; }
 .quick-step:hover { filter: brightness(1.2); }

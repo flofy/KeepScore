@@ -115,7 +115,13 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       )}
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
+        <div className="step-col">
+          <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
+          <div className="quick-stack">
+            <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-3)} aria-label={`${t('removePoint')} 3 — ${player.name}`}>−3</button>
+            <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-2)} aria-label={`${t('removePoint')} 2 — ${player.name}`}>−2</button>
+          </div>
+        </div>
         <button
           type="button"
           ref={scoreValueRef}
@@ -127,13 +133,13 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           onClick={onScoreClick}
           aria-label={`${t('setScore')} — ${player.name}`}
         >{player.score}</button>
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
-      </div>
-      <div className="quick-steps" aria-label={t('quickScoreChange')}>
-        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-3)} aria-label={`${t('removePoint')} 3 — ${player.name}`}>−3</button>
-        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-2)} aria-label={`${t('removePoint')} 2 — ${player.name}`}>−2</button>
-        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(2)} aria-label={`${t('addPoint')} 2 — ${player.name}`}>+2</button>
-        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
+        <div className="step-col">
+          <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
+          <div className="quick-stack">
+            <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(2)} aria-label={`${t('addPoint')} 2 — ${player.name}`}>+2</button>
+            <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
+          </div>
+        </div>
       </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
