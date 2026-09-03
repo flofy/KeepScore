@@ -42,14 +42,15 @@ h2 { letter-spacing: -.025em; }
 .players.duo .player-name { font-size: 34px; }
 .players.duo .inline-step { height: clamp(56px, 13vw, 78px); min-width: clamp(56px, 13vw, 78px); padding: 0 clamp(16px, 4vw, 26px); font-size: clamp(28px, 7vw, 40px); }
 .players.duo .player-card .score-value { font-size: clamp(44px, min(240px, calc(160cqw / var(--digits, 3))), 240px); }
-.players.duo .score-row { gap: 14px; }
-.players.duo .mini-step { height: clamp(48px, 11vw, 66px); min-width: clamp(58px, 13vw, 78px); font-size: clamp(20px, 4.5vw, 30px); }
+.players.duo .score-row { gap: 16px; }
+.players.duo .quick-steps { grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 22px; }
+.players.duo .quick-step { height: clamp(56px, 14vw, 84px); font-size: clamp(24px, 6vw, 40px); border-radius: 20px; }
 .duo-fab { position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 10; width: 52px; height: 52px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 50%; background: rgb(15 23 42 / 92%); color: #e2e8f0; font-size: 22px; font-weight: 800; cursor: pointer; box-shadow: 0 10px 26px rgb(0 0 0 / 40%); transition: background .15s ease, transform .1s ease; }
 .duo-fab:hover { background: rgb(30 41 59 / 96%); }
 .duo-fab:active { transform: translate(-50%, -50%) scale(.92); }
 .swap-toggle { left: 50%; }
 .rotate-toggle { left: calc(50% + 64px); }
-.score-row { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr) auto auto auto; align-items: center; justify-content: center; gap: 8px; container-type: inline-size; }
+.score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; container-type: inline-size; }
 .inline-step { height: clamp(46px, 11vw, 62px); min-width: clamp(46px, 11vw, 62px); padding: 0 clamp(14px, 3.5vw, 22px); border: 0; border-radius: 999px; color: #fff; font-size: clamp(22px, 6vw, 34px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
 .inline-step:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .inline-step:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
@@ -57,11 +58,12 @@ h2 { letter-spacing: -.025em; }
 .inline-step:active { transform: scale(.94); }
 .step-icon { display: block; width: 1em; height: 1em; }
 
-.mini-step { height: clamp(40px, 9vw, 54px); min-width: clamp(44px, 10vw, 62px); padding: 0 10px; border: 0; border-radius: 999px; color: #fff; font-size: clamp(15px, 3.6vw, 22px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
-.mini-step.neg { background: rgb(239 68 68 / 22%); color: #fecaca; }
-.mini-step.pos { background: rgb(59 130 246 / 22%); color: #bfdbfe; }
-.mini-step:hover { filter: brightness(1.2); }
-.mini-step:active { transform: scale(.94); }
+.quick-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+.quick-step { height: clamp(44px, 10vw, 56px); border: 0; border-radius: 14px; color: #fff; font-size: clamp(18px, 4.5vw, 26px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
+.quick-step.neg { background: rgb(239 68 68 / 22%); color: #fecaca; }
+.quick-step.pos { background: rgb(59 130 246 / 22%); color: #bfdbfe; }
+.quick-step:hover { filter: brightness(1.2); }
+.quick-step:active { transform: scale(.95); }
 
 .score-popup { position: absolute; inset: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; place-items: center; gap: 14px; padding: 24px; border-radius: 28px; background: rgb(2 6 23 / 86%); backdrop-filter: blur(10px); animation: popup-in .14s ease; }
 .score-popup button { min-width: 86px; min-height: 66px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 26px; font-weight: 800; cursor: pointer; }
