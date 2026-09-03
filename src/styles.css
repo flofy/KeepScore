@@ -57,8 +57,8 @@ h2 { letter-spacing: -.025em; }
 .players.duo .quick-step { height: clamp(48px, 11vw, 66px); font-size: clamp(20px, 5vw, 32px); border-radius: 16px; }
 .score-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 14px; container-type: inline-size; }
 .inline-step { height: clamp(46px, 11vw, 62px); min-width: clamp(46px, 11vw, 62px); padding: 0 clamp(14px, 3.5vw, 22px); border: 0; border-radius: 999px; color: #fff; font-size: clamp(22px, 6vw, 34px); font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; line-height: 1; transition: transform .08s ease, filter .15s ease; }
-.inline-step:first-child { background: linear-gradient(135deg, #b91c1c, #ef4444); }
-.inline-step:last-child { background: linear-gradient(135deg, #2563eb, #7c3aed); }
+.inline-step.inline-neg { background: linear-gradient(135deg, #b91c1c, #ef4444); }
+.inline-step.inline-pos { background: linear-gradient(135deg, #2563eb, #7c3aed); }
 .inline-step:hover { filter: brightness(1.15); }
 .inline-step:active { transform: scale(.94); }
 .step-icon { display: block; width: 1em; height: 1em; }
