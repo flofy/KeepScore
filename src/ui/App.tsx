@@ -190,6 +190,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const [historyOpen, setHistoryOpen] = useState(false)
   const [historyFlipped, setHistoryFlipped] = useState(false)
   const isDuo = game.players.length === 2
+  const isCrowded = game.players.length >= 4
   const orderedPlayers = isDuo && swapped ? [game.players[1], game.players[0]] : game.players
   useEffect(() => { localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0') }, [fullscreen])
   useEffect(() => { document.body.style.overflow = historyOpen ? 'hidden' : '' }, [historyOpen])
@@ -214,7 +215,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
               <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/></svg>
             </button>
         </div>
-        <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => {
+        <section className={isDuo ? 'players duo' : isCrowded ? 'players crowded' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => {
           const rotation = playerRotations[player.id] ?? 0
           return <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} rotation={rotation} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} onFlip={() => setPlayerRotations((prev) => ({ ...prev, [player.id]: prev[player.id] ? 0 : 180 }))} />
         })}</section>
