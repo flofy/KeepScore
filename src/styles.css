@@ -16,6 +16,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid #7dd3fc; outline-
 .app-header { margin-bottom: 28px; }
 .game-header { align-items: flex-start; }
 .game-header .toolbar { margin-top: 54px; }
+.game-name { width: 100%; margin: 0 0 10px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: #eef2ff; font-size: clamp(32px, 7vw, 52px); font-weight: 800; letter-spacing: -.045em; }
+.game-name:focus { border-bottom-color: #7dd3fc; outline: none; }
+.game-name::placeholder { color: rgb(148 163 184 / 55%); }
 .eyebrow { margin: 0 0 6px; color: #7dd3fc; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 0; letter-spacing: -.045em; font-size: clamp(32px, 7vw, 52px); }
