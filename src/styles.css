@@ -97,6 +97,7 @@ h2 { letter-spacing: -.025em; }
 .score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
 
 .quick-actions { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 30; display: flex; gap: 8px; }
+.quick-actions.duo-fullscreen { top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); }
 .burger-button, .icon-fab { width: 44px; height: 44px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; background: rgb(15 23 42 / 88%); color: #e2e8f0; font-size: 19px; font-weight: 800; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgb(0 0 0 / 35%); transition: background .15s ease, transform .1s ease; display: inline-flex; align-items: center; justify-content: center; }
 .icon-fab[aria-pressed="true"] { border-color: rgb(125 211 252 / 60%); color: #7dd3fc; }
 .burger-button:hover, .icon-fab:hover { background: rgb(30 41 59 / 96%); }
@@ -114,8 +115,8 @@ h2 { letter-spacing: -.025em; }
 .setup-card .lang-switch { justify-content: center; margin-top: 16px; }
 .setup-card .lang-menu { right: auto; left: 50%; transform: translateX(-50%); }
 
-.drawer-backdrop { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-start; justify-content: flex-end; padding: max(14px, env(safe-area-inset-top)) 14px; background: rgb(2 6 23 / 62%); backdrop-filter: blur(4px); animation: popup-in .14s ease; }
-.menu-drawer { width: min(300px, 88vw); display: grid; gap: 8px; padding: 16px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 22px; background: rgb(15 23 42 / 97%); box-shadow: 0 24px 60px rgb(0 0 0 / 45%); }
+.drawer-backdrop { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgb(2 6 23 / 62%); backdrop-filter: blur(4px); animation: popup-in .14s ease; }
+.menu-drawer { width: min(400px, 92vw); display: grid; gap: 10px; padding: 24px; border: 1px solid rgb(255 255 255 / 12%); border-radius: 22px; background: rgb(15 23 42 / 97%); box-shadow: 0 24px 60px rgb(0 0 0 / 45%); }
 .menu-item { min-height: 50px; padding: 0 16px; border: 1px solid rgb(255 255 255 / 8%); border-radius: 14px; background: rgb(255 255 255 / 5%); color: #f1f5f9; text-align: left; font-size: 16px; font-weight: 700; cursor: pointer; transition: background .15s ease; }
 .menu-item:hover:not(:disabled) { background: rgb(255 255 255 / 11%); }
 .menu-item:disabled { opacity: .38; cursor: default; }
