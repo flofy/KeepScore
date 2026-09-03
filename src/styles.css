@@ -14,7 +14,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid #7dd3fc; outline-
 .app-shell { width: min(980px, 100%); min-height: 100dvh; margin: 0 auto; padding: max(28px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom)); }
 .app-header, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .app-header { margin-bottom: 28px; }
-.game-header { padding-top: 54px; }
+.game-header { align-items: flex-start; }
+.game-header .toolbar { margin-top: 54px; }
 .eyebrow { margin: 0 0 6px; color: #7dd3fc; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
 h1, h2, p { margin-top: 0; }
 h1 { margin-bottom: 0; letter-spacing: -.045em; font-size: clamp(32px, 7vw, 52px); }
