@@ -51,9 +51,10 @@ type PlayerCardProps = {
   onDelta: (delta: number) => void
   onQuickDelta: (delta: number) => void
   onSetScore: (value: number) => void
+  onFlip?: () => void
 }
 
-function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta, onSetScore }: PlayerCardProps) {
+function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta, onSetScore, onFlip }: PlayerCardProps) {
   const { t } = useI18n()
   const longPressTimer = useRef<number | null>(null)
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null)
@@ -100,6 +101,11 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       onPointerCancel={clearLongPress}
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
+      {onFlip && (
+        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={flipped} aria-label={t('flipPlayer')}>
+          <svg className="flip-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3l5 5-5 5M21 8H7a4 4 0 00-4 4v0M8 21l-5-5 5-5M3 16h14a4 4 0 004-4v0" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+        </button>
+      )}
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
         <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
@@ -162,8 +168,8 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const { t } = useI18n()
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
-  const [topFlipped, setTopFlipped] = useState(true)
   const [swapped, setSwapped] = useState(false)
+  const [flippedPlayers, setFlippedPlayers] = useState<Set<string>>(() => new Set())
   const [fullscreen, setFullscreen] = useState(() => localStorage.getItem('keepscore-fullscreen') === '1')
   const [menuOpen, setMenuOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -179,7 +185,6 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
     <header className="app-header game-header"><div><p className="eyebrow">SCORE KEEPER</p><input className="game-name" value={game.name ?? ''} placeholder={t('appName')} onChange={(event) => dispatch({ type: 'RENAME_GAME', name: event.target.value })} aria-label={t('gameName')} /></div><div className="toolbar"><InstallButton/></div></header>
     <div className={isDuo && fullscreen ? 'quick-actions duo-fullscreen' : 'quick-actions'}>
       {isDuo && <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}
-      {isDuo && <button className="icon-fab" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}
       <button className="icon-fab" type="button" onClick={() => setFullscreen((current) => !current)} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>
         {fullscreen
           ? <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
@@ -203,7 +208,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} />)}</section>
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={flippedPlayers.has(player.id)} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} onFlip={() => setFlippedPlayers((prev) => { const next = new Set(prev); if (next.has(player.id)) next.delete(player.id); else next.add(player.id); return next })} />)}</section>
     {historyOpen && (
       <div className="history-fullscreen" role="dialog" aria-label={t('history')}>
         <button className="history-close" type="button" onClick={() => setHistoryOpen(false)} aria-label={t('closeHistory')} title={t('closeHistory')}>✕</button>
