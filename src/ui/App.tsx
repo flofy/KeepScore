@@ -204,7 +204,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
     <>
       <main className={fullscreen ? 'app-shell fullscreen' : 'app-shell'}>
         <header className="app-header game-header"><div><p className="eyebrow">SCORE KEEPER</p><input className="game-name" value={game.name ?? ''} placeholder={t('appName')} onChange={(event) => dispatch({ type: 'RENAME_GAME', name: event.target.value })} aria-label={t('gameName')} /></div><div className="toolbar"><InstallButton/></div></header>
-        <div className={fullscreen ? 'quick-actions duo-fullscreen' : 'quick-actions'}>
+        <div className="quick-actions">
           {isDuo && <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}
           <button className="icon-fab" type="button" onClick={() => setFullscreen((current) => !current)} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>
             {fullscreen

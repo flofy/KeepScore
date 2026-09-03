@@ -34,22 +34,22 @@ h2 { letter-spacing: -.025em; }
 .btn-icon { display: inline-block; width: 16px; height: 16px; vertical-align: -2px; margin-right: 6px; }
 
 .players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.players.crowded { gap: 12px; }
-.players.crowded .player-card { min-height: 0; padding: 0; border-radius: 20px; }
+.players.crowded { gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.players.crowded .player-card { min-height: clamp(130px, 22vh, 220px); padding: 0; border-radius: 20px; }
 .players.crowded .card-content { padding: 14px; }
 .players.crowded .player-name { font-size: clamp(16px, 3vw, 22px); }
 .players.crowded .score-row .score-value { font-size: clamp(22px, min(72px, calc(90cqw / var(--digits, 2))), 72px); }
 .players.crowded .inline-step { height: clamp(38px, 8vw, 48px); min-width: clamp(38px, 8vw, 48px); padding: 0 12px; font-size: clamp(16px, 4vw, 22px); }
 .players.crowded .quick-stack, .players.crowded .step-col { gap: 3px; }
 .players.crowded .quick-step { min-height: 18px; font-size: clamp(10px, 2.4vw, 12px); }
-.player-card { position: relative; overflow: hidden; min-height: 200px; border: 1px solid color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%)); border-radius: 28px; background: linear-gradient(150deg, color-mix(in srgb, var(--player-color, #38bdf8) 62%, #101828), color-mix(in srgb, var(--player-color, #38bdf8) 38%, #0a1020)); box-shadow: 0 22px 55px rgb(0 0 0 / 25%), inset 0 0 60px color-mix(in srgb, var(--player-color, #38bdf8) 18%, transparent); user-select: none; touch-action: pan-y; }
-.card-flip-btn { position: absolute; top: 10px; left: 10px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgb(255 255 255 / 6%); color: #cbd5e1; cursor: pointer; backdrop-filter: blur(4px); transition: background .15s ease, color .15s ease; z-index: 3; font-size: 18px; }
+.player-card { position: relative; overflow: hidden; min-height: clamp(180px, 26vh, 300px); border: 1px solid color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%)); border-radius: clamp(16px, 3vw, 28px); background: linear-gradient(150deg, color-mix(in srgb, var(--player-color, #38bdf8) 62%, #101828), color-mix(in srgb, var(--player-color, #38bdf8) 38%, #0a1020)); box-shadow: 0 clamp(10px, 2vw, 22px) clamp(30px, 6vw, 55px) rgb(0 0 0 / 25%), inset 0 0 clamp(30px, 6vw, 60px) color-mix(in srgb, var(--player-color, #38bdf8) 18%, transparent); user-select: none; touch-action: pan-y; }
+.card-flip-btn { position: absolute; top: clamp(6px, 1.5vw, 10px); left: clamp(6px, 1.5vw, 10px); width: clamp(28px, 5vw, 38px); height: clamp(28px, 5vw, 38px); display: flex; align-items: center; justify-content: center; border: 0; border-radius: clamp(7px, 1.5vw, 10px); background: rgb(255 255 255 / 6%); color: #cbd5e1; cursor: pointer; backdrop-filter: blur(4px); transition: background .15s ease, color .15s ease; z-index: 3; font-size: clamp(15px, 3vw, 20px); }
 .card-flip-btn:hover { background: rgb(255 255 255 / 12%); color: #f8fafc; }
 .card-flip-btn[aria-pressed="true"] { background: rgb(125 211 252 / 18%); color: #7dd3fc; }
 
 .player-name { width: 100%; border: 0; border-bottom: 1px solid transparent; padding: 0 4px; background: transparent; color: color-mix(in srgb, var(--player-color, #7dd3fc) 88%, white); text-align: center; font-weight: 800; font-size: clamp(22px, 4vw, 32px); letter-spacing: -.01em; text-shadow: 0 1px 0 rgb(0 0 0 / 35%); outline-offset: 4px; }
 .player-name:focus { border-bottom-color: var(--player-color, #7dd3fc); font-size: clamp(40px, 8vw, 60px); }
-.score-value { width: 100%; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; overflow: visible; white-space: nowrap; text-overflow: clip; display: block; margin: 30px 0; color: #0f172a; font-size: clamp(76px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; }
+.score-value { width: 100%; min-width: 0; border: 0; background: transparent; padding: 0; cursor: pointer; font-family: inherit; font-weight: inherit; overflow: visible; white-space: nowrap; text-overflow: clip; display: block; margin: clamp(12px, 3vh, 30px) 0; color: #0f172a; font-size: clamp(60px, 17vw, 126px); line-height: .82; letter-spacing: -.06em; }
 .score-row .score-value { margin: 0; font-size: clamp(30px, min(100px, calc(115cqw / var(--digits, 3))), 100px); text-align: center; }
 .score-value:hover { opacity: .85; }
 
@@ -123,7 +123,8 @@ h2 { letter-spacing: -.025em; }
 .score-popup.positive, .score-popup.negative { grid-template-columns: 1fr 1fr; }
 
 .quick-actions { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 100; display: flex; gap: 8px; }
-.quick-actions.duo-fullscreen { position: absolute; top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); }
+.app-shell.fullscreen .quick-actions { opacity: .7; }
+.app-shell.fullscreen .quick-actions:hover { opacity: 1; }
 .burger-button, .icon-fab { width: 44px; height: 44px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; background: rgb(15 23 42 / 88%); color: #e2e8f0; font-size: 19px; font-weight: 800; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgb(0 0 0 / 35%); transition: background .15s ease, transform .1s ease; display: inline-flex; align-items: center; justify-content: center; }
 .icon-fab[aria-pressed="true"] { border-color: rgb(125 211 252 / 60%); color: #7dd3fc; }
 .burger-button:hover, .icon-fab:hover { background: rgb(30 41 59 / 96%); }
