@@ -19,6 +19,28 @@ function formatDelta(delta: number): string {
   return delta > 0 ? `+${delta}` : `${delta}`
 }
 
+// Shrinks an element's font-size so its content always fits its available width.
+function useFitText<T extends HTMLElement>(content: unknown) {
+  const ref = useRef<T>(null)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const apply = () => {
+      const avail = el.clientWidth
+      const natural = el.scrollWidth
+      if (natural > avail && avail > 0) {
+        const current = parseFloat(window.getComputedStyle(el).fontSize)
+        el.style.fontSize = `${Math.max(12, current * (avail / natural))}px`
+      }
+    }
+    apply()
+    const observer = new ResizeObserver(apply)
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [content])
+  return ref
+}
+
 type PlayerCardProps = {
   player: Player
   deltas: number[]
@@ -53,6 +75,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined) }
   const openScoreEditor = () => { setScoreDraft(String(player.score)); setScoreEditOpen(true) }
   const saveScore = () => { const value = Number(scoreDraft); if (Number.isFinite(value)) onSetScore(Math.trunc(value)); setScoreEditOpen(false) }
+  const scoreValueRef = useFitText<HTMLButtonElement>(JSON.stringify(player.score))
   const startScoreLongPress = (event: ReactPointerEvent<HTMLElement>) => {
     event.stopPropagation()
     longPressOrigin.current = { x: event.clientX, y: event.clientY }
@@ -76,9 +99,10 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
     >
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><span className="step-glyph">−</span></button>
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
         <button
           type="button"
+          ref={scoreValueRef}
           className="score-value"
           onPointerDown={startScoreLongPress}
           onPointerMove={moveLongPress}
@@ -87,7 +111,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           onClick={onScoreClick}
           aria-label={`${t('setScore')} — ${player.name}`}
         >{player.score}</button>
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><span className="step-glyph">+</span></button>
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
       </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
