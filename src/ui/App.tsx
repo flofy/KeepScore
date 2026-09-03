@@ -175,7 +175,6 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         <nav className="menu-drawer" aria-label={t('menu')} onClick={(event) => event.stopPropagation()}>
           <button className="menu-item menu-close" type="button" onClick={() => setMenuOpen(false)}>{t('closeMenu')}</button>
           <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 {t('history')}</button>
-          <button className="menu-item" type="button" onClick={() => { setFullscreen((current) => !current); setMenuOpen(false) }}>{fullscreen ? t('exitFullscreen') : t('fullscreen')}</button>
           <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
           <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
           <button className="menu-item" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
