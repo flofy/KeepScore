@@ -34,7 +34,7 @@ h2 { letter-spacing: -.025em; }
 .btn-icon { display: inline-block; width: 16px; height: 16px; vertical-align: -2px; margin-right: 6px; }
 
 .players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.player-card { position: relative; overflow: hidden; padding: 28px; border: 1px solid color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%)); border-radius: 28px; background: linear-gradient(150deg, color-mix(in srgb, var(--player-color, #38bdf8) 62%, #101828), color-mix(in srgb, var(--player-color, #38bdf8) 38%, #0a1020)); box-shadow: 0 22px 55px rgb(0 0 0 / 25%), inset 0 0 60px color-mix(in srgb, var(--player-color, #38bdf8) 18%, transparent); text-align: center; user-select: none; touch-action: pan-y; }
+.player-card { position: relative; overflow: hidden; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px; border: 1px solid color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%)); border-radius: 28px; background: linear-gradient(150deg, color-mix(in srgb, var(--player-color, #38bdf8) 62%, #101828), color-mix(in srgb, var(--player-color, #38bdf8) 38%, #0a1020)); box-shadow: 0 22px 55px rgb(0 0 0 / 25%), inset 0 0 60px color-mix(in srgb, var(--player-color, #38bdf8) 18%, transparent); text-align: center; user-select: none; touch-action: pan-y; }
 .card-flip-btn { position: absolute; top: 10px; left: 10px; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; border: 0; border-radius: 10px; background: rgb(255 255 255 / 6%); color: #cbd5e1; cursor: pointer; backdrop-filter: blur(4px); transition: background .15s ease, color .15s ease; z-index: 3; font-size: 18px; }
 .card-flip-btn:hover { background: rgb(255 255 255 / 12%); color: #f8fafc; }
 .card-flip-btn[aria-pressed="true"] { background: rgb(125 211 252 / 18%); color: #7dd3fc; }
@@ -47,7 +47,7 @@ h2 { letter-spacing: -.025em; }
 .score-value:hover { opacity: .85; }
 
 .players.duo { position: relative; grid-template-columns: 1fr; gap: 10px; }
-.players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: center; }
+.players.duo .player-card { min-height: 44dvh; display: flex; flex-direction: column; justify-content: flex-end; }
 .players.duo .player-card.flipped { transform: rotate(180deg); }
 .players.duo .player-card > strong { margin: 20px 0; font-size: clamp(96px, 26vw, 200px); }
 .players.duo .player-name { font-size: 34px; }
