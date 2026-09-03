@@ -113,6 +113,11 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
       {onFlip && (
         <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={rotation > 0} aria-label={t('flipPlayer')}>↻</button>
       )}
+      {deltas.length > 0 && (
+        <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
+          {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
+        </div>
+      )}
       <div className="card-content" style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}>
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
@@ -142,11 +147,6 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
           </div>
         </div>
       </div>
-      {deltas.length > 0 && (
-        <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
-          {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
-        </div>
-      )}
       {scoreEditOpen && (
         <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
           <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />
