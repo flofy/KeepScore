@@ -102,7 +102,7 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
   return (
     <article
       className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
-      style={{ '--player-color': player.color ?? '#38bdf8', '--digits': String(Math.abs(player.score)).length, transform: rotation ? `rotate(${rotation}deg)` : undefined } as CSSProperties}
+      style={{ '--player-color': player.color ?? '#38bdf8', '--digits': String(Math.abs(player.score)).length } as CSSProperties}
       onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}
@@ -111,8 +111,9 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
       {onFlip && (
-        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={rotation > 0} aria-label={t('flipPlayer')}>{rotation ? `↻${rotation}°` : '↻'}</button>
+        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={rotation > 0} aria-label={t('flipPlayer')}>↻</button>
       )}
+      <div className="card-content" style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}>
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
         <div className="step-col">
@@ -172,6 +173,7 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
           </div>
         </div>
       )}
+      </div>
     </article>
   )
 }
