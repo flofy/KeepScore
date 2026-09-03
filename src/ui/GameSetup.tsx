@@ -4,11 +4,12 @@ import { PLAYER_COLORS, colorForIndex } from '../domain/game/colors'
 import { GAME_PRESETS } from '../domain/game/presets'
 import type { Game } from '../domain/game/types'
 import { useI18n } from './i18n'
+import { LangFlags } from './LangFlags'
 
 type Props = { onCreate: (game: Game) => void }
 
 export function GameSetup({ onCreate }: Props) {
-  const { t, lang, setLang } = useI18n()
+  const { t } = useI18n()
   const [names, setNames] = useState(['Alice', 'Bob'])
   const [colors, setColors] = useState<string[]>(() => names.map((_, index) => colorForIndex(index)))
   const [gameName, setGameName] = useState('')
@@ -108,7 +109,7 @@ export function GameSetup({ onCreate }: Props) {
           <button className="add-player-button" type="button" onClick={addPlayer}>{t('addPlayer')}</button>
         </section>
         <button className="primary-button" type="button" onClick={startGame}>{t('startGame')} <span>→</span></button>
-        <button className="lang-toggle" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
+        <LangFlags />
       </div>
     </main>
   )

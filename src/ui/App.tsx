@@ -9,6 +9,7 @@ import { downloadGames, importGames } from '../infrastructure/portability/gamesP
 import { useGameHistory } from './useGameHistory'
 import { InstallButton } from './InstallButton'
 import { I18nProvider, useI18n } from './i18n'
+import { LangFlags } from './LangFlags'
 import './saved-games.css'
 
 function haptic() { if ('vibrate' in navigator) navigator.vibrate(8) }
@@ -146,7 +147,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
 
 function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Game; onNewGame: () => void; onSavedGames: () => void }) {
   const { present: game, past, future, dispatch, undo, redo } = useGameHistory(initialGame)
-  const { t, lang, setLang } = useI18n()
+  const { t } = useI18n()
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [topFlipped, setTopFlipped] = useState(true)
@@ -168,6 +169,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
       {isDuo && <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}
       {isDuo && <button className="icon-fab" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}
       <button className="icon-fab" type="button" onClick={() => setFullscreen((current) => !current)} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>⤢</button>
+      <LangFlags />
       <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label={t('menu')}>☰</button>
     </div>
     {menuOpen && (
@@ -177,7 +179,6 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
           <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 {t('history')}</button>
           <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
           <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
-          <button className="menu-item" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button>
           <button className="menu-item" type="button" onClick={() => { dispatch({ type: 'ADD_PLAYER' }); haptic(); setMenuOpen(false) }}>{t('addPlayerMenuItem')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
@@ -194,7 +195,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
 }
 
 function SavedScreen({ onResume, onBack }: { onResume: (game: Game) => void; onBack: () => void }) {
-  const { t, lang, setLang } = useI18n()
+  const { t } = useI18n()
   const [games, setGames] = useState<Game[]>(() => localGameRepository.list())
   const [portabilityError, setPortabilityError] = useState('')
   const importInput = useRef<HTMLInputElement>(null)
@@ -211,7 +212,7 @@ function SavedScreen({ onResume, onBack }: { onResume: (game: Game) => void; onB
       setPortabilityError(t('importError'))
     }
   }
-  return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><button className="secondary-button" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onResume} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
+  return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><LangFlags /><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onResume} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
 }
 
 export function App() {
