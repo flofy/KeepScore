@@ -163,7 +163,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const lastDeltaFor = (playerId: string) => { for (let i = game.history.length - 1; i >= 0; i -= 1) { if (game.history[i].playerId === playerId) return game.history[i].delta } return undefined }
   const historyContent = <section className="history" aria-label={t('history')}><div className="section-heading"><h2>{t('history')}</h2><span>{game.history.length} {t('moves')}</span></div>{game.history.length === 0 ? <p className="empty-state">{t('noMoves')}</p> : <ol>{[...game.history].reverse().map((entry) => { const player = game.players.find((candidate) => candidate.id === entry.playerId); return <li key={entry.id}><span>{player?.name} <strong className={entry.delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(entry.delta)}</strong></span><span className="history-actions"><button type="button" className="secondary-button" onClick={() => beginEdit(entry.id, entry.delta)}>{t('edit')}</button><button type="button" className="secondary-button" onClick={() => dispatch({ type: 'DELETE_HISTORY_ENTRY', entryId: entry.id })} aria-label={t('removeHistoryEntry')}>{t('delete')}</button></span>{editingEntry === entry.id && <span className="history-editor"><input autoFocus type="number" value={draftDelta} onChange={(event) => setDraftDelta(event.target.value)} aria-label={t('editHistoryDelta')}/><button type="button" className="secondary-button" onClick={saveEdit}>{t('save')}</button><button type="button" className="secondary-button" onClick={() => setEditingEntry(null)}>{t('cancel')}</button></span>}</li> })}</ol>}</section>
   return <main className={fullscreen ? 'app-shell fullscreen' : 'app-shell'}>
-    <header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{game.name || t('appName')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={undo} disabled={!past.length}>{t('undo')}</button><button className="secondary-button" type="button" onClick={redo} disabled={!future.length}>{t('redo')}</button><button className="secondary-button" type="button" onClick={onSavedGames}>{t('savedGames')}</button><button className="secondary-button" type="button" onClick={onNewGame}>{t('newGame')}</button></div></header>
+    <header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{game.name || t('appName')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={onSavedGames}>{t('savedGames')}</button><button className="secondary-button" type="button" onClick={onNewGame}>{t('newGame')}</button></div></header>
     <div className="quick-actions">
       {isDuo && <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}
       {isDuo && <button className="icon-fab" type="button" onClick={() => setTopFlipped((current) => !current)} aria-pressed={topFlipped} aria-label={t('flippedToggle')}>↻</button>}
@@ -193,7 +193,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   </main>
 }
 
-function SavedScreen({ onBack }: { onBack: () => void }) {
+function SavedScreen({ onResume, onBack }: { onResume: (game: Game) => void; onBack: () => void }) {
   const { t, lang, setLang } = useI18n()
   const [games, setGames] = useState<Game[]>(() => localGameRepository.list())
   const [portabilityError, setPortabilityError] = useState('')
@@ -211,14 +211,14 @@ function SavedScreen({ onBack }: { onBack: () => void }) {
       setPortabilityError(t('importError'))
     }
   }
-  return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><button className="secondary-button" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onBack} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
+  return <main className="app-shell"><header className="app-header"><div><p className="eyebrow">SCORE KEEPER</p><h1>{t('savedGames')}</h1></div><div className="toolbar"><InstallButton/><button className="secondary-button" type="button" onClick={() => downloadGames(localGameRepository.list())}>{t('export')}</button><button className="secondary-button" type="button" onClick={() => importInput.current?.click()}>{t('import')}</button><button className="secondary-button" type="button" onClick={() => setLang(lang === 'fr' ? 'en' : 'fr')}>{t('language')}</button><button className="secondary-button" type="button" onClick={onBack}>{t('back')}</button></div></header><input ref={importInput} hidden type="file" accept="application/json,.json" onChange={handleImport}/>{portabilityError && <p role="alert" className="empty-state">{portabilityError}</p>}<SavedGames games={games} onResume={onResume} onDelete={(id) => { localGameRepository.remove(id); setGames(localGameRepository.list()) }} /></main>
 }
 
 export function App() {
   const [screen, setScreen] = useState<Screen>('game')
   const [game, setGame] = useState<Game | undefined>(() => localGameRepository.list()[0])
 
-  if (screen === 'saved') return <SavedScreen onBack={() => setScreen('game')} />
+  if (screen === 'saved') return <SavedScreen onResume={(selected) => { setGame(selected); setScreen('game') }} onBack={() => setScreen('game')} />
   if (!game) return <GameSetup onCreate={setGame} />
   return <GameScreen key={game.id} initialGame={game} onNewGame={() => setGame(undefined)} onSavedGames={() => setScreen('saved')} />
 }
