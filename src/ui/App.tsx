@@ -45,7 +45,7 @@ function useFitText<T extends HTMLElement>(content: unknown) {
 type PlayerCardProps = {
   player: Player
   deltas: number[]
-  flipped?: boolean
+  rotation?: number
   lastDelta?: number
   onRename: (name: string) => void
   onDelta: (delta: number) => void
@@ -54,7 +54,7 @@ type PlayerCardProps = {
   onFlip?: () => void
 }
 
-function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDelta, onQuickDelta, onSetScore, onFlip }: PlayerCardProps) {
+function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta, onQuickDelta, onSetScore, onFlip }: PlayerCardProps) {
   const { t } = useI18n()
   const longPressTimer = useRef<number | null>(null)
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null)
@@ -101,8 +101,8 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   const popupClass = 'score-popup' + (effectiveSign === undefined ? '' : effectiveSign === 'positive' ? ' positive' : ' negative')
   return (
     <article
-      className={flipped ? 'player-card flipped' : 'player-card'}
-      style={{ '--player-color': player.color ?? '#38bdf8', '--digits': String(Math.abs(player.score)).length } as CSSProperties}
+      className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
+      style={{ '--player-color': player.color ?? '#38bdf8', '--digits': String(Math.abs(player.score)).length, transform: rotation ? `rotate(${rotation}deg)` : undefined } as CSSProperties}
       onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}
@@ -111,7 +111,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
       {onFlip && (
-        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={flipped} aria-label={t('flipPlayer')}>↻</button>
+        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={rotation > 0} aria-label={t('flipPlayer')}>{rotation ? `↻${rotation}°` : '↻'}</button>
       )}
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
@@ -182,7 +182,7 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [swapped, setSwapped] = useState(false)
-  const [flippedPlayers, setFlippedPlayers] = useState<Set<string>>(() => new Set())
+  const [playerRotations, setPlayerRotations] = useState<Record<string, number>>({})
   const [fullscreen, setFullscreen] = useState(() => localStorage.getItem('keepscore-fullscreen') === '1')
   const [menuOpen, setMenuOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
@@ -228,7 +228,10 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         </nav>
       </div>
     )}
-    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={flippedPlayers.has(player.id)} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} onFlip={() => setFlippedPlayers((prev) => { const next = new Set(prev); if (next.has(player.id)) next.delete(player.id); else next.add(player.id); return next })} />)}</section>
+    <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => {
+      const rotation = playerRotations[player.id] ?? 0
+      return <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} rotation={rotation} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} onFlip={() => setPlayerRotations((prev) => ({ ...prev, [player.id]: ((prev[player.id] ?? 0) + 90) % 360 }))} />
+    })}</section>
     {historyOpen && (
       <div className="history-fullscreen" role="dialog" aria-label={t('history')}>
         <button className="history-close" type="button" onClick={() => setHistoryOpen(false)} aria-label={t('closeHistory')} title={t('closeHistory')}>✕</button>
