@@ -191,8 +191,9 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
     )}
     <section className={isDuo ? 'players duo' : 'players'} aria-label={t('players')}>{orderedPlayers.map((player, index) => <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} flipped={isDuo && index === 0 && topFlipped} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} />)}</section>
     {historyOpen && (
-      <div className="drawer-backdrop" onClick={() => setHistoryOpen(false)}>
-        <div className="history-drawer" role="dialog" aria-label={t('history')} onClick={(event) => event.stopPropagation()}>{historyContent}</div>
+      <div className="history-fullscreen" role="dialog" aria-label={t('history')}>
+        <button className="history-close" type="button" onClick={() => setHistoryOpen(false)} aria-label={t('closeHistory')} title={t('closeHistory')}>✕</button>
+        {historyContent}
       </div>
     )}
   </main>
