@@ -224,6 +224,6 @@ export function App() {
   const [game, setGame] = useState<Game | undefined>(() => localGameRepository.list()[0])
 
   if (screen === 'saved') return <SavedScreen onResume={(selected) => { setGame(selected); setScreen('game') }} onBack={() => setScreen('game')} />
-  if (!game) return <GameSetup onCreate={setGame} />
+  if (!game) return <GameSetup onCreate={setGame} onBack={localGameRepository.list().length > 0 ? () => setScreen('saved') : undefined} />
   return <GameScreen key={game.id} initialGame={game} onNewGame={() => setGame(undefined)} onSavedGames={() => setScreen('saved')} />
 }
