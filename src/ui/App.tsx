@@ -78,7 +78,16 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined); setCustomDraft('') }
   const openScoreEditor = () => { setScoreDraft(String(player.score)); setScoreEditOpen(true) }
   const saveScore = () => { const value = Number(scoreDraft); if (Number.isFinite(value)) onSetScore(Math.trunc(value)); setScoreEditOpen(false) }
-  const saveCustom = () => { const value = Number(customDraft); if (Number.isFinite(value) && value !== 0) { onQuickDelta(value); setQuickOpen(false); setForcedSign(undefined); setCustomDraft('') } }
+  const saveCustom = () => {
+    let value = Number(customDraft)
+    if (Number.isFinite(value) && value !== 0) {
+      if (effectiveSign === 'negative' && value > 0) value = -value
+      onQuickDelta(value)
+      setQuickOpen(false)
+      setForcedSign(undefined)
+      setCustomDraft('')
+    }
+  }
   const scoreValueRef = useFitText<HTMLButtonElement>(JSON.stringify(player.score))
   const startScoreLongPress = (event: ReactPointerEvent<HTMLElement>) => {
     event.stopPropagation()
@@ -121,10 +130,10 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
         <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
       </div>
       <div className="quick-steps" aria-label={t('quickScoreChange')}>
-        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-10)} aria-label={`${t('removePoint')} 10 — ${player.name}`}>−10</button>
-        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-5)} aria-label={`${t('removePoint')} 5 — ${player.name}`}>−5</button>
-        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(5)} aria-label={`${t('addPoint')} 5 — ${player.name}`}>+5</button>
-        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(10)} aria-label={`${t('addPoint')} 10 — ${player.name}`}>+10</button>
+        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-3)} aria-label={`${t('removePoint')} 3 — ${player.name}`}>−3</button>
+        <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-2)} aria-label={`${t('removePoint')} 2 — ${player.name}`}>−2</button>
+        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(2)} aria-label={`${t('addPoint')} 2 — ${player.name}`}>+2</button>
+        <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
       </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
@@ -143,16 +152,16 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           <button type="button" className="popup-close" onClick={closeQuick} aria-label={t('cancel')}>✕</button>
           <div className="quick-grid">
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-20)}>−20</button>}
-            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-15)}>−15</button>}
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-10)}>−10</button>}
-            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-5)}>−5</button>}
-            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(5)}>+5</button>}
+            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-3)}>−3</button>}
+            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-2)}>−2</button>}
+            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(2)}>+2</button>}
+            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(3)}>+3</button>}
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(10)}>+10</button>}
-            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(15)}>+15</button>}
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(20)}>+20</button>}
           </div>
           <div className="custom-row">
-            <input type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} aria-label={t('newDelta')} placeholder={t('customDelta')} onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(); if (event.key === 'Escape') closeQuick() }} />
+            <input type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} aria-label={t('newDelta')} placeholder={effectiveSign === 'negative' ? '−' : t('customDelta')} onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(); if (event.key === 'Escape') closeQuick() }} />
             <button type="button" className="editor-save" onClick={saveCustom}>{t('save')}</button>
           </div>
         </div>
