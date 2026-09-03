@@ -113,6 +113,12 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
         >{player.score}</button>
         <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none"/></svg></button>
       </div>
+      <div className="quick-steps" aria-label={t('quickScoreChange')}>
+        <button type="button" className="quick-step neg" onClick={() => onQuickDelta(-10)}>−10</button>
+        <button type="button" className="quick-step neg" onClick={() => onQuickDelta(-5)}>−5</button>
+        <button type="button" className="quick-step pos" onClick={() => onQuickDelta(5)}>+5</button>
+        <button type="button" className="quick-step pos" onClick={() => onQuickDelta(10)}>+10</button>
+      </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
           {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
