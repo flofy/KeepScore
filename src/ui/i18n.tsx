@@ -15,7 +15,7 @@ export type TranslationKey =
   | 'swapPlayers' | 'addPlayerMenuItem' | 'setScore'
   | 'install' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
-  | 'closeHistory'
+  | 'closeHistory' | 'flipHistory'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -39,6 +39,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     removeHistoryEntry: 'Remove this entry', editHistoryDelta: 'New score delta', playerNameLabel: 'name',
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
     closeHistory: 'Close history',
+    flipHistory: 'Flip history',
   },
   fr: {
     appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
@@ -61,6 +62,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     removeHistoryEntry: 'Supprimer cette entrée', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Définir la couleur', playerCardRegion: 'Carte du joueur',
     closeHistory: 'Fermer l\'historique',
+    flipHistory: 'Retourner l\'historique',
   },
 }
 

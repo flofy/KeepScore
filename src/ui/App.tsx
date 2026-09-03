@@ -141,12 +141,12 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
             <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
           </div>
         </div>
+        {deltas.length > 0 && (
+          <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
+            {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
+          </div>
+        )}
       </div>
-      {deltas.length > 0 && (
-        <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
-          {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
-        </div>
-      )}
       {scoreEditOpen && (
         <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
           <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />
@@ -180,7 +180,7 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
 
 function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Game; onNewGame: () => void; onSavedGames: () => void }) {
   const { present: game, past, future, dispatch, undo, redo } = useGameHistory(initialGame)
-  const { t } = useI18n()
+  const { t, lang, setLang } = useI18n()
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [swapped, setSwapped] = useState(false)
@@ -188,9 +188,11 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
   const [fullscreen, setFullscreen] = useState(() => localStorage.getItem('keepscore-fullscreen') === '1')
   const [menuOpen, setMenuOpen] = useState(false)
   const [historyOpen, setHistoryOpen] = useState(false)
+  const [historyFlipped, setHistoryFlipped] = useState(false)
   const isDuo = game.players.length === 2
   const orderedPlayers = isDuo && swapped ? [game.players[1], game.players[0]] : game.players
   useEffect(() => { localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0') }, [fullscreen])
+  useEffect(() => { document.body.style.overflow = historyOpen ? 'hidden' : '' }, [historyOpen])
   const beginEdit = (id: string, delta: number) => { setEditingEntry(id); setDraftDelta(String(delta)) }
   const saveEdit = () => { if (!editingEntry) return; const delta = Number(draftDelta); if (Number.isFinite(delta) && delta !== 0) dispatch({ type: 'EDIT_HISTORY_ENTRY', entryId: editingEntry, delta }); setEditingEntry(null) }
   const recentDeltasFor = (playerId: string): number[] => game.history.filter((entry) => entry.playerId === playerId).slice(-RECENT_DELTAS).map((entry) => entry.delta).reverse()
@@ -199,14 +201,13 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
             <button type="button" className="secondary-button danger" onClick={() => dispatch({ type: 'DELETE_HISTORY_ENTRY', entryId: entry.id })} aria-label={t('removeHistoryEntry')} title={t('delete')}><svg className="btn-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M9 7V4h6v3M7 7l1 13h8l1-13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg> {t('delete')}</button></span>{editingEntry === entry.id && <span className="history-editor"><input autoFocus type="number" value={draftDelta} onChange={(event) => setDraftDelta(event.target.value)} aria-label={t('editHistoryDelta')}/><button type="button" className="secondary-button" onClick={saveEdit}>{t('save')}</button><button type="button" className="secondary-button" onClick={() => setEditingEntry(null)}>{t('cancel')}</button></span>}</li> })}</ol>}</section>
   return <main className={fullscreen ? 'app-shell fullscreen' : 'app-shell'}>
     <header className="app-header game-header"><div><p className="eyebrow">SCORE KEEPER</p><input className="game-name" value={game.name ?? ''} placeholder={t('appName')} onChange={(event) => dispatch({ type: 'RENAME_GAME', name: event.target.value })} aria-label={t('gameName')} /></div><div className="toolbar"><InstallButton/></div></header>
-    <div className={isDuo && fullscreen ? 'quick-actions duo-fullscreen' : 'quick-actions'}>
+    <div className={fullscreen ? 'quick-actions duo-fullscreen' : 'quick-actions'}>
       {isDuo && <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>}
       <button className="icon-fab" type="button" onClick={() => setFullscreen((current) => !current)} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>
         {fullscreen
           ? <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           : <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
       </button>
-      <LangFlags />
       <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label={t('menu')}>
           <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/></svg>
         </button>
@@ -227,6 +228,19 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
           <div className="menu-separator" />
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
+          <div className="menu-separator" />
+          <div className="menu-row lang-row">
+            <button
+              type="button"
+              className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'}
+              onClick={() => setLang('fr')}
+            >🇫🇷 Français</button>
+            <button
+              type="button"
+              className={lang === 'en' ? 'menu-item lang active' : 'menu-item lang'}
+              onClick={() => setLang('en')}
+            >🇬🇧 English</button>
+          </div>
         </nav>
       </div>
     )}
@@ -235,8 +249,9 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
       return <PlayerCard key={player.id} player={{ ...player, color: player.color ?? colorForIndex(game.players.indexOf(player)) }} deltas={recentDeltasFor(player.id)} rotation={rotation} lastDelta={lastDeltaFor(player.id)} onRename={(name) => dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })} onDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onQuickDelta={(delta) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta }); haptic() }} onSetScore={(value) => { dispatch({ type: 'ADD_SCORE', playerId: player.id, delta: value - player.score }); haptic() }} onFlip={() => setPlayerRotations((prev) => ({ ...prev, [player.id]: prev[player.id] ? 0 : 180 }))} />
     })}</section>
     {historyOpen && (
-      <div className="history-fullscreen" role="dialog" aria-label={t('history')}>
+      <div className={historyFlipped ? 'history-fullscreen flipped' : 'history-fullscreen'} role="dialog" aria-label={t('history')}>
         <button className="history-close" type="button" onClick={() => setHistoryOpen(false)} aria-label={t('closeHistory')} title={t('closeHistory')}>✕</button>
+        <button className="history-flip-btn" type="button" onClick={() => setHistoryFlipped((current) => !current)} aria-pressed={historyFlipped} aria-label={t('flipHistory')} title={t('flipHistory')}>↻</button>
         {historyContent}
       </div>
     )}
