@@ -8,7 +8,7 @@ export type TranslationKey =
   | 'players' | 'whoIsPlaying' | 'addPlayer' | 'startGame' | 'playerNumber' | 'playerName'
   | 'removePlayer' | 'colorForPlayer' | 'setupTagline'
   | 'undo' | 'redo' | 'savedGames' | 'history' | 'moves' | 'noMoves' | 'movesPlaceholder'
-  | 'edit' | 'delete' | 'save' | 'cancel' | 'newDelta'
+  | 'edit' | 'delete' | 'save' | 'cancel' | 'newDelta' | 'customDelta'
   | 'addPoint' | 'removePoint' | 'quickScoreChange' | 'flippedToggle'
   | 'resume' | 'untitledGame' | 'noSavedGames' | 'export' | 'import' | 'back'
   | 'menu' | 'closeMenu' | 'fullscreen' | 'exitFullscreen' | 'language' | 'newGameMenuItem'
@@ -27,7 +27,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setupTagline: 'Set up your players, then let the score battle begin.',
     undo: 'Undo', redo: 'Redo', savedGames: 'Saved games', history: 'History', moves: 'moves',
     noMoves: 'No moves yet.', movesPlaceholder: 'Score changes will appear here.',
-    edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel', newDelta: 'New score delta',
+    edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel', newDelta: 'New score delta', customDelta: 'Custom',
     addPoint: 'Add one point to', removePoint: 'Remove one point from', quickScoreChange: 'Quick score change for',
     flippedToggle: 'Toggle flipped score for the top player',
     resume: 'Resume', untitledGame: 'Untitled game', noSavedGames: 'No saved games yet.',
@@ -49,7 +49,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setupTagline: 'Configurez vos joueurs, puis que la bataille des scores commence.',
     undo: 'Annuler', redo: 'Rétablir', savedGames: 'Parties sauvegardées', history: 'Historique', moves: 'coups',
     noMoves: 'Aucun mouvement pour le moment.', movesPlaceholder: 'Les changements de score apparaîtront ici.',
-    edit: 'Modifier', delete: 'Supprimer', save: 'Valider', cancel: 'Annuler', newDelta: 'Nouveau delta de score',
+    edit: 'Modifier', delete: 'Supprimer', save: 'Valider', cancel: 'Annuler', newDelta: 'Nouveau delta de score', customDelta: 'Personnalisé',
     addPoint: 'Ajouter un point à', removePoint: 'Retirer un point à', quickScoreChange: 'Changement rapide pour',
     flippedToggle: 'Pivoter le score du joueur du haut',
     resume: 'Reprendre', untitledGame: 'Partie sans nom', noSavedGames: 'Aucune partie sauvegardée.',

@@ -62,7 +62,6 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
   const [forcedSign, setForcedSign] = useState<'positive' | 'negative' | undefined>(undefined)
   const [scoreEditOpen, setScoreEditOpen] = useState(false)
   const [scoreDraft, setScoreDraft] = useState(String(player.score))
-  const [customOpen, setCustomOpen] = useState(false)
   const [customDraft, setCustomDraft] = useState('')
   const clearLongPress = () => { if (longPressTimer.current !== null) { clearTimeout(longPressTimer.current); longPressTimer.current = null } longPressOrigin.current = null }
   const startLongPress = (event: ReactPointerEvent<HTMLElement>, sign?: 'positive' | 'negative') => {
@@ -75,10 +74,10 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
     if (Math.hypot(event.clientX - longPressOrigin.current.x, event.clientY - longPressOrigin.current.y) > 10) clearLongPress()
   }
   const quick = (delta: number) => { onQuickDelta(delta); setQuickOpen(false); setForcedSign(undefined) }
-  const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined); setCustomOpen(false) }
+  const closeQuick = () => { setQuickOpen(false); setForcedSign(undefined); setCustomDraft('') }
   const openScoreEditor = () => { setScoreDraft(String(player.score)); setScoreEditOpen(true) }
   const saveScore = () => { const value = Number(scoreDraft); if (Number.isFinite(value)) onSetScore(Math.trunc(value)); setScoreEditOpen(false) }
-  const saveCustom = () => { const value = Number(customDraft); if (Number.isFinite(value) && value !== 0) { onQuickDelta(value); setQuickOpen(false); setForcedSign(undefined); setCustomOpen(false); setCustomDraft('') } }
+  const saveCustom = () => { const value = Number(customDraft); if (Number.isFinite(value) && value !== 0) { onQuickDelta(value); setQuickOpen(false); setForcedSign(undefined); setCustomDraft('') } }
   const scoreValueRef = useFitText<HTMLButtonElement>(JSON.stringify(player.score))
   const startScoreLongPress = (event: ReactPointerEvent<HTMLElement>) => {
     event.stopPropagation()
@@ -148,15 +147,10 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(15)}>+15</button>}
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(20)}>+20</button>}
           </div>
-          {customOpen ? (
-            <div className="custom-row">
-              <input autoFocus type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} aria-label={t('newDelta')} onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(); if (event.key === 'Escape') setCustomOpen(false) }} placeholder={t('newDelta')} />
-              <button type="button" className="editor-save" onClick={saveCustom}>{t('save')}</button>
-            </div>
-          ) : (
-            <button type="button" className="custom-toggle" role="menuitem" onClick={() => { setCustomDraft(''); setCustomOpen(true) }}>⋯</button>
-          )}
-          <button type="button" className="score-cancel" role="menuitem" onClick={closeQuick}>{t('cancel')}</button>
+          <div className="custom-row">
+            <input type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} aria-label={t('newDelta')} placeholder={t('customDelta')} onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(); if (event.key === 'Escape') closeQuick() }} />
+            <button type="button" className="editor-save" onClick={saveCustom}>{t('save')}</button>
+          </div>
         </div>
       )}
     </article>
