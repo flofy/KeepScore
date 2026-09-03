@@ -137,6 +137,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       )}
       {quickOpen && (
         <div className={popupClass} role="menu" aria-label={`${t('quickScoreChange')} ${player.name}`}>
+          <button type="button" className="popup-close" onClick={closeQuick} aria-label={t('cancel')}>✕</button>
           <div className="quick-grid">
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-20)}>−20</button>}
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-15)}>−15</button>}
@@ -191,12 +192,14 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
           : <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>}
       </button>
       <LangFlags />
-      <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label={t('menu')}>☰</button>
+      <button className="burger-button" type="button" onClick={() => setMenuOpen(true)} aria-label={t('menu')}>
+          <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none"/></svg>
+        </button>
     </div>
     {menuOpen && (
       <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
         <nav className="menu-drawer" aria-label={t('menu')} onClick={(event) => event.stopPropagation()}>
-          <button className="menu-item menu-close" type="button" onClick={() => setMenuOpen(false)}>{t('closeMenu')}</button>
+          <button className="menu-close" type="button" onClick={() => setMenuOpen(false)} aria-label={t('closeMenu')}>✕</button>
           <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 {t('history')}</button>
           <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
           <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
