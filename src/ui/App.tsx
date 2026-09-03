@@ -141,12 +141,12 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
             <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive') }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
           </div>
         </div>
-        {deltas.length > 0 && (
-          <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
-            {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
-          </div>
-        )}
       </div>
+      {deltas.length > 0 && (
+        <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
+          {deltas.map((delta, index) => <span key={index} className={delta > 0 ? 'delta-plus' : 'delta-minus'}>{formatDelta(delta)}</span>)}
+        </div>
+      )}
       {scoreEditOpen && (
         <div className="score-popup score-editor" role="dialog" aria-label={`${t('setScore')} — ${player.name}`}>
           <input autoFocus type="number" inputMode="numeric" value={scoreDraft} onChange={(event) => setScoreDraft(event.target.value)} aria-label={t('setScore')} onKeyDown={(event) => { if (event.key === 'Enter') saveScore(); if (event.key === 'Escape') setScoreEditOpen(false) }} />
@@ -180,7 +180,7 @@ function PlayerCard({ player, deltas, rotation = 0, lastDelta, onRename, onDelta
 
 function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Game; onNewGame: () => void; onSavedGames: () => void }) {
   const { present: game, past, future, dispatch, undo, redo } = useGameHistory(initialGame)
-  const { t, lang, setLang } = useI18n()
+  const { t } = useI18n()
   const [editingEntry, setEditingEntry] = useState<string | null>(null)
   const [draftDelta, setDraftDelta] = useState('')
   const [swapped, setSwapped] = useState(false)
