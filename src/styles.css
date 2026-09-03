@@ -34,7 +34,7 @@ h2 { letter-spacing: -.025em; }
 .btn-icon { display: inline-block; width: 16px; height: 16px; vertical-align: -2px; margin-right: 6px; }
 
 .players { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.players.crowded { gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+.players.crowded { gap: 12px; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr)); }
 .players.crowded .player-card { min-height: clamp(130px, 22vh, 220px); padding: 0; border-radius: 20px; }
 .players.crowded .card-content { padding: 14px; }
 .players.crowded .player-name { font-size: clamp(16px, 3vw, 22px); }
@@ -196,6 +196,10 @@ h2 { letter-spacing: -.025em; }
   .app-header { align-items: flex-start; flex-direction: column; }
   .toolbar { width: 100%; justify-content: flex-start; }
   .players { grid-template-columns: 1fr; gap: 14px; }
+  .players.crowded { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .players.crowded .card-content { padding: 10px; }
+  .players.crowded .player-name { font-size: clamp(13px, 3.5vw, 16px); }
+  .players.crowded .score-row .score-value { font-size: clamp(18px, min(56px, calc(75cqw / var(--digits, 2))), 56px); }
   .player-card { padding: 24px 18px; border-radius: 24px; }
   .player-card > strong { margin: 28px 0; }
   .history { padding-top: 60px; }
