@@ -102,9 +102,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
       onContextMenu={(event) => { event.preventDefault(); clearLongPress() }}
     >
       {onFlip && (
-        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={flipped} aria-label={t('flipPlayer')}>
-          <svg className="flip-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M16 3l5 5-5 5M21 8H7a4 4 0 00-4 4v0M8 21l-5-5 5-5M3 16h14a4 4 0 004-4v0" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-        </button>
+        <button type="button" className="card-flip-btn" onClick={(event) => { event.stopPropagation(); onFlip() }} aria-pressed={flipped} aria-label={t('flipPlayer')}>↻</button>
       )}
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
