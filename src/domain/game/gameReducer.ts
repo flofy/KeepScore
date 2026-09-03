@@ -5,6 +5,7 @@ import { colorForIndex } from './colors'
 export type GameAction =
   | { type: 'ADD_SCORE'; playerId: string; delta: number }
   | { type: 'RENAME_PLAYER'; playerId: string; name: string }
+  | { type: 'RENAME_GAME'; name: string }
   | { type: 'RESET_SCORE'; playerId: string }
   | { type: 'ADD_PLAYER'; name?: string }
   | { type: 'EDIT_HISTORY_ENTRY'; entryId: string; delta: number }
@@ -20,6 +21,8 @@ export function gameReducer(game: Game, action: GameAction): Game {
     }
     case 'RENAME_PLAYER':
       return { ...game, players: game.players.map((player) => player.id === action.playerId && action.name.trim() ? { ...player, name: action.name.trim() } : player), updatedAt }
+    case 'RENAME_GAME':
+      return { ...game, name: action.name.trim() || undefined, updatedAt }
     case 'RESET_SCORE': {
       const player = game.players.find((candidate) => candidate.id === action.playerId)
       if (!player || player.score === 0) return game

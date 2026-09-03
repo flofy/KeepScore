@@ -8,13 +8,14 @@ export type TranslationKey =
   | 'players' | 'whoIsPlaying' | 'addPlayer' | 'startGame' | 'playerNumber' | 'playerName'
   | 'removePlayer' | 'colorForPlayer' | 'setupTagline'
   | 'undo' | 'redo' | 'savedGames' | 'history' | 'moves' | 'noMoves' | 'movesPlaceholder'
-  | 'edit' | 'delete' | 'save' | 'cancel' | 'newDelta'
-  | 'addPoint' | 'removePoint' | 'quickScoreChange' | 'flippedToggle'
+  | 'edit' | 'delete' | 'save' | 'cancel' | 'newDelta' | 'customDelta'
+  | 'addPoint' | 'removePoint' | 'quickScoreChange' | 'flipPlayer'
   | 'resume' | 'untitledGame' | 'noSavedGames' | 'export' | 'import' | 'back'
   | 'menu' | 'closeMenu' | 'fullscreen' | 'exitFullscreen' | 'language' | 'newGameMenuItem'
   | 'swapPlayers' | 'addPlayerMenuItem' | 'setScore'
   | 'install' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
+  | 'closeHistory'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -26,9 +27,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setupTagline: 'Set up your players, then let the score battle begin.',
     undo: 'Undo', redo: 'Redo', savedGames: 'Saved games', history: 'History', moves: 'moves',
     noMoves: 'No moves yet.', movesPlaceholder: 'Score changes will appear here.',
-    edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel', newDelta: 'New score delta',
+    edit: 'Edit', delete: 'Delete', save: 'Save', cancel: 'Cancel', newDelta: 'New score delta', customDelta: 'Custom',
     addPoint: 'Add one point to', removePoint: 'Remove one point from', quickScoreChange: 'Quick score change for',
-    flippedToggle: 'Toggle flipped score for the top player',
+    flipPlayer: 'Flip player card',
     resume: 'Resume', untitledGame: 'Untitled game', noSavedGames: 'No saved games yet.',
     export: 'Export', import: 'Import', back: 'Back',
     menu: 'Open menu', closeMenu: '✕ Close', fullscreen: '⤢ Fullscreen', exitFullscreen: '⤢ Exit fullscreen',
@@ -37,6 +38,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     swapPlayers: 'Swap player positions', addPlayerMenuItem: '👤 Add player', setScore: 'Set score',
     removeHistoryEntry: 'Remove this entry', editHistoryDelta: 'New score delta', playerNameLabel: 'name',
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
+    closeHistory: 'Close history',
   },
   fr: {
     appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
@@ -47,9 +49,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setupTagline: 'Configurez vos joueurs, puis que la bataille des scores commence.',
     undo: 'Annuler', redo: 'Rétablir', savedGames: 'Parties sauvegardées', history: 'Historique', moves: 'coups',
     noMoves: 'Aucun mouvement pour le moment.', movesPlaceholder: 'Les changements de score apparaîtront ici.',
-    edit: 'Modifier', delete: 'Supprimer', save: 'Valider', cancel: 'Annuler', newDelta: 'Nouveau delta de score',
+    edit: 'Modifier', delete: 'Supprimer', save: 'Valider', cancel: 'Annuler', newDelta: 'Nouveau delta de score', customDelta: 'Personnalisé',
     addPoint: 'Ajouter un point à', removePoint: 'Retirer un point à', quickScoreChange: 'Changement rapide pour',
-    flippedToggle: 'Pivoter le score du joueur du haut',
+    flipPlayer: 'Retourner la carte du joueur',
     resume: 'Reprendre', untitledGame: 'Partie sans nom', noSavedGames: 'Aucune partie sauvegardée.',
     export: 'Exporter', import: 'Importer', back: 'Retour',
     menu: 'Ouvrir le menu', closeMenu: '✕ Fermer', fullscreen: '⤢ Plein écran', exitFullscreen: '⤢ Quitter le plein écran',
@@ -58,6 +60,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     swapPlayers: 'Échanger la position des joueurs', addPlayerMenuItem: '👤 Ajouter un joueur', setScore: 'Définir le score',
     removeHistoryEntry: 'Supprimer cette entrée', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Définir la couleur', playerCardRegion: 'Carte du joueur',
+    closeHistory: 'Fermer l\'historique',
   },
 }
 
