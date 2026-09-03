@@ -198,8 +198,12 @@ function GameScreen({ initialGame, onNewGame, onSavedGames }: { initialGame: Gam
         <nav className="menu-drawer" aria-label={t('menu')} onClick={(event) => event.stopPropagation()}>
           <button className="menu-close" type="button" onClick={() => setMenuOpen(false)} aria-label={t('closeMenu')}>✕</button>
           <button className="menu-item" type="button" onClick={() => { setHistoryOpen((current) => !current); setMenuOpen(false) }}>🕘 {t('history')}</button>
-          <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
-          <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
+          <div className="menu-separator" />
+          <div className="menu-row">
+            <button className="menu-item" type="button" onClick={() => { undo(); setMenuOpen(false) }} disabled={!past.length}>↩ {t('undo')}</button>
+            <button className="menu-item" type="button" onClick={() => { redo(); setMenuOpen(false) }} disabled={!future.length}>↪ {t('redo')}</button>
+          </div>
+          <div className="menu-separator" />
           <button className="menu-item" type="button" onClick={() => { dispatch({ type: 'ADD_PLAYER' }); haptic(); setMenuOpen(false) }}>{t('addPlayerMenuItem')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onSavedGames() }}>💾 {t('savedGames')}</button>
           <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame() }}>{t('newGameMenuItem')}</button>
