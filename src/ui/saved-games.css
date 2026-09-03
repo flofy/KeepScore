@@ -1,5 +1,5 @@
 .saved-games { display: grid; gap: 12px; }
-.saved-game { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; border-radius: 20px; background: white; box-shadow: 0 8px 30px rgb(0 0 0 / 7%); }
-.saved-game h2 { margin: 0 0 6px; font-size: 20px; }
-.saved-game p { margin: 0; color: #6b7280; }
+.saved-game { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px; border: 1px solid rgb(255 255 255 / 9%); border-radius: 20px; background: rgb(15 23 42 / 72%); backdrop-filter: blur(14px); box-shadow: 0 8px 30px rgb(0 0 0 / 18%); }
+.saved-game h2 { margin: 0 0 6px; font-size: 20px; color: #f8fafc; letter-spacing: -.01em; }
+.saved-game p { margin: 0; color: #94a3b8; }
 @media (max-width: 560px) { .saved-game { align-items: stretch; flex-direction: column; } }
