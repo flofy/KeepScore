@@ -132,10 +132,10 @@ h2 { letter-spacing: -.025em; }
 .app-shell.fullscreen .players.duo { gap: 0; }
 .app-shell.fullscreen .players:not(.duo) { display: grid; grid-auto-rows: 1fr; height: 100dvh; gap: 0; }
 .app-shell.fullscreen .players:not(.duo) .player-card { border-radius: 0; min-height: 0; }
-.app-shell.fullscreen .history { display: none; }
+
 @keyframes popup-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 
-.history { margin-top: 22px; padding: 22px; border: 1px solid rgb(255 255 255 / 9%); border-radius: 24px; background: rgb(15 23 42 / 72%); box-shadow: 0 18px 45px rgb(0 0 0 / 16%); backdrop-filter: blur(14px); }
+.history { flex: 1; overflow-y: auto; padding-top: 60px; }
 .section-heading h2 { margin: 0; }
 .section-heading span { color: #94a3b8; font-size: 13px; }
 .empty-state { margin: 18px 0 0; color: #94a3b8; }
@@ -154,7 +154,7 @@ h2 { letter-spacing: -.025em; }
   .players { grid-template-columns: 1fr; gap: 14px; }
   .player-card { padding: 24px 18px; border-radius: 24px; }
   .player-card > strong { margin: 28px 0; }
-  .history { padding: 18px; }
+  .history { padding-top: 60px; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
 
