@@ -122,8 +122,8 @@ h2 { letter-spacing: -.025em; }
 .menu-close { background: transparent; border-color: transparent; color: #94a3b8; text-align: center; }
 
 .history-fullscreen { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; padding: 24px; background: rgb(15 23 42 / 98%); backdrop-filter: blur(12px); }
-.history-close { position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #94a3b8; background: rgb(255 255 255 / 8%); border: 1px solid rgb(255 255 255 / 12%); border-radius: 12px; cursor: pointer; }
-.history-close:hover { background: rgb(255 255 255 / 14%); color: #f8fafc; }
+.history-close { position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #94a3b8; background: transparent; border: 0; cursor: pointer; }
+.history-close:hover { color: #f8fafc; }
 
 .app-shell.fullscreen { width: 100%; max-width: none; padding: 0; display: flex; flex-direction: column; }
 .app-shell.fullscreen .app-header { display: none; }
