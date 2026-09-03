@@ -93,7 +93,7 @@ h2 { letter-spacing: -.025em; }
 .score-popup.score-editor button:hover { filter: brightness(1.15); }
 .card-content { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 28px; transition: transform .35s cubic-bezier(.22,1,.36,1); transform-origin: center center; text-align: center; }
 .player-card.rotated-180 .card-content { transform: rotate(180deg); }
-.player-card.rotated-180 .score-popup, .player-card.rotated-180 .score-popup.score-editor { transform: rotate(180deg); }
+.player-card.rotated-180 .score-popup, .player-card.rotated-180 .score-popup.score-editor { transform: rotate(180deg); animation: none; }
 .player-card.rotated-180 .card-flip-btn { top: auto; bottom: 10px; left: auto; right: 10px; }
 .player-card.rotated-180 .player-deltas { top: auto; right: auto; bottom: 14px; left: 12px; align-items: flex-end; transform: rotate(180deg); }
 
