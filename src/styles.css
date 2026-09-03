@@ -11,7 +11,7 @@ button, input { font: inherit; }
 button { touch-action: manipulation; }
 button:focus-visible, input:focus-visible { outline: 3px solid #7dd3fc; outline-offset: 3px; }
 
-.app-shell { width: min(980px, 100%); min-height: 100dvh; margin: 0 auto; padding: max(28px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom)); }
+.app-shell { position: relative; width: min(980px, 100%); min-height: 100dvh; margin: 0 auto; padding: max(28px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom)); }
 .app-header, .section-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .app-header { margin-bottom: 28px; }
 .game-header { align-items: flex-start; }
@@ -97,7 +97,7 @@ h2 { letter-spacing: -.025em; }
 .score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
 
 .quick-actions { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 30; display: flex; gap: 8px; }
-.quick-actions.duo-fullscreen { top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); }
+.quick-actions.duo-fullscreen { position: absolute; top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); }
 .burger-button, .icon-fab { width: 44px; height: 44px; border: 1px solid rgb(255 255 255 / 20%); border-radius: 14px; background: rgb(15 23 42 / 88%); color: #e2e8f0; font-size: 19px; font-weight: 800; cursor: pointer; backdrop-filter: blur(8px); box-shadow: 0 8px 22px rgb(0 0 0 / 35%); transition: background .15s ease, transform .1s ease; display: inline-flex; align-items: center; justify-content: center; }
 .icon-fab[aria-pressed="true"] { border-color: rgb(125 211 252 / 60%); color: #7dd3fc; }
 .burger-button:hover, .icon-fab:hover { background: rgb(30 41 59 / 96%); }
