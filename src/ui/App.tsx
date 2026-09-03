@@ -76,7 +76,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
     >
       <input className="player-name" value={player.name} onChange={(event) => onRename(event.target.value)} aria-label={`${player.name} ${t('playerNameLabel')}`} />
       <div className="score-row">
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}>−</button>
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'negative')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(-1)} aria-label={`${t('removePoint')} ${player.name}`}><span className="step-glyph">−</span></button>
         <button
           type="button"
           className="score-value"
@@ -87,7 +87,7 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           onClick={onScoreClick}
           aria-label={`${t('setScore')} — ${player.name}`}
         >{player.score}</button>
-        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}>+</button>
+        <button type="button" className="inline-step" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onDelta(1)} aria-label={`${t('addPoint')} ${player.name}`}><span className="step-glyph">+</span></button>
       </div>
       {deltas.length > 0 && (
         <div className="player-deltas" aria-label={`${t('history')} — ${player.name}`}>
