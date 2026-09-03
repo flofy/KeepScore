@@ -64,13 +64,19 @@ h2 { letter-spacing: -.025em; }
 .quick-step:hover { filter: brightness(1.2); }
 .quick-step:active { transform: scale(.95); }
 
-.score-popup { position: absolute; inset: 0; z-index: 5; display: grid; grid-template-columns: 1fr 1fr; place-items: center; gap: 14px; padding: 24px; border-radius: 28px; background: rgb(2 6 23 / 86%); backdrop-filter: blur(10px); animation: popup-in .14s ease; }
-.score-popup button { min-width: 86px; min-height: 66px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 26px; font-weight: 800; cursor: pointer; }
+.score-popup { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; gap: 14px; padding: 24px; border-radius: 28px; background: rgb(2 6 23 / 86%); backdrop-filter: blur(10px); animation: popup-in .14s ease; }
+.quick-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; flex: 1; }
+.score-popup button { border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: clamp(18px, 4.5vw, 26px); font-weight: 800; cursor: pointer; min-height: 56px; }
 .score-popup .delta-neg { background: linear-gradient(135deg, #b91c1c, #ef4444); }
 .score-popup .delta-pos { background: linear-gradient(135deg, #2563eb, #7c3aed); }
-.score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(100 116 139 / 30%); color: #cbd5e1; font-size: 17px; font-weight: 700; }
+.score-popup .score-cancel { min-width: 0; min-height: 52px; background: rgb(100 116 139 / 30%); color: #cbd5e1; font-size: 17px; font-weight: 700; }
 .score-popup button:hover { filter: brightness(1.15); }
 .score-popup button:active { transform: scale(.95); }
+.custom-toggle { background: rgb(255 255 255 / 6%) !important; color: #94a3b8 !important; font-size: 22px !important; font-weight: 800; }
+.custom-row { display: flex; gap: 10px; }
+.custom-row input { flex: 1; min-height: 56px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 24px; font-weight: 800; text-align: center; }
+.custom-row .editor-save { min-width: 80px; background: linear-gradient(135deg, #1d4ed8, #3b82f6); font-size: 18px; }
+.score-popup.positive .quick-grid, .score-popup.negative .quick-grid { grid-template-columns: repeat(4, 1fr); }
 
 .score-popup.score-editor { place-items: stretch; gap: 12px; }
 .score-popup.score-editor input { grid-column: 1 / -1; width: 100%; min-height: 72px; border: 1px solid rgb(255 255 255 / 14%); border-radius: 18px; background: rgb(255 255 255 / 8%); color: #f8fafc; font-size: 32px; font-weight: 800; text-align: center; }
@@ -94,7 +100,6 @@ h2 { letter-spacing: -.025em; }
 .preset-name { font-size: 14px; font-weight: 800; text-align: center; }
 .preset-score { color: #7dd3fc; font-size: 12px; font-weight: 800; }
 .score-popup.positive, .score-popup.negative { grid-template-columns: 1fr 1fr; }
-.score-popup .score-cancel { grid-column: 1 / -1; min-width: 0; min-height: 52px; background: rgb(255 255 255 / 5%); color: #94a3b8; font-size: 17px; font-weight: 700; }
 
 .quick-actions { position: fixed; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 30; display: flex; gap: 8px; }
 .quick-actions.duo-fullscreen { position: absolute; top: 50%; left: 50%; right: auto; transform: translate(-50%, -50%); }
@@ -116,6 +121,7 @@ h2 { letter-spacing: -.025em; }
 .setup-card .lang-menu { right: auto; left: 50%; transform: translateX(-50%); }
 
 .drawer-backdrop { position: fixed; inset: 0; z-index: 40; display: flex; align-items: center; justify-content: center; background: rgb(2 6 23 / 70%); backdrop-filter: blur(8px); animation: overlay-in .35s cubic-bezier(.22,1,.36,1); }
+.drawer-backdrop::before { content: ''; position: fixed; top: calc(max(14px, env(safe-area-inset-top)) + 22px); right: calc(14px + 22px); width: 0; height: 0; border-radius: 50%; background: rgb(15 23 42 / 95%); transform: translate(50%, -50%); animation: circle-reveal .45s cubic-bezier(.22,1,.36,1) both; }
 .menu-drawer { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; padding: 40px 24px; animation: menu-rise .45s cubic-bezier(.22,1,.36,1) both; }
 .menu-item { width: min(420px, 88vw); min-height: 64px; padding: 0 24px; border: 1px solid rgb(255 255 255 / 10%); border-radius: 18px; background: rgb(255 255 255 / 6%); color: #f1f5f9; text-align: center; font-size: 20px; font-weight: 700; cursor: pointer; transition: background .2s ease, transform .15s ease; }
 .menu-item:nth-child(1) { animation-delay: .02s; }
@@ -147,6 +153,7 @@ h2 { letter-spacing: -.025em; }
 
 @keyframes popup-in { from { opacity: 0; transform: scale(.94); } to { opacity: 1; transform: scale(1); } }
 @keyframes overlay-in { from { opacity: 0; backdrop-filter: blur(0); } to { opacity: 1; backdrop-filter: blur(8px); } }
+@keyframes circle-reveal { from { width: 0; height: 0; } to { width: 250vmax; height: 250vmax; } }
 @keyframes menu-rise { from { opacity: 0; transform: scale(1.04); } to { opacity: 1; transform: scale(1); } }
 @keyframes menu-item-in { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
 
