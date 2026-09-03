@@ -152,12 +152,12 @@ function PlayerCard({ player, deltas, flipped = false, lastDelta, onRename, onDe
           <button type="button" className="popup-close" onClick={closeQuick} aria-label={t('cancel')}>✕</button>
           <div className="quick-grid">
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-20)}>−20</button>}
+            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-15)}>−15</button>}
             {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-10)}>−10</button>}
-            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-3)}>−3</button>}
-            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-2)}>−2</button>}
-            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(2)}>+2</button>}
-            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(3)}>+3</button>}
+            {showNegative && <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-5)}>−5</button>}
+            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(5)}>+5</button>}
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(10)}>+10</button>}
+            {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(15)}>+15</button>}
             {showPositive && <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(20)}>+20</button>}
           </div>
           <div className="custom-row">
