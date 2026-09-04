@@ -160,41 +160,6 @@ h2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
-.players.portrait {
-  gap: 12px;
-  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
-}
-.players.portrait .player-card {
-  min-height: clamp(150px, 24vh, 240px);
-  padding: 0;
-  border-radius: 20px;
-}
-.players.portrait .card-content {
-  padding: 14px;
-}
-.players.portrait .player-name {
-  font-size: clamp(16px, 3vw, 22px);
-}
-.players.portrait .score-row {
-  gap: 8px;
-}
-.players.portrait .score-row .score-value {
-  font-size: clamp(22px, min(72px, calc(90cqw / var(--digits, 2))), 72px);
-}
-.players.portrait .inline-step {
-  height: clamp(38px, 8vw, 48px);
-  min-width: clamp(38px, 8vw, 48px);
-  padding: 0 10px;
-  font-size: clamp(16px, 4vw, 22px);
-}
-.players.portrait .quick-stack,
-.players.portrait .step-col {
-  gap: 3px;
-}
-.players.portrait .quick-step {
-  min-height: 22px;
-  font-size: clamp(10px, 2.4vw, 13px);
-}
 .player-card {
   position: relative;
   overflow: hidden;
@@ -425,13 +390,11 @@ h2 {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 12px;
+  padding: 6px;
   border-radius: 18px;
-  background: rgb(2 6 23 / 86%);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 20px 60px rgb(0 0 0 / 40%);
+  background: transparent;
   animation: tooltip-in 0.14s ease;
-  max-width: min(300px, 92cqw);
+  max-width: min(320px, 94cqw);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -100%);
@@ -485,45 +448,24 @@ h2 {
   outline: none;
   background: rgb(255 255 255 / 18%);
 }
-.score-edit-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-}
-.score-edit-row .score-input {
-  flex: 1;
-  min-width: 0;
-  font-size: clamp(30px, 8vw, 56px);
-}
-.score-edit-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-.score-edit-btn {
-  width: 40px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 10px;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 800;
+.custom-delta-btn {
+  position: static;
+  align-self: center;
+  border: 1px solid rgb(255 255 255 / 15%);
+  border-radius: 12px;
+  background: rgb(148 163 184 / 10%);
+  color: #cbd5e1;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1;
+  padding: 2px 14px;
   cursor: pointer;
 }
-.score-edit-btn.neg {
-  background: linear-gradient(135deg, #b91c1c, #ef4444);
+.custom-delta-btn:hover {
+  background: rgb(148 163 184 / 20%);
+  color: #f8fafc;
 }
-.score-edit-btn.pos {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-}
-.score-edit-btn:hover {
-  filter: brightness(1.15);
-}
-.score-edit-btn:active {
+.custom-delta-btn:active {
   transform: scale(0.95);
 }
 .card-content {
@@ -846,8 +788,7 @@ h2 {
   border-radius: 12px;
   background: rgb(255 255 255 / 4%);
 }
-.menu-item.lang.active,
-.menu-item.portrait.active {
+.menu-item.lang.active {
   border-color: rgb(125 211 252 / 60%);
   color: #7dd3fc;
   background: rgb(125 211 252 / 10%);
@@ -1085,19 +1026,6 @@ h2 {
   .players {
     grid-template-columns: 1fr;
     gap: 14px;
-  }
-  .players.portrait {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-  }
-  .players.portrait .card-content {
-    padding: 10px;
-  }
-  .players.portrait .player-name {
-    font-size: clamp(13px, 3.5vw, 16px);
-  }
-  .players.portrait .score-row .score-value {
-    font-size: clamp(18px, min(56px, calc(75cqw / var(--digits, 2))), 56px);
   }
   .player-card {
     padding: 24px 18px;

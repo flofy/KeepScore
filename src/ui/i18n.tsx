@@ -15,7 +15,7 @@ export type TranslationKey =
   | 'swapPlayers' | 'addPlayerMenuItem' | 'setScore'
   | 'install' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
-  | 'closeHistory' | 'flipHistory' | 'portraitModeOn' | 'portraitModeOff'
+  | 'closeHistory' | 'flipHistory'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -40,8 +40,6 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
     closeHistory: 'Close history',
     flipHistory: 'Flip history',
-    portraitModeOn: 'Portrait mode: on',
-    portraitModeOff: 'Portrait mode: off',
   },
   fr: {
     appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
@@ -65,8 +63,6 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     setPlayerColor: 'Définir la couleur', playerCardRegion: 'Carte du joueur',
     closeHistory: 'Fermer l\'historique',
     flipHistory: 'Retourner l\'historique',
-    portraitModeOn: 'Mode portrait : activé',
-    portraitModeOff: 'Mode portrait : désactivé',
   },
 }
 

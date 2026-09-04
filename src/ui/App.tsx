@@ -56,7 +56,6 @@ type PlayerCardProps = {
   deltas: number[];
   rotation?: number;
   lastDelta?: number;
-  portrait?: boolean;
   onRename: (name: string) => void;
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
@@ -69,7 +68,6 @@ function PlayerCard({
   deltas,
   rotation = 0,
   lastDelta,
-  portrait = false,
   onRename,
   onDelta,
   onQuickDelta,
@@ -81,6 +79,8 @@ function PlayerCard({
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null);
   const longPressFired = useRef(false);
   const quickRef = useRef<HTMLDivElement>(null);
+  const customBtnRef = useRef<HTMLButtonElement>(null);
+  const customTooltipRef = useRef<HTMLDivElement>(null);
   const scoreInputRef = useRef<HTMLInputElement>(null);
   const [quickOpen, setQuickOpen] = useState(false);
   const [forcedSign, setForcedSign] = useState<
@@ -88,6 +88,8 @@ function PlayerCard({
   >(undefined);
   const [scoreEditing, setScoreEditing] = useState(false);
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customDraft, setCustomDraft] = useState("");
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
       clearTimeout(longPressTimer.current);
@@ -127,6 +129,13 @@ function PlayerCard({
     setQuickOpen(false);
     setForcedSign(undefined);
   };
+  const onStepClick = (delta: number) => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    onDelta(delta);
+  };
   const openScoreEditor = () => {
     setScoreDraft(String(player.score));
     setScoreEditing(true);
@@ -148,12 +157,33 @@ function PlayerCard({
     setScoreEditing(false);
     setScoreDraft(String(player.score));
   };
+  const saveCustom = (sign: 1 | -1) => {
+    const value = Number(customDraft);
+    if (Number.isFinite(value) && value !== 0) {
+      onQuickDelta(sign * Math.abs(Math.trunc(value)));
+      haptic();
+    }
+    setCustomOpen(false);
+    setCustomDraft("");
+  };
+  const closeCustom = () => {
+    setCustomOpen(false);
+    setCustomDraft("");
+  };
 
   useEffect(() => {
-    if (!quickOpen) return;
+    if (!quickOpen && !customOpen) return;
     const onDown = (event: Event) => {
-      if (quickRef.current?.contains(event.target as Node)) return;
+      const target = event.target as Node;
+      if (quickOpen && quickRef.current?.contains(target)) return;
+      if (
+        customOpen &&
+        (customTooltipRef.current?.contains(target) ||
+          customBtnRef.current?.contains(target))
+      )
+        return;
       closeQuick();
+      closeCustom();
     };
     document.addEventListener("mousedown", onDown);
     document.addEventListener("touchstart", onDown);
@@ -161,7 +191,7 @@ function PlayerCard({
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("touchstart", onDown);
     };
-  }, [quickOpen]);
+  }, [quickOpen, customOpen]);
 
   useEffect(() => {
     if (scoreEditing) {
@@ -198,10 +228,7 @@ function PlayerCard({
         : "";
   return (
     <article
-      className={
-        (rotation ? `player-card rotated-${rotation}` : "player-card") +
-        (portrait ? " portrait" : "")
-      }
+      className={rotation ? `player-card rotated-${rotation}` : "player-card"}
       style={
         {
           "--player-color": player.color ?? "#38bdf8",
@@ -267,7 +294,7 @@ function PlayerCard({
               onPointerUp={clearLongPress}
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
-              onClick={() => onDelta(-1)}
+              onClick={() => onStepClick(-1)}
               aria-label={`${t("removePoint")} ${player.name}`}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -316,62 +343,57 @@ function PlayerCard({
             </div>
           </div>
           {scoreEditing ? (
-            <div className="score-edit-row">
-              <input
-                ref={scoreInputRef}
-                className="score-value score-input"
-                type="number"
-                inputMode="numeric"
-                value={scoreDraft}
-                onChange={(event) => setScoreDraft(event.target.value)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter") {
-                    event.preventDefault();
-                    saveScore();
-                  }
-                  if (event.key === "Escape") {
-                    event.preventDefault();
-                    cancelScoreEdit();
-                  }
-                }}
-                aria-label={`${t("setScore")} — ${player.name}`}
-              />
-              <div className="score-edit-actions">
-                <button
-                  type="button"
-                  className="score-edit-btn neg"
-                  onClick={() => applyCustomDelta(-1)}
-                  aria-label={`${t("removePoint")} — ${player.name}`}
-                >
-                  −
-                </button>
-                <button
-                  type="button"
-                  className="score-edit-btn pos"
-                  onClick={() => applyCustomDelta(1)}
-                  aria-label={`${t("addPoint")} — ${player.name}`}
-                >
-                  +
-                </button>
-              </div>
-            </div>
-          ) : (
-            <div
-              ref={scoreValueRef}
-              className="score-value"
-              onClick={onScoreClick}
-              role="button"
-              tabIndex={0}
+            <input
+              ref={scoreInputRef}
+              className="score-value score-input"
+              type="number"
+              inputMode="numeric"
+              value={scoreDraft}
+              onChange={(event) => setScoreDraft(event.target.value)}
+              onBlur={saveScore}
               onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
+                if (event.key === "Enter") {
                   event.preventDefault();
-                  onScoreClick();
+                  saveScore();
+                }
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  cancelScoreEdit();
                 }
               }}
               aria-label={`${t("setScore")} — ${player.name}`}
-            >
-              {player.score}
-            </div>
+            />
+          ) : (
+            <>
+              <div
+                ref={scoreValueRef}
+                className="score-value"
+                onClick={onScoreClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onScoreClick();
+                  }
+                }}
+                aria-label={`${t("setScore")} — ${player.name}`}
+              >
+                {player.score}
+              </div>
+              <button
+                ref={customBtnRef}
+                type="button"
+                className="custom-delta-btn"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setCustomOpen((current) => !current);
+                }}
+                aria-label={t("customDelta")}
+              >
+                ⋯
+              </button>
+            </>
           )}
           <div className="step-col">
             <button
@@ -382,7 +404,7 @@ function PlayerCard({
               onPointerUp={clearLongPress}
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
-              onClick={() => onDelta(1)}
+              onClick={() => onStepClick(1)}
               aria-label={`${t("addPoint")} ${player.name}`}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -496,6 +518,44 @@ function PlayerCard({
             )}
           </div>
         )}
+        {customOpen && (
+          <div
+            ref={customTooltipRef}
+            className="score-tooltip"
+            role="tooltip"
+            aria-label={t("customDelta")}
+          >
+            <input
+              type="number"
+              inputMode="numeric"
+              value={customDraft}
+              onChange={(event) => setCustomDraft(event.target.value)}
+              autoFocus
+              onKeyDown={(event) => {
+                if (event.key === "Enter") saveCustom(1);
+                if (event.key === "Escape") closeCustom();
+              }}
+              aria-label={t("customDelta")}
+              placeholder="0"
+            />
+            <button
+              type="button"
+              className="delta-neg"
+              onClick={() => saveCustom(-1)}
+              aria-label={`${t("removePoint")} — ${player.name}`}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              className="delta-pos"
+              onClick={() => saveCustom(1)}
+              aria-label={`${t("addPoint")} — ${player.name}`}
+            >
+              +
+            </button>
+          </div>
+        )}
       </div>
     </article>
   );
@@ -531,19 +591,12 @@ function GameScreen({
   const [menuOpen, setMenuOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
-  const [portrait, setPortrait] = useState(
-    () => localStorage.getItem("keepscore-portrait") === "1",
-  );
   const isDuo = game.players.length === 2;
-  const portraitCols = Math.min(4, Math.ceil(game.players.length / 2));
   const orderedPlayers =
     isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
   useEffect(() => {
     localStorage.setItem("keepscore-fullscreen", fullscreen ? "1" : "0");
   }, [fullscreen]);
-  useEffect(() => {
-    localStorage.setItem("keepscore-portrait", portrait ? "1" : "0");
-  }, [portrait]);
   useEffect(() => {
     document.body.style.overflow = historyOpen ? "hidden" : "";
   }, [historyOpen]);
@@ -761,14 +814,7 @@ function GameScreen({
           </button>
         </div>
         <section
-          className={
-            isDuo ? "players duo" : portrait ? "players portrait" : "players"
-          }
-          style={
-            portrait
-              ? ({ "--cols": String(portraitCols) } as CSSProperties)
-              : undefined
-          }
+          className={isDuo ? "players duo" : "players"}
           aria-label={t("players")}
         >
           {orderedPlayers.map((player, index) => {
@@ -784,7 +830,6 @@ function GameScreen({
                 deltas={recentDeltasFor(player.id)}
                 rotation={rotation}
                 lastDelta={lastDeltaFor(player.id)}
-                portrait={portrait}
                 onRename={(name) =>
                   dispatch({ type: "RENAME_PLAYER", playerId: player.id, name })
                 }
@@ -908,20 +953,6 @@ function GameScreen({
               }}
             >
               {t("addPlayerMenuItem")}
-            </button>
-            <div className="menu-separator" />
-            <button
-              className={
-                portrait ? "menu-item portrait active" : "menu-item portrait"
-              }
-              type="button"
-              aria-pressed={portrait}
-              onClick={() => {
-                setPortrait((current) => !current);
-                setMenuOpen(false);
-              }}
-            >
-              {portrait ? `🃏 ${t("portraitModeOn")}` : `🃏 ${t("portraitModeOff")}`}
             </button>
             <div className="menu-separator" />
             <button
