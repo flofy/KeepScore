@@ -162,8 +162,9 @@ h2 {
 }
 .player-card {
   position: relative;
+  container-type: inline-size;
   overflow: hidden;
-  min-height: clamp(180px, 26vh, 300px);
+  min-height: clamp(150px, 32cqw, 300px);
   border: 1px solid
     color-mix(in srgb, var(--player-color, #38bdf8) 45%, rgb(255 255 255 / 12%));
   border-radius: clamp(16px, 3vw, 28px);
@@ -181,10 +182,10 @@ h2 {
 }
 .card-flip-btn {
   position: absolute;
-  top: clamp(6px, 1.5vw, 10px);
-  left: clamp(6px, 1.5vw, 10px);
-  width: clamp(28px, 5vw, 38px);
-  height: clamp(28px, 5vw, 38px);
+  top: clamp(6px, 4cqw, 10px);
+  left: clamp(6px, 4cqw, 10px);
+  width: clamp(28px, 10cqw, 38px);
+  height: clamp(28px, 10cqw, 38px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,7 +199,7 @@ h2 {
     background 0.15s ease,
     color 0.15s ease;
   z-index: 3;
-  font-size: clamp(15px, 3vw, 20px);
+  font-size: clamp(13px, 6cqw, 20px);
 }
 .card-flip-btn:hover {
   background: rgb(255 255 255 / 12%);
@@ -218,14 +219,14 @@ h2 {
   color: color-mix(in srgb, var(--player-color, #7dd3fc) 88%, white);
   text-align: center;
   font-weight: 800;
-  font-size: clamp(22px, 4vw, 32px);
+  font-size: clamp(18px, 8cqw, 34px);
   letter-spacing: -0.01em;
   text-shadow: 0 1px 0 rgb(0 0 0 / 35%);
   outline-offset: 4px;
 }
 .player-name:focus {
   border-bottom-color: var(--player-color, #7dd3fc);
-  font-size: clamp(40px, 8vw, 60px);
+  font-size: clamp(28px, 14cqw, 60px);
 }
 .score-value {
   width: 100%;
@@ -242,7 +243,7 @@ h2 {
   display: block;
   margin: clamp(12px, 3vh, 30px) 0;
   color: #0f172a;
-  font-size: clamp(60px, 17vw, 126px);
+  font-size: clamp(40px, 60cqw, 126px);
   line-height: 0.82;
   letter-spacing: -0.06em;
 }
@@ -275,7 +276,7 @@ h2 {
   justify-content: space-between;
 }
 .players.duo .player-name {
-  font-size: 34px;
+  font-size: clamp(22px, 8cqw, 34px);
 }
 .players.duo .player-card .score-value {
   font-size: clamp(40px, min(200px, calc(140cqw / var(--digits, 3))), 200px);
@@ -289,8 +290,8 @@ h2 {
   margin-top: 18px;
 }
 .players.duo .quick-step {
-  height: clamp(48px, 11vw, 66px);
-  font-size: clamp(20px, 5vw, 32px);
+  height: clamp(44px, 18cqw, 66px);
+  font-size: clamp(18px, 9cqw, 32px);
   border-radius: 16px;
 }
 .score-row {
@@ -301,13 +302,13 @@ h2 {
   container-type: inline-size;
 }
 .inline-step {
-  height: clamp(46px, 11vw, 62px);
-  min-width: clamp(46px, 11vw, 62px);
-  padding: 0 clamp(14px, 3.5vw, 22px);
+  height: clamp(40px, 17cqw, 62px);
+  min-width: clamp(40px, 17cqw, 62px);
+  padding: 0 clamp(12px, 5cqw, 22px);
   border: 0;
   border-radius: 999px;
   color: #fff;
-  font-size: clamp(22px, 6vw, 34px);
+  font-size: clamp(18px, 9cqw, 34px);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -350,11 +351,11 @@ h2 {
 }
 .quick-step {
   width: 100%;
-  min-height: 22px;
+  min-height: clamp(18px, 6cqw, 24px);
   border: 0;
   outline: none;
   border-radius: 6px;
-  font-size: clamp(11px, 2.8vw, 14px);
+  font-size: clamp(11px, 4cqw, 14px);
   font-weight: 700;
   cursor: pointer;
   display: inline-flex;
@@ -482,7 +483,7 @@ h2 {
   border-radius: 12px;
   background: rgb(148 163 184 / 10%);
   color: #cbd5e1;
-  font-size: 16px;
+  font-size: clamp(14px, 6cqw, 18px);
   font-weight: 700;
   line-height: 1;
   padding: 2px 14px;
