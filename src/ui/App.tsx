@@ -319,10 +319,10 @@ function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(-3)}
-                aria-label={`${t("removePoint")} 3 — ${player.name}`}
+                onClick={() => onQuickDelta(-2)}
+                aria-label={`${t("removePoint")} 2 — ${player.name}`}
               >
-                −3
+                −2
               </button>
               <button
                 type="button"
@@ -335,10 +335,10 @@ function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(-2)}
-                aria-label={`${t("removePoint")} 2 — ${player.name}`}
+                onClick={() => onQuickDelta(-3)}
+                aria-label={`${t("removePoint")} 3 — ${player.name}`}
               >
-                −2
+                −3
               </button>
             </div>
           </div>
