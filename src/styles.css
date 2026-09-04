@@ -297,9 +297,18 @@ h2 {
 .score-row {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
+  align-items: stretch;
   gap: 14px;
   container-type: inline-size;
+}
+.score-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
 }
 .inline-step {
   height: clamp(40px, 17cqw, 62px);
@@ -341,6 +350,7 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 6px;
 }
 .quick-stack {

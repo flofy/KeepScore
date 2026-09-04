@@ -364,36 +364,36 @@ function PlayerCard({
               aria-label={`${t("setScore")} — ${player.name}`}
             />
           ) : (
-            <>
-              <div
-                ref={scoreValueRef}
-                className="score-value"
-                onClick={onScoreClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onScoreClick();
-                  }
-                }}
-                aria-label={`${t("setScore")} — ${player.name}`}
-              >
-                {player.score}
+              <div className="score-center">
+                <div
+                  ref={scoreValueRef}
+                  className="score-value"
+                  onClick={onScoreClick}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onScoreClick();
+                    }
+                  }}
+                  aria-label={`${t("setScore")} — ${player.name}`}
+                >
+                  {player.score}
+                </div>
+                <button
+                  ref={customBtnRef}
+                  type="button"
+                  className="custom-delta-btn"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setCustomOpen((current) => !current);
+                  }}
+                  aria-label={t("customDelta")}
+                >
+                  ⋯
+                </button>
               </div>
-              <button
-                ref={customBtnRef}
-                type="button"
-                className="custom-delta-btn"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setCustomOpen((current) => !current);
-                }}
-                aria-label={t("customDelta")}
-              >
-                ⋯
-              </button>
-            </>
           )}
           <div className="step-col">
             <button
