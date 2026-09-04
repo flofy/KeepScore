@@ -14,7 +14,6 @@ describe('gameReducer', () => {
   it('adds score and records history', () => {
     const game = createGame(['Alice', 'Bob'])
     const next = gameReducer(game, { type: 'ADD_SCORE', playerId: game.players[0].id, delta: 5 })
-
     expect(next.players[0].score).toBe(5)
     expect(next.history).toHaveLength(1)
     expect(next.history[0].delta).toBe(5)
@@ -40,5 +39,19 @@ describe('gameReducer', () => {
     const game = createGame(['Alice', 'Bob'])
     const next = gameReducer(game, { type: 'ADD_PLAYER' })
     expect(next.players[2].name).toBe('Player 3')
+  })
+
+  it('removes a player and their history', () => {
+    const game = createGame(['Alice', 'Bob'])
+    const scored = gameReducer(game, { type: 'ADD_SCORE', playerId: game.players[0].id, delta: 3 })
+    const next = gameReducer(scored, { type: 'REMOVE_PLAYER', playerId: game.players[0].id })
+    expect(next.players.map(({ name }) => name)).toEqual(['Bob'])
+    expect(next.history).toEqual([])
+  })
+
+  it('never removes the last remaining player', () => {
+    const game = createGame(['Alice'])
+    const next = gameReducer(game, { type: 'REMOVE_PLAYER', playerId: game.players[0].id })
+    expect(next).toBe(game)
   })
 })
