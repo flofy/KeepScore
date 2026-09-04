@@ -157,7 +157,7 @@ h2 {
 
 .players {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(max(150px, 22vw), 1fr));
   gap: 18px;
 }
 .player-card {
@@ -257,46 +257,15 @@ h2 {
 }
 
 .players.duo {
-  position: relative;
   grid-template-columns: 1fr;
   gap: 10px;
 }
-.players.duo .player-card {
-  min-height: 44dvh;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.players.duo .player-card > strong {
-  margin: 20px 0;
-  font-size: clamp(96px, 26vw, 200px);
-}
-.players.duo .card-content {
-  justify-content: space-between;
-}
-.players.duo .player-name {
-  font-size: clamp(22px, 8cqw, 34px);
-}
-.players.duo .player-card .score-value {
-  font-size: clamp(40px, min(200px, calc(140cqw / var(--digits, 3))), 200px);
-}
-.players.duo .score-row {
-  gap: 16px;
-}
-.players.duo .quick-steps {
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-top: 18px;
-}
-.players.duo .quick-step {
-  height: clamp(44px, 18cqw, 66px);
-  font-size: clamp(18px, 9cqw, 32px);
-  border-radius: 16px;
-}
+
 .score-row {
+  flex: 1 1 auto;
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
+  align-content: center;
   align-items: stretch;
   gap: 14px;
   container-type: inline-size;
@@ -511,8 +480,8 @@ h2 {
   inset: 0;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 28px;
+  justify-content: flex-start;
+  padding: clamp(10px, 3cqi, 16px) clamp(10px, 5cqi, 24px);
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
   transform-origin: center center;
   text-align: center;
@@ -1066,11 +1035,7 @@ h2 {
     gap: 14px;
   }
   .player-card {
-    padding: 24px 18px;
     border-radius: 24px;
-  }
-  .player-card > strong {
-    margin: 28px 0;
   }
   .history {
     padding-top: 60px;
