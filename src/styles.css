@@ -160,37 +160,40 @@ h2 {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
 }
-.players.crowded {
+.players.portrait {
   gap: 12px;
   grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
 }
-.players.crowded .player-card {
-  min-height: clamp(130px, 22vh, 220px);
+.players.portrait .player-card {
+  min-height: clamp(150px, 24vh, 240px);
   padding: 0;
   border-radius: 20px;
 }
-.players.crowded .card-content {
+.players.portrait .card-content {
   padding: 14px;
 }
-.players.crowded .player-name {
+.players.portrait .player-name {
   font-size: clamp(16px, 3vw, 22px);
 }
-.players.crowded .score-row .score-value {
+.players.portrait .score-row {
+  gap: 8px;
+}
+.players.portrait .score-row .score-value {
   font-size: clamp(22px, min(72px, calc(90cqw / var(--digits, 2))), 72px);
 }
-.players.crowded .inline-step {
+.players.portrait .inline-step {
   height: clamp(38px, 8vw, 48px);
   min-width: clamp(38px, 8vw, 48px);
-  padding: 0 12px;
+  padding: 0 10px;
   font-size: clamp(16px, 4vw, 22px);
 }
-.players.crowded .quick-stack,
-.players.crowded .step-col {
+.players.portrait .quick-stack,
+.players.portrait .step-col {
   gap: 3px;
 }
-.players.crowded .quick-step {
-  min-height: 18px;
-  font-size: clamp(10px, 2.4vw, 12px);
+.players.portrait .quick-step {
+  min-height: 22px;
+  font-size: clamp(10px, 2.4vw, 13px);
 }
 .player-card {
   position: relative;
@@ -416,34 +419,42 @@ h2 {
 
 .score-tooltip {
   position: absolute;
-  z-index: 5;
+  z-index: 50;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 14px;
-  border-radius: 20px;
+  padding: 10px 12px;
+  border-radius: 18px;
   background: rgb(2 6 23 / 86%);
   backdrop-filter: blur(10px);
   box-shadow: 0 20px 60px rgb(0 0 0 / 40%);
-  animation: popup-in 0.14s ease;
-  max-width: min(240px, 70cqw);
+  animation: tooltip-in 0.14s ease;
+  max-width: min(300px, 92cqw);
   top: 50%;
   left: 50%;
   transform: translate(-50%, -100%);
 }
-.score-tooltip .quick-grid {
-  grid-template-columns: repeat(4, 1fr);
+@keyframes tooltip-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 .score-tooltip button {
   border: 0;
   border-radius: 12px;
   background: transparent;
   color: #f8fafc;
-  font-size: clamp(12px, 2.8vw, 20px);
+  font-size: clamp(13px, 3vw, 20px);
   font-weight: 700;
   cursor: pointer;
   min-height: 44px;
-  min-width: 40px;
+  min-width: 52px;
+  padding: 0 10px;
 }
 .score-tooltip .delta-neg {
   background: linear-gradient(135deg, #b91c1c, #ef4444);
@@ -457,193 +468,63 @@ h2 {
 .score-tooltip button:active {
   transform: scale(0.95);
 }
-.score-tooltip input {
+.score-input {
   width: 100%;
   min-height: 44px;
-  border: 0;
+  border: 2px solid var(--player-color, #7dd3fc);
   border-radius: 14px;
-  background: rgb(255 255 255 / 8%);
-  color: #f8fafc;
-  font-size: clamp(16px, 3.5vw, 24px);
-  font-weight: 700;
+  background: rgb(255 255 255 / 12%);
+  color: inherit;
+  font-family: inherit;
+  font-weight: inherit;
   text-align: center;
   padding: 0 8px;
+  cursor: text;
 }
-.score-tooltip input::placeholder {
-  color: #64748b;
-  font-size: clamp(12px, 2.8vw, 16px);
+.score-input:focus {
+  outline: none;
+  background: rgb(255 255 255 / 18%);
 }
-.score-tooltip .editor-save {
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-  color: #fff;
-  font-size: 16px;
-  font-weight: 700;
-  min-height: 44px;
-  cursor: pointer;
-}
-.score-tooltip .editor-save:hover {
-  filter: brightness(1.15);
-}
-.score-tooltip .editor-save:active {
-  transform: scale(0.95);
-}
-.custom-delta-btn {
-  position: absolute;
-  bottom: 12px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 36px;
-  height: 28px;
+.score-edit-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  border: 1px solid rgb(255 255 255 / 15%);
-  border-radius: 12px;
-  background: rgb(148 163 184 / 10%);
-  color: #cbd5e1;
-  font-size: 18px;
-  font-weight: 700;
-  cursor: pointer;
-  z-index: 3;
+  gap: 8px;
+  width: 100%;
 }
-.custom-delta-btn:hover {
-  background: rgb(148 163 184 / 20%);
-  color: #f8fafc;
+.score-edit-row .score-input {
+  flex: 1;
+  min-width: 0;
+  font-size: clamp(30px, 8vw, 56px);
 }
-.custom-delta-btn:active {
-  transform: translate(-50%) scale(0.95);
-}
-.score-popup {
-  position: absolute;
-  inset: 0;
-  z-index: 5;
+.score-edit-actions {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 48px 16px 16px;
-  border-radius: 28px;
-  background: rgb(2 6 23 / 86%);
-  backdrop-filter: blur(10px);
-  animation: popup-in 0.14s ease;
+  gap: 4px;
 }
-.popup-close {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 38px;
-  height: 38px;
+.score-edit-btn {
+  width: 40px;
+  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
   font-size: 20px;
-  color: #94a3b8;
-  background: transparent;
-  border: 0;
-  border-radius: 50%;
+  font-weight: 800;
   cursor: pointer;
-  z-index: 2;
 }
-.popup-close:hover,
-.popup-close:active,
-.popup-close:focus {
-  color: #f8fafc;
-  background: transparent;
-  outline: none;
-}
-.quick-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-}
-.score-popup button {
-  border: 0;
-  border-radius: 14px;
-  background: transparent;
-  color: #f8fafc;
-  font-size: clamp(14px, 3.6vw, 20px);
-  font-weight: 700;
-  cursor: pointer;
-  min-height: 44px;
-}
-.score-popup .delta-neg {
+.score-edit-btn.neg {
   background: linear-gradient(135deg, #b91c1c, #ef4444);
 }
-.score-popup .delta-pos {
+.score-edit-btn.pos {
   background: linear-gradient(135deg, #2563eb, #7c3aed);
 }
-.score-popup button:hover {
+.score-edit-btn:hover {
   filter: brightness(1.15);
 }
-.score-popup button:active {
+.score-edit-btn:active {
   transform: scale(0.95);
-}
-.custom-row {
-  display: flex;
-  gap: 8px;
-}
-.custom-row input {
-  flex: 1;
-  min-height: 44px;
-  border: 0;
-  border-radius: 14px;
-  background: rgb(255 255 255 / 8%);
-  color: #f8fafc;
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-}
-.custom-row input::placeholder {
-  color: #64748b;
-  font-size: 15px;
-}
-.custom-row .editor-save {
-  min-width: 64px;
-  border: 0;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-  font-size: 16px;
-}
-.score-popup.positive .quick-grid,
-.score-popup.negative .quick-grid {
-  grid-template-columns: repeat(4, 1fr);
-}
-
-.score-popup.score-editor {
-  place-items: stretch;
-  gap: 12px;
-}
-.score-popup.score-editor input {
-  grid-column: 1 / -1;
-  width: 100%;
-  min-height: 72px;
-  border: 1px solid rgb(255 255 255 / 14%);
-  border-radius: 18px;
-  background: rgb(255 255 255 / 8%);
-  color: #f8fafc;
-  font-size: 32px;
-  font-weight: 800;
-  text-align: center;
-}
-.score-popup.score-editor button {
-  width: 100%;
-  min-width: 0;
-  min-height: 56px;
-  font-size: 20px;
-  background: rgb(100 116 139 / 30%);
-}
-.score-popup.score-editor .editor-save {
-  background: linear-gradient(135deg, #1d4ed8, #3b82f6);
-  font-weight: 800;
-}
-.score-popup.score-editor .score-cancel {
-  grid-column: auto;
-  background: rgb(100 116 139 / 30%);
-  color: #cbd5e1;
-}
-.score-popup.score-editor button:hover {
-  filter: brightness(1.15);
 }
 .card-content {
   position: absolute;
@@ -659,9 +540,8 @@ h2 {
 .player-card.rotated-180 .card-content {
   transform: rotate(180deg);
 }
-.player-card.rotated-180 .score-popup,
-.player-card.rotated-180 .score-popup.score-editor {
-  transform: rotate(180deg);
+.player-card.rotated-180 .score-tooltip {
+  transform: translate(-50%, -100%) rotate(180deg);
 }
 .player-card.rotated-180 .card-flip-btn {
   top: auto;
@@ -758,10 +638,6 @@ h2 {
   color: #7dd3fc;
   font-size: 12px;
   font-weight: 800;
-}
-.score-popup.positive,
-.score-popup.negative {
-  grid-template-columns: 1fr 1fr;
 }
 
 .quick-actions {
@@ -970,7 +846,8 @@ h2 {
   border-radius: 12px;
   background: rgb(255 255 255 / 4%);
 }
-.menu-item.lang.active {
+.menu-item.lang.active,
+.menu-item.portrait.active {
   border-color: rgb(125 211 252 / 60%);
   color: #7dd3fc;
   background: rgb(125 211 252 / 10%);
@@ -1209,17 +1086,17 @@ h2 {
     grid-template-columns: 1fr;
     gap: 14px;
   }
-  .players.crowded {
+  .players.portrait {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
-  .players.crowded .card-content {
+  .players.portrait .card-content {
     padding: 10px;
   }
-  .players.crowded .player-name {
+  .players.portrait .player-name {
     font-size: clamp(13px, 3.5vw, 16px);
   }
-  .players.crowded .score-row .score-value {
+  .players.portrait .score-row .score-value {
     font-size: clamp(18px, min(56px, calc(75cqw / var(--digits, 2))), 56px);
   }
   .player-card {
