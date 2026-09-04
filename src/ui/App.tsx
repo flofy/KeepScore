@@ -814,7 +814,22 @@ function GameScreen({
           </button>
         </div>
         <section
-          className={isDuo ? "players duo" : "players"}
+          className={
+            isDuo
+              ? "players duo"
+              : game.players.length >= 4
+                ? "players crowded"
+                : "players"
+          }
+          style={
+            (!isDuo &&
+              game.players.length > 2 && {
+                "--cols": String(
+                  Math.max(2, Math.min(4, Math.ceil(game.players.length / 2))),
+                ),
+              } as CSSProperties) ||
+            undefined
+          }
           aria-label={t("players")}
         >
           {orderedPlayers.map((player, index) => {
