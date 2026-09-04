@@ -394,10 +394,10 @@ h2 {
   border-radius: 18px;
   background: transparent;
   animation: tooltip-in 0.14s ease;
-  max-width: min(320px, 94cqw);
+  max-width: calc(100% - 20px);
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%, -50%);
 }
 @keyframes tooltip-in {
   from {
@@ -418,6 +418,33 @@ h2 {
   min-height: 44px;
   min-width: 52px;
   padding: 0 10px;
+  flex: none;
+}
+.score-tooltip input {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: 56px;
+  max-width: 110px;
+  min-height: 44px;
+  border: 2px solid var(--player-color, #7dd3fc);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 12%);
+  color: #f8fafc;
+  font-size: clamp(16px, 3.5vw, 24px);
+  font-weight: 700;
+  text-align: center;
+  padding: 0 6px;
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+.score-tooltip input::-webkit-inner-spin-button,
+.score-tooltip input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.score-tooltip input:focus {
+  outline: none;
+  background: rgb(255 255 255 / 18%);
 }
 .score-tooltip .delta-neg {
   background: linear-gradient(135deg, #b91c1c, #ef4444);
