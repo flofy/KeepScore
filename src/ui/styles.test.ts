@@ -50,7 +50,7 @@ describe('player card fluid layout (styles.css)', () => {
   it('scales the card height with the container, not a fixed value', () => {
     const card = rules.find((rule) => rule.selector === '.player-card')
     const minHeight = card?.body.match(/min-height:\s*([^;]+);/)?.[1] ?? ''
-    expect(minHeight).toMatch(/cqw|dvh|vh|%/)
+    expect(minHeight).toMatch(/cq[wihb]|dvh|vh|%/)
   })
 
   const fluidFontSelectors = [
