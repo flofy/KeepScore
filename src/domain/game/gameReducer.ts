@@ -8,6 +8,7 @@ export type GameAction =
   | { type: 'RENAME_GAME'; name: string }
   | { type: 'RESET_SCORE'; playerId: string }
   | { type: 'ADD_PLAYER'; name?: string }
+  | { type: 'REMOVE_PLAYER'; playerId: string }
   | { type: 'EDIT_HISTORY_ENTRY'; entryId: string; delta: number }
   | { type: 'DELETE_HISTORY_ENTRY'; entryId: string }
 
@@ -32,6 +33,17 @@ export function gameReducer(game: Game, action: GameAction): Game {
       const name = action.name?.trim() || `Player ${game.players.length + 1}`
       const player = { id: crypto.randomUUID(), name, score: 0, color: colorForIndex(game.players.length) }
       return { ...game, players: [...game.players, player], updatedAt }
+    }
+    case 'REMOVE_PLAYER': {
+      if (game.players.length <= 1) return game
+      const playerExists = game.players.some((player) => player.id === action.playerId)
+      if (!playerExists) return game
+      return {
+        ...game,
+        players: game.players.filter((player) => player.id !== action.playerId),
+        history: game.history.filter((entry) => entry.playerId !== action.playerId),
+        updatedAt,
+      }
     }
     case 'EDIT_HISTORY_ENTRY': return updateHistoryEntry(game, action.entryId, action.delta)
     case 'DELETE_HISTORY_ENTRY': return removeHistoryEntry(game, action.entryId)
