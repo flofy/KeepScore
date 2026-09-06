@@ -19,4 +19,5 @@ export type Game = {
   history: ScoreEntry[]
   createdAt: number
   updatedAt: number
+  startingPlayerId?: string
 }
