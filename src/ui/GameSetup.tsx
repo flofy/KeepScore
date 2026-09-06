@@ -5,9 +5,13 @@ import { GAME_PRESETS } from '../domain/game/presets'
 import type { Game } from '../domain/game/types'
 import { useI18n } from './i18n'
 
-type Props = { onCreate: (game: Game) => void; onBack?: () => void }
+type Props = { 
+  onCreate: (game: Game) => void; 
+  onBack?: () => void;
+  onDetermineStartingPlayer?: (game: Game) => void;
+}
 
-export function GameSetup({ onCreate, onBack }: Props) {
+export function GameSetup({ onCreate, onBack, onDetermineStartingPlayer }: Props) {
   const { t } = useI18n()
   const [names, setNames] = useState(['Alice', 'Bob'])
   const [colors, setColors] = useState<string[]>(() => names.map((_, index) => colorForIndex(index)))
@@ -43,6 +47,19 @@ export function GameSetup({ onCreate, onBack }: Props) {
     const playerNames = names.map((name) => name.trim()).filter(Boolean)
     const playerColors = names.map((name, index) => (name.trim() ? colors[index] : undefined)).filter((color): color is string => Boolean(color))
     onCreate(createGame(playerNames, gameName.trim(), safeStartingScore, playerColors))
+  }
+
+  function determineStartingPlayer() {
+    const parsedStartingScore = Number(startingScore)
+    const safeStartingScore = Number.isFinite(parsedStartingScore) ? Math.trunc(parsedStartingScore) : 0
+    const playerNames = names.map((name) => name.trim()).filter(Boolean)
+    const playerColors = names.map((name, index) => (name.trim() ? colors[index] : undefined)).filter((color): color is string => Boolean(color))
+    const game = createGame(playerNames, gameName.trim(), safeStartingScore, playerColors)
+    if (onDetermineStartingPlayer) {
+      onDetermineStartingPlayer(game)
+    } else {
+      onCreate(game)
+    }
   }
 
   return (
@@ -87,9 +104,9 @@ export function GameSetup({ onCreate, onBack }: Props) {
             {names.map((name, index) => (
               <div className="player-editor" key={index}>
                 <span className="player-number">{index + 1}</span>
-                <input value={name} onChange={(event) => updateName(index, event.target.value)} aria-label={`${t('playerNumber')} ${index + 1} ${t('playerName')}`} />
-                <button className="icon-button" type="button" onClick={() => removePlayer(index)} disabled={names.length <= 1} aria-label={`${t('removePlayer')} ${index + 1}`}>×</button>
-                <div className="color-row" role="radiogroup" aria-label={`${t('colorForPlayer')} ${index + 1}`}>
+                <input value={name} onChange={(event) => updateName(index, event.target.value)} aria-label={t('playerNumber') + ' ' + (index + 1) + ' ' + t('playerName')} />
+                <button className="icon-button" type="button" onClick={() => removePlayer(index)} disabled={names.length <= 1} aria-label={t('removePlayer') + ' ' + (index + 1)}>×</button>
+                <div className="color-row" role="radiogroup" aria-label={t('colorForPlayer') + ' ' + (index + 1)}>
                   {PLAYER_COLORS.map((color) => (
                     <button
                       key={color}
@@ -99,7 +116,7 @@ export function GameSetup({ onCreate, onBack }: Props) {
                       className={colors[index] === color ? 'color-dot selected' : 'color-dot'}
                       style={{ background: color }}
                       onClick={() => setColor(index, color)}
-                      aria-label={`${t('setPlayerColor')} ${color} ${t('playerNumber')} ${index + 1}`}
+                      aria-label={t('setPlayerColor') + ' ' + color + ' ' + t('playerNumber') + ' ' + (index + 1)}
                     />
                   ))}
                 </div>
@@ -109,6 +126,16 @@ export function GameSetup({ onCreate, onBack }: Props) {
           <button className="add-player-button" type="button" onClick={addPlayer}>{t('addPlayer')}</button>
         </section>
         <button className="primary-button" type="button" onClick={startGame}>{t('startGame')} <span>→</span></button>
+        {onDetermineStartingPlayer && names.length > 1 && (
+          <button 
+            className="secondary-button determine-starter-button" 
+            type="button" 
+            onClick={determineStartingPlayer}
+            style={{ marginTop: 8 }}
+          >
+            🎲 {t('determineWhoStarts')}
+          </button>
+        )}
       </div>
     </main>
   )
