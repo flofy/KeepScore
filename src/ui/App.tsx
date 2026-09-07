@@ -10,7 +10,6 @@ import { GameSetup } from "./GameSetup";
 import { ChwatziScreen } from "./ChwatziScreen";
 import { SavedGames } from "./SavedGames";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
-import { createGame } from "../domain/game/gameFactory";
 import {
   downloadGames,
   importGames,
@@ -25,7 +24,7 @@ import "./chwatzi.css";
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
 }
-type Screen = "setup" | "chwatzi" | "game" | "saved";
+type Screen = "chwatzi" | "game" | "saved";
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
@@ -232,10 +231,12 @@ function PlayerCard({
   return (
     <article
       className={rotation ? `player-card rotated-${rotation}` : "player-card"}
-      style={{
-        "--player-color": player.color ?? "#38bdf8",
-        "--digits": String(Math.abs(player.score)).length,
-      } as CSSProperties}
+      style={
+        {
+          "--player-color": player.color ?? "#38bdf8",
+          "--digits": String(Math.abs(player.score)).length,
+        } as CSSProperties
+      }
       onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}
@@ -365,36 +366,36 @@ function PlayerCard({
               aria-label={`${t("setScore")} — ${player.name}`}
             />
           ) : (
-            <div className="score-center">
-              <div
-                ref={scoreValueRef}
-                className="score-value"
-                onClick={onScoreClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onScoreClick();
-                  }
-                }}
-                aria-label={`${t("setScore")} — ${player.name}`}
-              >
-                {player.score}
+              <div className="score-center">
+                <div
+                  ref={scoreValueRef}
+                  className="score-value"
+                  onClick={onScoreClick}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onScoreClick();
+                    }
+                  }}
+                  aria-label={`${t("setScore")} — ${player.name}`}
+                >
+                  {player.score}
+                </div>
+                <button
+                  ref={customBtnRef}
+                  type="button"
+                  className="custom-delta-btn"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setCustomOpen((current) => !current);
+                  }}
+                  aria-label={t("customDelta")}
+                >
+                  ⋯
+                </button>
               </div>
-              <button
-                ref={customBtnRef}
-                type="button"
-                className="custom-delta-btn"
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setCustomOpen((current) => !current);
-                }}
-                aria-label={t("customDelta")}
-              >
-                ⋯
-              </button>
-            </div>
           )}
           <div className="step-col">
             <button
@@ -566,10 +567,12 @@ function GameScreen({
   initialGame,
   onNewGame,
   onSavedGames,
+  onChwatzi,
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
+  onChwatzi: () => void;
 }) {
   const {
     present: game,
@@ -822,7 +825,7 @@ function GameScreen({
                 ? "players crowded"
                 : "players"
           }
-          style={{
+          style={
             (!isDuo &&
               game.players.length > 2 && {
                 "--cols": String(
@@ -830,7 +833,7 @@ function GameScreen({
                 ),
               } as CSSProperties) ||
             undefined
-          }}
+          }
           aria-label={t("players")}
         >
           {orderedPlayers.map((player, index) => {
@@ -998,7 +1001,7 @@ function GameScreen({
               type="button"
               onClick={() => {
                 setMenuOpen(false);
-                onNewGame();
+                onChwatzi();
               }}
             >
               🎲 {t("whoStarts")}
@@ -1110,95 +1113,49 @@ function SavedScreen({
   );
 }
 
-function App() {
+export function App() {
   const [screen, setScreen] = useState<Screen>("game");
   const [game, setGame] = useState<Game | undefined>(
     () => localGameRepository.list()[0],
   );
-  const [gameInSetup, setGameInSetup] = useState<Game | null>(null);
 
+  if (screen === "chwatzi" && game)
+    return (
+      <ChwatziScreen
+        game={game}
+        onSelect={() => setScreen("game")}
+        onBack={() => setScreen("game")}
+      />
+    );
   if (screen === "saved")
     return (
-      <I18nProvider>
-        <SavedScreen
-          onResume={(selected) => {
-            setGame(selected);
-            setScreen("game");
-          }}
-          onBack={() => setScreen("game")}
-        />
-      </I18nProvider>
+      <SavedScreen
+        onResume={(selected) => {
+          setGame(selected);
+          setScreen("game");
+        }}
+        onBack={() => setScreen("game")}
+      />
     );
-
-  if (screen === "setup")
-    return (
-      <I18nProvider>
-        <GameSetup
-          onCreate={(playerNames, options) => {
-            const game = createGame(
-              playerNames,
-              options?.name,
-              options?.startingScore,
-              options?.colors,
-            );
-            setGameInSetup(game);
-            setScreen("chwatzi");
-          }}
-          onBack={() => setScreen("saved")}
-        />
-      </I18nProvider>
-    );
-
-  if (screen === "chwatzi" && gameInSetup)
-    return (
-      <I18nProvider>
-        <ChwatziScreen
-          game={gameInSetup}
-          onSelect={(startingPlayerId) => {
-            const gameWithStartingPlayer = {
-              ...gameInSetup,
-              startingPlayerId,
-            };
-            localGameRepository.save(gameWithStartingPlayer);
-            setScreen("game");
-          }}
-          onBack={() => setScreen("setup")}
-        />
-      </I18nProvider>
-    );
-
   if (!game)
     return (
-      <I18nProvider>
-        <GameSetup
-          onCreate={setGame}
-          onBack={
-            localGameRepository.list().length > 0
-              ? () => setScreen("saved")
-              : undefined
-          }
-        />
-      </I18nProvider>
+      <GameSetup
+        onCreate={setGame}
+        onBack={
+          localGameRepository.list().length > 0
+            ? () => setScreen("saved")
+            : undefined
+        }
+      />
     );
 
   return (
-    <I18nProvider>
-      <GameScreen
-        key={game.id}
-        initialGame={game}
-        onNewGame={() => setScreen("setup")}
-        onSavedGames={() => setScreen("saved")}
-      />
-    </I18nProvider>
+    <GameScreen
+      key={game.id}
+      initialGame={game}
+      onNewGame={() => setGame(undefined)}
+      onSavedGames={() => setScreen("saved")}
+      onChwatzi={() => setScreen("chwatzi")}
+    />
   );
 }
-
-function Root() {
-  return (
-    <I18nProvider>
-      <App />
-    </I18nProvider>
-  );
-}
-
-export default Root;
