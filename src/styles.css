@@ -1092,6 +1092,51 @@ h2 {
 .back-button:active {
   transform: scale(0.93);
 }
+/* Route shell: common chrome wrapper for router-rendered screens. */
+.route-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+}
+
+/* Floating chrome (install banner + language switch), anchored to the
+   top-right corner of the viewport, above every screen's own layout. */
+.route-chrome {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  right: calc(14px + env(safe-area-inset-right));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  z-index: 30;
+}
+
+/* Back control for screens without a built-in one (saved games), matching
+   the in-card back buttons: a quiet ghost square next to the list. */
+.saved-back-button {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  left: calc(14px + env(safe-area-inset-left));
+  width: 40px;
+  height: 40px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 12px;
+  background: rgb(15 23 42 / 88%);
+  color: #e2e8f0;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 30;
+  transition:
+    background 0.15s ease,
+    transform 0.1s ease;
+}
+.saved-back-button:hover {
+  background: rgb(30 41 59 / 96%);
+}
+.saved-back-button:active {
+  transform: scale(0.93);
+}
+
 .setup-header {
   margin-bottom: 34px;
 }

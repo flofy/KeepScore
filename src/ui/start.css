@@ -114,7 +114,9 @@
 }
 
 .chwatzi-btn {
-  border-color: rgba(56, 189, 248, 0.3);
+  border-color: rgba(56, 189, 248, 0
+
+.3);
 }
 
 .chwatzi-btn:hover {
@@ -226,7 +228,9 @@
   
   .player-count-selector {
     padding: 10px 16px;
-    gap: 10px;
+
+ 
+   gap: 10px;
   }
   
   .count-btn {
@@ -239,3 +243,8 @@
     font-size: 16px;
   }
 }
+
+/* Back button */
+.back-button { position: absolute; top: 16px; left: 16px; width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #f8fafc; font-size: 20px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; z-index: 10; }
+.back-button:hover:not(:disabled) { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.2); }
+.back-button:disabled { opacity: 0.5; cursor: not-allowed; }
