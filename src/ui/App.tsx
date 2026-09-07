@@ -1060,6 +1060,15 @@ export function App() {
   const { t, lang } = useI18n();
   const [screen, setScreen] = useState<Screen>('start');
   const [currentGame, setCurrentGame] = useState<Game | null>(null);
+  const [savedGames, setSavedGames] = useState<Game[]>([]);
+
+  useEffect(() => {
+    const loadSavedGames = async () => {
+      const games = await localGameRepository.list();
+      setSavedGames(games);
+    };
+    loadSavedGames();
+  }, []);
 
   const handleNewGame = useCallback(() => {
     setScreen('game');
@@ -1098,6 +1107,17 @@ export function App() {
     setScreen('start');
   }, []);
 
+  const handleResumeGame = useCallback((game: Game) => {
+    setCurrentGame(game);
+    setScreen('game');
+  }, []);
+
+  const handleDeleteGame = useCallback(async (id: string) => {
+    await localGameRepository.delete(id);
+    const games = await localGameRepository.list();
+    setSavedGames(games);
+  }, []);
+
   return (
     <I18nProvider>
       <LangFlags />
@@ -1119,7 +1139,6 @@ export function App() {
         <ChwatziScreen
           game={currentGame}
           onSelect={(startingPlayerId) => {
-            // Navigate back to game screen with the selected starting player
             setCurrentGame(prev => prev ? { ...prev, startingPlayerId } : null);
             setScreen('game');
           }}
@@ -1128,9 +1147,9 @@ export function App() {
       )}
       {screen === 'saved' && (
         <SavedGames
-          onSelect={handleGameSelect}
-          onNewGame={handleNewGame}
-          onBack={handleBackFromSaved}
+          games={savedGames}
+          onResume={handleResumeGame}
+          onDelete={handleDeleteGame}
         />
       )}
     </I18nProvider>
