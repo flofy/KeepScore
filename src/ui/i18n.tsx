@@ -20,6 +20,7 @@ export type TranslationKey =
   | 'modeRoulette' | 'modeMultitouch' | 'pickSingle' | 'pickOrder'
   | 'multitouchInstructions' | 'multitouchSingleHint' | 'multitouchOrderHint'
   | 'multitouchWaiting' | 'multitouchHold' | 'playOrder' | 'tryAgain'
+  | 'startNewGame' | 'startChwatzi' | 'or'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -61,6 +62,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     multitouchHold: 'Hold... selecting!',
     playOrder: 'Play order',
     tryAgain: 'Try again',
+    startNewGame: 'Start a new game',
+    startChwatzi: 'Pick a random starter',
+    or: 'or',
   },
   fr: {
     appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
@@ -101,6 +105,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     multitouchHold: 'Maintenez... selection !',
     playOrder: 'Ordre de jeu',
     tryAgain: 'Reessayer',
+    startNewGame: 'Demarrer une nouvelle partie',
+    startChwatzi: 'Lancer Chwatzi',
+    or: 'ou',
   },
 }
 
