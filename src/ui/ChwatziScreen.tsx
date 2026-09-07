@@ -27,6 +27,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const [countdownValue, setCountdownValue] = useState(3)
   const [blinkingIndex, setBlinkingIndex] = useState<number | null>(null)
   const [selectedFingerIndex, setSelectedFingerIndex] = useState<number | null>(null)
+  const [colorWipeVisible, setColorWipeVisible] = useState(false)
   const [showBackButton, setShowBackButton] = useState(false)
   const holdTimerRef = useRef<number | null>(null)
   const countdownTimerRef = useRef<number | null>(null)
@@ -34,10 +35,17 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const selectedBackgroundTimerRef = useRef<number | null>(null)
   const noTouchTimerRef = useRef<number | null>(null)
   const selectedPlayerRef = useRef<ColoredPlayer | null>(null)
-  const selectedFingerIndexRef = useRef<number | null>(null)
-  const selectionStartedAtRef = useRef<number | null>(null)
 
   useEffect(() => setDisplayPlayers(players), [game.id, game.players.length])
+  useEffect(() => {
+    if (countdown !== 'selected') {
+      setColorWipeVisible(false)
+      return
+    }
+    const frame = window.requestAnimationFrame(() => setColorWipeVisible(true))
+    return () => window.cancelAnimationFrame(frame)
+  }, [countdown])
+
   const clearTimers = useCallback(() => {
     if (spinTimerRef.current !== null) window.clearInterval(spinTimerRef.current)
     if (holdTimerRef.current !== null) window.clearTimeout(holdTimerRef.current)
@@ -85,9 +93,8 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
     setBlinkingIndex(null)
     setSelectedFingerIndex(null)
     setSelectedPlayer(null)
+    setColorWipeVisible(false)
     selectedPlayerRef.current = null
-    selectedFingerIndexRef.current = null
-    selectionStartedAtRef.current = null
     setShowBackButton(false)
     if (holdTimerRef.current !== null) window.clearTimeout(holdTimerRef.current)
     if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current)
@@ -98,10 +105,9 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const finishSelection = useCallback(() => {
     const player = selectedPlayerRef.current
     if (!player) return
-    if (countdown !== 'selected') setCountdown('selected')
     if ('vibrate' in navigator) navigator.vibrate([100, 60, 180])
     onSelect(player.id)
-  }, [countdown, onSelect])
+  }, [onSelect])
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
     if (mode !== 'multitouch' || countdown !== 'idle') return
@@ -135,7 +141,6 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
     if (countdown !== 'idle' || fingers.length < players.length || players.length === 0) return
     setCountdown('counting')
     setCountdownValue(3)
-    selectionStartedAtRef.current = Date.now()
     let count = 3
     countdownTimerRef.current = window.setInterval(() => {
       count -= 1
@@ -145,7 +150,6 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
         const maxFingerIndex = Math.min(fingers.length, players.length) - 1
         const winnerIndex = Math.floor(Math.random() * (maxFingerIndex + 1))
         const winner = players[winnerIndex]
-        selectedFingerIndexRef.current = winnerIndex
         selectedPlayerRef.current = winner
         setSelectedFingerIndex(winnerIndex)
         setSelectedPlayer(winner)
@@ -161,9 +165,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
             setBlinkingIndex(null)
             setCountdown('selected')
             if ('vibrate' in navigator) navigator.vibrate([70, 50, 140])
-            selectedBackgroundTimerRef.current = window.setTimeout(() => {
-              finishSelection()
-            }, SELECTED_BACKGROUND_MS)
+            selectedBackgroundTimerRef.current = window.setTimeout(finishSelection, SELECTED_BACKGROUND_MS)
             return
           }
           setBlinkingIndex(index)
@@ -188,13 +190,12 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   }, [fingers.length, mode])
 
   const selectedColor = selectedPlayer?.color ?? '#0f172a'
-  const backgroundStyle = countdown === 'selected' ? ({ '--selected-player-color': selectedColor } as CSSProperties) : undefined
 
   return (
     <main className="chwatzi-screen">
       {mode === 'multitouch' ? (
         <div className="multitouch-overlay" onPointerDown={handlePointerDown} onPointerMove={handlePointerMove} onPointerUp={handlePointerUp} onPointerCancel={handlePointerUp}>
-          {countdown === 'selected' && <div className="multitouch-color-wipe" style={{ backgroundColor: selectedColor }} aria-hidden="true" />}
+          {countdown === 'selected' && <div className="multitouch-color-wipe" style={{ backgroundColor: selectedColor, transform: colorWipeVisible ? 'scaleY(1)' : 'scaleY(0)' }} aria-hidden="true" />}
           {showBackButton && onBack && countdown === 'idle' && <button className="multitouch-back-btn" type="button" onPointerDown={e => e.stopPropagation()} onClick={onBack}>← {t('back')}</button>}
           {countdown === 'counting' && <span className="countdown-number">{countdownValue}</span>}
           {(countdown === 'idle' || countdown === 'counting' || countdown === 'blinking' || countdown === 'selected') && fingers.map((finger, index) => {
