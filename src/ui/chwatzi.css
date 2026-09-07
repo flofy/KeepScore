@@ -47,6 +47,79 @@
   margin: 0;
 }
 
+/* Mode Toggle */
+.chwatzi-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mode-btn:hover:not(:disabled) {
+  color: #e2e8f0;
+}
+
+.mode-btn.active {
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+}
+
+.mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Pick Mode Toggle */
+.pick-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pick-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pick-btn:hover:not(:disabled) {
+  border-color: rgba(255, 255, 255, 0.2);
+  color: #e2e8f0;
+}
+
+.pick-btn.active {
+  border-color: rgba(56, 189, 248, 0.5);
+  background: rgba(56, 189, 248, 0.1);
+  color: #38bdf8;
+}
+
+.pick-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* Roulette Wheel */
 .chwatzi-roulette {
   margin: 24px 0;
@@ -158,6 +231,23 @@
   margin-top: 8px;
 }
 
+.secondary-button {
+  padding: 12px 24px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: #94a3b8;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.secondary-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
 /* Back button */
 .chwatzi-card .back-button {
   position: absolute;
@@ -186,6 +276,159 @@
   cursor: not-allowed;
 }
 
+/* Multi-touch Zone */
+.multitouch-zone {
+  min-height: 280px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 2px dashed rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  margin: 16px 0;
+  transition: border-color 0.2s ease;
+}
+
+.multitouch-zone:active {
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+.multitouch-instructions {
+  text-align: center;
+  padding: 24px;
+}
+
+.multitouch-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.multitouch-instructions p {
+  font-size: 16px;
+  color: #e2e8f0;
+  margin: 0 0 8px;
+}
+
+.multitouch-instructions .muted.small {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.multitouch-fingers {
+  position: absolute;
+  inset: 0;
+}
+
+.finger-dot {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  transition: transform 0.1s ease;
+  pointer-events: none;
+}
+
+.multitouch-count {
+  position: absolute;
+  bottom: 12px;
+  right: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 4px 12px;
+  border-radius: 8px;
+}
+
+/* Multi-touch Result */
+.multitouch-result {
+  text-align: center;
+}
+
+.result-label {
+  font-size: 14px;
+  color: #94a3b8;
+  margin: 0 0 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.winner-card {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 32px;
+  border-radius: 16px;
+  background: rgba(56, 189, 248, 0.1);
+  border: 2px solid var(--player-color);
+  margin-bottom: 20px;
+}
+
+.winner-card strong {
+  font-size: 22px;
+  color: #f8fafc;
+}
+
+.order-result {
+  margin-bottom: 20px;
+}
+
+.order-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.order-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-left: 3px solid var(--player-color);
+}
+
+.order-rank {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(56, 189, 248, 0.2);
+  color: #38bdf8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* Utility */
+.muted.small {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.center-text {
+  text-align: center;
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .chwatzi-card {
@@ -203,5 +446,9 @@
   
   .roulette-item {
     padding: 14px 16px;
+  }
+  
+  .multitouch-zone {
+    min-height: 240px;
   }
 }
