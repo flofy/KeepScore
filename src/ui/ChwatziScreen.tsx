@@ -39,9 +39,11 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const [countdown, setCountdown] = useState<CountdownState>('idle')
   const [countdownValue, setCountdownValue] = useState(3)
   const [blinkingIndex, setBlinkingIndex] = useState(0)
+  const [showBackButton, setShowBackButton] = useState(false)
   const holdTimerRef = useRef<number | null>(null)
   const countdownTimerRef = useRef<number | null>(null)
   const blinkTimerRef = useRef<number | null>(null)
+  const noTouchTimerRef = useRef<number | null>(null)
 
   // Joueurs avec leurs couleurs
   const playersWithColors = game.players.map((player, index) => ({
@@ -129,6 +131,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
       if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
       if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current)
       if (blinkTimerRef.current) clearInterval(blinkTimerRef.current)
+      if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
     }
   }, [])
 
@@ -136,6 +139,25 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   useEffect(() => {
     setDisplayPlayers(playersWithColors)
   }, [playersWithColors])
+
+  // Start no-touch timer when entering multitouch mode
+  useEffect(() => {
+    if (mode !== 'multitouch') {
+      setShowBackButton(false)
+      if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
+      return
+    }
+    // Show back button after 3 seconds of no touch
+    if (fingers.length === 0) {
+      if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
+      noTouchTimerRef.current = window.setTimeout(() => {
+        setShowBackButton(true)
+      }, 3000)
+    } else {
+      setShowBackButton(false)
+      if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
+    }
+  }, [mode, fingers.length])
 
   // --- Multi-touch logic ---
 
@@ -148,6 +170,8 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
       if (prev.some(f => f.pointerId === pointerId)) return prev
       return [...prev, { pointerId, x: e.clientX, y: e.clientY }]
     })
+    setShowBackButton(false)
+    if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
     if ('vibrate' in navigator) navigator.vibrate(30)
   }, [mode, countdown])
 
@@ -174,9 +198,11 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
     setCountdown('idle')
     setCountdownValue(3)
     setBlinkingIndex(0)
+    setShowBackButton(false)
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
     if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current)
     if (blinkTimerRef.current) clearInterval(blinkTimerRef.current)
+    if (noTouchTimerRef.current) clearTimeout(noTouchTimerRef.current)
   }, [])
 
   // Auto-trigger countdown when enough fingers are down
@@ -249,7 +275,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
 
   return (
     <main className="chwatzi-screen">
-      {/* Full-screen multi-touch overlay - covers ENTIRE viewport */}
+      {/* Full-screen multi-touch overlay - covers ENTIRE viewport, hides everything */}
       {mode === 'multitouch' && (
         <div
           className="multitouch-overlay"
@@ -259,6 +285,17 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
           onPointerCancel={handlePointerUp}
           onPointerLeave={handlePointerUp}
         >
+          {/* Back button shown after 3s of no touch */}
+          {showBackButton && onBack && (
+            <button
+              className="multitouch-back-btn"
+              type="button"
+              onClick={(e) => { e.stopPropagation(); onBack(); }}
+            >
+              ← {t('back')}
+            </button>
+          )}
+
           {/* Countdown overlay */}
           {countdown === 'counting' && (
             <div className="countdown-overlay">
@@ -309,10 +346,81 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
               </div>
             </>
           )}
+
+          {/* Instructions - shown when no fingers down and no back button */}
+          {countdown === 'idle' && fingers.length === 0 && !showBackButton && (
+            <div className="multitouch-instructions">
+              <span className="multitouch-icon" role="img" aria-label="fingers">👆</span>
+              <p>{t('multitouchInstructions')}</p>
+            </div>
+          )}
+
+          {/* Waiting message */}
+          {countdown === 'idle' && fingers.length > 0 && fingers.length < playersWithColors.length && (
+            <p className="waiting-text">{t('multitouchWaiting')}</p>
+          )}
+
+          {/* Result overlay - shown when done */}
+          {countdown === 'done' && multiResult && (
+            <div className="multitouch-result-overlay">
+              {pickMode === 'single' ? (
+                <div className="single-winner">
+                  <p className="result-label">{t('selectedPlayer')}</p>
+                  <div
+                    className="winner-card"
+                    style={{ '--player-color': multiResult[0].color } as React.CSSProperties}
+                  >
+                    <span
+                      className="player-indicator"
+                      style={{ backgroundColor: multiResult[0].color }}
+                    />
+                    <strong>{multiResult[0].name}</strong>
+                  </div>
+                </div>
+              ) : (
+                <div className="order-result">
+                  <p className="result-label">{t('playOrder')}</p>
+                  <ol className="order-list">
+                    {multiResult.map((p, i) => (
+                      <li
+                        key={p.id}
+                        className="order-item"
+                        style={{ '--player-color': p.color } as React.CSSProperties}
+                      >
+                        <span className="order-rank">{i + 1}</span>
+                        <span
+                          className="player-indicator"
+                          style={{ backgroundColor: p.color }}
+                        />
+                        <span className="player-name">{p.name}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              )}
+              <div className="result-actions">
+                <button
+                  className="primary-button confirm-button"
+                  type="button"
+                  onClick={confirmMultiResult}
+                >
+                  {t('continue')}
+                </button>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={resetMultiTouch}
+                >
+                  {t('tryAgain')}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      <div className="chwatzi-card" style={{ pointerEvents: mode === 'multitouch' ? 'none' : 'auto' }}>
+      {/* Regular card UI - hidden in multitouch mode */}
+      <div className="chwatzi-card" style={{ display: mode === 'multitouch' ? 'none' : 'block' }}>
         {onBack && (
           <button
             className="back-button"
@@ -320,33 +428,32 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
             onClick={onBack}
             aria-label={t('back')}
             disabled={isSpinning || countdown !== 'idle'}
-            style={{ pointerEvents: 'auto' }}
           >
             ←
           </button>
         )}
 
-        <header className="chwatzi-header" style={{ pointerEvents: 'auto' }}>
+        <header className="chwatzi-header">
           <p className="eyebrow">CHWATZI</p>
           <h1>{t('whoStarts')}</h1>
           <p className="muted">{t('chwatziTagline')}</p>
         </header>
 
         {/* Mode toggle */}
-        <div className="chwatzi-mode-toggle" style={{ pointerEvents: 'auto' }}>
+        <div className="chwatzi-mode-toggle">
           <button
             type="button"
             className={mode === 'roulette' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => { setMode('roulette'); resetMultiTouch(); }}
-            disabled={isSpinning || countdown !== 'idle'}
+            disabled={isSpinning}
           >
             🎰 {t('modeRoulette')}
           </button>
           <button
             type="button"
             className={mode === 'multitouch' ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => { setMode('multitouch'); setSelectedPlayer(null); setMultiResult(null); resetMultiTouch(); }}
-            disabled={isSpinning || countdown !== 'idle'}
+            onClick={() => { setMode('multitouch'); resetMultiTouch(); }}
+            disabled={isSpinning}
           >
             👆 {t('modeMultitouch')}
           </button>
@@ -411,14 +518,13 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
         )}
 
         {mode === 'multitouch' && (
-          <div style={{ pointerEvents: 'auto' }}>
+          <div>
             {/* Pick mode sub-toggle */}
             <div className="pick-mode-toggle">
               <button
                 type="button"
                 className={pickMode === 'single' ? 'pick-btn active' : 'pick-btn'}
                 onClick={() => { setPickMode('single'); resetMultiTouch(); }}
-                disabled={countdown !== 'idle'}
               >
                 {t('pickSingle')}
               </button>
@@ -426,88 +532,10 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                 type="button"
                 className={pickMode === 'order' ? 'pick-btn active' : 'pick-btn'}
                 onClick={() => { setPickMode('order'); resetMultiTouch(); }}
-                disabled={countdown !== 'idle'}
               >
                 {t('pickOrder')}
               </button>
             </div>
-
-            {/* Instructions - shown when no fingers down */}
-            {countdown === 'idle' && fingers.length === 0 && (
-              <div className="multitouch-instructions">
-                <span className="multitouch-icon" role="img" aria-label="fingers">👆</span>
-                <p>{t('multitouchInstructions')}</p>
-                <p className="muted small">
-                  {pickMode === 'single'
-                    ? t('multitouchSingleHint')
-                    : t('multitouchOrderHint')}
-                </p>
-              </div>
-            )}
-
-            {/* Waiting message */}
-            {countdown === 'idle' && fingers.length > 0 && fingers.length < playersWithColors.length && (
-              <p className="muted small center-text waiting-text">
-                {t('multitouchWaiting')}
-              </p>
-            )}
-
-            {multiResult && (
-              <div className="multitouch-result">
-                {pickMode === 'single' ? (
-                  <div className="single-winner">
-                    <p className="result-label">{t('selectedPlayer')}</p>
-                    <div
-                      className="winner-card"
-                      style={{ '--player-color': multiResult[0].color } as React.CSSProperties}
-                    >
-                      <span
-                        className="player-indicator"
-                        style={{ backgroundColor: multiResult[0].color }}
-                      />
-                      <strong>{multiResult[0].name}</strong>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="order-result">
-                    <p className="result-label">{t('playOrder')}</p>
-                    <ol className="order-list">
-                      {multiResult.map((p, i) => (
-                        <li
-                          key={p.id}
-                          className="order-item"
-                          style={{ '--player-color': p.color } as React.CSSProperties}
-                        >
-                          <span className="order-rank">{i + 1}</span>
-                          <span
-                            className="player-indicator"
-                            style={{ backgroundColor: p.color }}
-                          />
-                          <span className="player-name">{p.name}</span>
-                        </li>
-                      ))}
-                    </ol>
-                  </div>
-                )}
-
-                <div className="chwatzi-actions">
-                  <button
-                    className="primary-button confirm-button"
-                    type="button"
-                    onClick={confirmMultiResult}
-                  >
-                    {t('continue')}
-                  </button>
-                  <button
-                    className="secondary-button"
-                    type="button"
-                    onClick={resetMultiTouch}
-                  >
-                    {t('tryAgain')}
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>
