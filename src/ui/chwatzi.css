@@ -276,48 +276,76 @@
   cursor: not-allowed;
 }
 
-/* Multi-touch Zone */
+/* Multi-touch Zone - Full Screen */
 .multitouch-zone {
-  min-height: 280px;
-  border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 2px dashed rgba(255, 255, 255, 0.15);
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
   touch-action: none;
-  margin: 16px 0;
-  transition: border-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 
-.multitouch-zone:active {
-  border-color: rgba(56, 189, 248, 0.3);
+.multitouch-zone.fullscreen {
+  background: rgba(0, 0, 0, 0.9);
 }
 
-.multitouch-instructions {
-  text-align: center;
-  padding: 24px;
+/* Countdown Overlay */
+.countdown-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
 }
 
-.multitouch-icon {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 12px;
+.countdown-number {
+  font-size: 200px;
+  font-weight: 900;
+  color: #f8fafc;
+  text-shadow: 0 0 60px rgba(255, 255, 255, 0.5);
+  animation: countdownPulse 0.5s ease;
 }
 
-.multitouch-instructions p {
-  font-size: 16px;
-  color: #e2e8f0;
-  margin: 0 0 8px;
+@keyframes countdownPulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-.multitouch-instructions .muted.small {
-  font-size: 13px;
-  color: #94a3b8;
+/* Blink Ring Animation */
+.blink-ring {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 4px solid;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.1s ease;
 }
 
+.blink-ring.blinking {
+  animation: blinkExpand 0.8s ease-out forwards;
+}
+
+@keyframes blinkExpand {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(4);
+    opacity: 0;
+  }
+}
+
+/* Fingers dots */
 .multitouch-fingers {
   position: absolute;
   inset: 0;
@@ -335,27 +363,34 @@
   color: white;
   font-weight: 700;
   font-size: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  transition: transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  border: 3px solid;
+  transition: all 0.2s ease;
   pointer-events: none;
+}
+
+.finger-dot:hover {
+  transform: translate(-50%, -50%) scale(1.1);
 }
 
 .multitouch-count {
   position: absolute;
-  bottom: 12px;
-  right: 16px;
-  font-size: 14px;
+  bottom: 24px;
+  right: 24px;
+  font-size: 16px;
   font-weight: 600;
   color: #94a3b8;
-  background: rgba(0, 0, 0, 0.3);
-  padding: 4px 12px;
-  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 16px;
+  border-radius: 12px;
+  z-index: 10;
 }
 
 /* Multi-touch Result */
 .multitouch-result {
   text-align: center;
+  position: relative;
+  z-index: 101;
 }
 
 .result-label {
@@ -372,7 +407,7 @@
   gap: 12px;
   padding: 16px 32px;
   border-radius: 16px;
-  background: rgba(56, 189, 248, 0.1);
+  background: rgba(56, 189, 248, 0.15);
   border: 2px solid var(--player-color);
   margin-bottom: 20px;
 }
@@ -419,6 +454,30 @@
   flex-shrink: 0;
 }
 
+/* Multi-touch Instructions */
+.multitouch-instructions {
+  text-align: center;
+  padding: 24px;
+  z-index: 1;
+}
+
+.multitouch-icon {
+  font-size: 48px;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.multitouch-instructions p {
+  font-size: 16px;
+  color: #e2e8f0;
+  margin: 0 0 8px;
+}
+
+.multitouch-instructions .muted.small {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
 /* Utility */
 .muted.small {
   font-size: 13px;
@@ -427,6 +486,10 @@
 
 .center-text {
   text-align: center;
+}
+
+.waiting-text {
+  margin-top: 16px;
 }
 
 /* Responsive */
@@ -448,7 +511,7 @@
     padding: 14px 16px;
   }
   
-  .multitouch-zone {
-    min-height: 240px;
+  .countdown-number {
+    font-size: 120px;
   }
 }
