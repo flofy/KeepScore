@@ -7,7 +7,7 @@ import { useI18n } from './i18n'
 type Props = { game: Game; onSelect: (startingPlayerId: string) => void; onBack?: () => void }
 type ChwatziMode = 'roulette' | 'multitouch'
 type PickMode = 'single' | 'order'
-type CountdownState = 'idle' | 'counting' | 'blinking' | 'done'
+type CountdownState = 'idle' | 'counting' | 'done'
 type FingerSlot = { pointerId: number; x: number; y: number }
 type ColoredPlayer = Player & { color: string }
 
@@ -15,7 +15,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const { t } = useI18n()
   const players = game.players.map((player, index) => ({ ...player, color: player.color ?? colorForIndex(index) })) as ColoredPlayer[]
   const [mode, setMode] = useState<ChwatziMode>('roulette')
-  const [pickMode, setPickMode] = useState<PickMode>('single')
+  const [pickMode] = useState<PickMode>('single')
   const [displayPlayers, setDisplayPlayers] = useState<ColoredPlayer[]>(players)
   const [selectedPlayer, setSelectedPlayer] = useState<ColoredPlayer | null>(null)
   const [isSpinning, setIsSpinning] = useState(false)
@@ -23,12 +23,10 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const [fingers, setFingers] = useState<FingerSlot[]>([])
   const [countdown, setCountdown] = useState<CountdownState>('idle')
   const [countdownValue, setCountdownValue] = useState(3)
-  const [selectedFingerIndex, setSelectedFingerIndex] = useState<number | null>(null)
   const [multiResult, setMultiResult] = useState<ColoredPlayer[] | null>(null)
   const [showBackButton, setShowBackButton] = useState(false)
   const holdTimerRef = useRef<number | null>(null)
   const countdownTimerRef = useRef<number | null>(null)
-  const blinkTimerRef = useRef<number | null>(null)
   const noTouchTimerRef = useRef<number | null>(null)
 
   useEffect(() => setDisplayPlayers(players), [game.id, game.players.length])
@@ -36,7 +34,6 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
     if (spinTimerRef.current !== null) window.clearInterval(spinTimerRef.current)
     if (holdTimerRef.current !== null) window.clearTimeout(holdTimerRef.current)
     if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current)
-    if (blinkTimerRef.current !== null) window.clearTimeout(blinkTimerRef.current)
     if (noTouchTimerRef.current !== null) window.clearTimeout(noTouchTimerRef.current)
   }, [])
   useEffect(() => () => clearTimers(), [clearTimers])
@@ -75,13 +72,11 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
     setFingers([])
     setCountdown('idle')
     setCountdownValue(3)
-    setSelectedFingerIndex(null)
     setMultiResult(null)
     setSelectedPlayer(null)
     setShowBackButton(false)
     if (holdTimerRef.current !== null) window.clearTimeout(holdTimerRef.current)
     if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current)
-    if (blinkTimerRef.current !== null) window.clearTimeout(blinkTimerRef.current)
   }, [])
 
   const handlePointerDown = useCallback((event: ReactPointerEvent<HTMLDivElement>) => {
@@ -112,17 +107,16 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
       if (count <= 0) {
         if (countdownTimerRef.current !== null) window.clearInterval(countdownTimerRef.current)
         const winnerIndex = Math.floor(Math.random() * Math.min(fingers.length, players.length))
-        setSelectedFingerIndex(winnerIndex)
-        setCountdown('blinking')
-        if ('vibrate' in navigator) navigator.vibrate(100)
-        blinkTimerRef.current = window.setTimeout(() => {
-          const winner = players[winnerIndex]
-          const result = pickMode === 'single' ? [winner] : [winner, ...players.filter(player => player.id !== winner.id)]
-          setMultiResult(result)
-          setSelectedPlayer(winner)
-          setCountdown('done')
-          if ('vibrate' in navigator) navigator.vibrate([100, 60, 180])
-        }, 900)
+        const winner = players[winnerIndex]
+        const result = pickMode === 'single' ? [winner] : [winner, ...players.filter(player => player.id !== winner.id)]
+
+        // The selection is finished as soon as the winner is chosen: stop accepting
+        // touch input and go directly to the result state. No post-selection blink.
+        setFingers([])
+        setMultiResult(result)
+        setSelectedPlayer(winner)
+        setCountdown('done')
+        if ('vibrate' in navigator) navigator.vibrate([100, 60, 180])
       }
     }, 800)
   }, [countdown, fingers.length, pickMode, players])
@@ -152,11 +146,6 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
           {countdown === 'idle' && fingers.map((finger, index) => {
             const player = players[index]
             return <div key={finger.pointerId} className="finger-dot" style={{ left: finger.x, top: finger.y, backgroundColor: player?.color, borderColor: player?.color }}><span className="finger-number">{index + 1}</span></div>
-          })}
-          {countdown === 'blinking' && fingers.map((finger, index) => {
-            const player = players[index]
-            const selected = index === selectedFingerIndex
-            return <div key={finger.pointerId} className={`finger-dot ${selected ? 'selected-blinking' : 'selected-static'}`} style={{ left: finger.x, top: finger.y, backgroundColor: player?.color, borderColor: player?.color }}><span className="finger-number">{index + 1}</span></div>
           })}
           {countdown === 'idle' && fingers.length === 0 && !showBackButton && <div className="multitouch-instructions"><span className="multitouch-icon" role="img" aria-label="fingers">👆</span><p>{t('multitouchInstructions')}</p></div>}
           {countdown === 'idle' && fingers.length > 0 && fingers.length < players.length && <p className="waiting-text">{t('multitouchWaiting')}</p>}
