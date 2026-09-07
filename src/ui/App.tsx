@@ -278,7 +278,7 @@ chstart', onDown);
    
      <div
           className="player-deltas"
-          aria-label={t('history').concat(' — ', player.name)}
+          aria-label={`${t('history')} — ${player.name}`}
         >
           {deltas.map((delta, index) => (
             <span
@@ -299,7 +299,7 @@ chstart', onDown);
           className="player-name"
           value={player.name}
           onChange={(event) => onRename(event.target.value)}
-          aria-label={player.name.concat(' ', t('playerNameLabel'))}
+          aria-label={`${player.name} ${t('playerNameLabel')}`}
         />
         <div className="score-row">
           <div className="step-col">
@@ -312,7 +312,7 @@ chstart', onDown);
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               onClick={() => onStepClick(-1)}
-              aria-label={t('removePoint').concat(' ', player.name)}
+              aria-label={`${t('removePoint')} ${player.name}`}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -333,8 +333,8 @@ chstart', onDown);
                   startLongPress(event, 'negative');
                 }}
                 onPointerMove={moveLongPress}
-               
- onPointerUp={clearLongPress}
+                onPointerUp={c
+learLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(-2)}
@@ -380,7 +380,7 @@ t('removePoint')} 2 — ${player.name}`}
                   cancelScoreEdit();
                 }
               }}
-              aria-label={t('setScore').concat(' — ', player.name)}
+              aria-label={`${t('setScore')} — ${player.name}`}
             />
           ) : (
             <div className="score-center">
@@ -391,8 +391,8 @@ t('removePoint')} 2 — ${player.name}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(event) => {
-
-                  if (event.key === 'Enter' || event.key === ' ') {
+                  if
+ (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     onScoreClick();
                   }
@@ -426,7 +426,7 @@ t('removePoint')} 2 — ${player.name}`}
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               onClick={() => onStepClick(1)}
-              aria-label={t('addPoint').concat(' ', player.name)}
+              aria-label={`${t('addPoint')} ${player.name}`}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -448,8 +448,8 @@ t('removePoint')} 2 — ${player.name}`}
                 }}
                 onPointerMove={moveLongPress}
                 onPointerUp={clearLongPress}
-      
-          onPointerLeave={clearLongPress}
+                onPointerLeave=
+{clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(2)}
                 aria-label={`${t('addPoint')} 2 — ${player.name}`}
@@ -479,9 +479,9 @@ t('removePoint')} 2 — ${player.name}`}
         {quickOpen && (
           <div
             ref={quickRef}
-            className={'score-tooltip'.concat(signClass)}
+            className={`score-tooltip${signClass}`}
             role="tooltip"
-            aria-label={t('quickScoreChange').concat(' ', player.name)}
+            aria-label={`${t('quickScoreChange')} ${player.name}`}
           >
             {showNegative && (
               <>
@@ -512,9 +512,9 @@ t('removePoint')} 2 — ${player.name}`}
               </>
             )}
             {showPositive && (
-
               <>
-                <button
+                <b
+utton
                   type="button"
                   className="delta-pos"
                   role="menuitem"
@@ -582,12 +582,12 @@ t('removePoint')} 2 — ${player.name}`}
           </div>
         )}
       </div>
-    </
-article>
+    </article>
   );
 }
 
-// Helper to create a temporary game for Chwatzi
+// Helper to create
+ a temporary game for Chwatzi
 function createTempGame(playerCount: number): Game {
   const now = Date.now();
   const players: Player[] = [];
@@ -617,99 +617,41 @@ function BackButton() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
-  
   if (location.pathname === '/') return null;
-  
   return (
-    <button
-      className="back-button"
-      type="button"
-      onClick={() => navigate(-1)}
-      aria-label={t('back')}
-    >
-      ←
-    </button>
+    <button className="back-button" type="button" onClick={() => navigate(-1)} aria-label={t('back')}>←</button>
   );
 }
 
-// Wrapper components for route-based navigation
+// Wrapper components
 function StartScreenWrapper() {
   const navigate = useNavigate();
-  return (
-    <StartScreen
-      onNewGame={() => navigate('/setup')}
-      onChwatzi={(count) => navigate('/chwatzi?players=' + String(count))}
-    />
-  );
+  return <StartScreen onNewGame={() => navigate('/setup')} onChwatzi={(c) => navigate('/chwatzi?players=' + String(c))} />;
 }
-
 function ChwatziScreenWrapper() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const playerCount = Number(searchParams.get('players')) || 4;
-  const game = createTempGame(playerCount);
-  return (
-    <ChwatziScreen
-      game={game}
-      onSelect={(startingPlayerId) => {
-        const gameWithStartingPlayer = { ...game, startingPlayerId };
-        localGameRepository.save(gameWithStartingPlayer);
-        navigate('/game?gameId=' + gameWithStartingPlayer.id);
-      }}
-      onBack={() => navigate(-1)}
-    />
-  );
+  const [sp] = useSearchParams();
+  const pc = Number(sp.get('players')) || 4;
+  const game = createTempGame(pc);
+  return <ChwatziScreen game={game} onSelect={(sid) => { localGameRepository.save({...game, startingPlayerId: sid}); navigate('/game?gameId=' + game.id); }} onBack={() => navigate(-1)} />;
 }
-
 function GameSetupWrapper() {
   const navigate = useNavigate();
-  return (
-    <GameSetup
-      onCreate={(game) => {
-        localGameRepository.save(game);
-        navigate('/game?gameId=' + game.id);
-      }}
-      onBack={() => navigate(-1)}
-    />
-  );
+  return <GameSetup onCreate={(g) => { localGameRepository.save(g); navigate('/game?gameId=' + g.id); }} onBack={() => navigate(-1)} />;
 }
-
-functi
-on GameScreenWrapper() {
+function GameScreenWrapper() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
+  const [sp] = useSearchParams();
+  const gid = sp.get('gameId');
   const [game, setGame] = useState<Game | null>(null);
-  
-  useEffect(() => {
-    if (gameId) {
-      const loaded = localGameRepository.get(gameId);
-      if (loaded) setGame(loaded);
-      else navigate('/');
-    } else navigate('/');
-  }, [gameId, navigate]);
-  
+  useEffect(() => { if (gid) { const l = localGameRepository.get(gid); if (l) setGame(l); else navigate('/'); } else navigate('/'); }, [gid, navigate]);
   if (!game) return null;
-  
-  return (
-    <GameScreenInnerInner
-      initialGame={game}
-      onNewGame={() => navigate('/setup')}
-      onSavedGames={() => navigate('/saved')}
-      onChwatzi={() => navigate('/')}
-    />
-  );
+  return <GameScreenInnerInn
+er initialGame={game} onNewGame={() => navigate('/setup')} onSavedGames={() => navigate('/saved')} onChwatzi={() => navigate('/')} />;
 }
-
 function SavedGamesWrapper() {
   const navigate = useNavigate();
-  return (
-    <SavedGames
-      onNewGame={() => navigate('/setup')}
-      onGameSelect={(game) => navigate('/game?gameId=' + game.id)}
-      onBack={() => navigate(-1)}
-    />
-  );
+  return <SavedGames onNewGame={() => navigate('/setup')} onGameSelect={(g) => navigate('/game?gameId=' + g.id)} onBack={() => navigate(-1)} />;
 }
 function GameScreenInner({
   initialGame,
@@ -745,8 +687,7 @@ function GameScreenInner({
   const orderedPlayers = isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
 
   useEffect(() => {
-    localStorage.setItem('keepscore-fulls
-creen', fullscreen ? '1' : '0');
+    localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0');
   }, [fullscreen]);
 
   useEffect(() => {
@@ -766,7 +707,8 @@ creen', fullscreen ? '1' : '0');
     setEditingEntry(null);
   };
 
-  const recentDeltasFor = (playerId: string): number[] =>
+  const recentDe
+ltasFor = (playerId: string): number[] =>
     game.history
       .filter((entry) => e
 ntry.playerId === playerId)
@@ -810,8 +752,7 @@ ntry.playerId === playerId)
                 <span className="history-actions">
                   <button
                     type="button"
-                    className="secondary-but
-ton"
+                    className="secondary-button"
                     onClick={() => beginEdit(entry.id, entry.delta)}
                     title={t('edit')}
                   >
@@ -824,7 +765,8 @@ ton"
                         d="M16.8 3.8a2.4 2.4 0 013.4 3.4L7.6 19.7l-4.6 1.3 1.3-4.6L16.8 3.8z"
                         stroke="currentColor"
                         strokeWidth="2"
-                        strokeLinecap="round"
+                        strokeLinec
+ap="round"
                         strokeLinejoin="round"
                         fill
 ="none"
@@ -865,8 +807,7 @@ ton"
                   <span className="history-editor">
                     <input
                       autoFocus
-                      t
-ype="number"
+                      type="number"
                       value={draftDelta}
                       onChange={(event) => setDraftDelta(event.target.value)}
                       aria-label={t('editHistoryDelta')}
@@ -880,7 +821,8 @@ ype="number"
                     </button>
                     <button
                       type="button"
-                      className="secondary-button"
+                      classNam
+e="secondary-button"
                       onClick={() => setEditingEntry(null)}
       
               >
@@ -932,7 +874,6 @@ ype="number"
             className="icon-fab"
             type="button"
             onClick={() => setFullscreen((current) => !current)}
-
             aria-pressed={fullscreen}
             aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}
           >
@@ -947,7 +888,8 @@ ype="number"
                   fill="none"
                 />
               </svg>
-            ) : (
+   
+         ) : (
               <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="
 true">
                 <path
@@ -994,8 +936,7 @@ true">
                 ),
               } as CSSProperties) ||
             undefined
-  
-        }
+          }
           aria-label={t('players')}
         >
           {orderedPlayers.map((player, index) => {
@@ -1010,7 +951,8 @@ true">
                 }}
                 deltas={recentDeltasFor(player.id)}
                 rotation={rotation}
-                lastDelta={lastDeltaFor(player.id)}
+                lastDelta={lastD
+eltaFor(player.id)}
                 onRename={(name) =>
                   dispatch({ type
 : 'RENAME_PLAYER', playerId: player.id, name })
@@ -1055,8 +997,7 @@ true">
               className="history-close"
               type="button"
               onClick={() => setHistoryOpen(false)}
-           
-   aria-label={t('closeHistory')}
+              aria-label={t('closeHistory')}
               title={t('closeHistory')}
             >
               ✕
@@ -1075,12 +1016,32 @@ true">
           </div>
         )}
       </main>
-      {menuOpen && (
+      {men
+uOpen && (
         <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
   
         <nav
             className="menu-drawer"
             aria-label={t('menu')}
-            onClick={(event) 
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="menu-close"
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              aria-label={t('closeMenu')}
+            >
+              ✕
+            </button>
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setHistoryOpen((current) => !current);
+                setMenuOpen(false);
+              }}
+            >
+              🕘 {t('history')}
+            
 
 ... [Content truncated]
