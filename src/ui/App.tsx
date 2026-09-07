@@ -565,6 +565,7 @@ function PlayerCard({
 
 // Helper to create a temporary game for Chwatzi
 function createTempGame(playerCount: number): Game {
+  const now = Date.now();
   const players: Player[] = [];
   for (let i = 0; i < playerCount; i++) {
     players.push({
@@ -575,12 +576,12 @@ function createTempGame(playerCount: number): Game {
     });
   }
   return {
-    id: `temp-game-${Date.now()}`,
+    id: `temp-game-${now}`,
     name: 'Chwatzi Game',
     players,
     history: [],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
+    createdAt: now,
+    updatedAt: now,
   };
 }
 
