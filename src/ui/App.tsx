@@ -1113,7 +1113,7 @@ export function App() {
   }, []);
 
   const handleDeleteGame = useCallback(async (id: string) => {
-    await localGameRepository.delete(id);
+    await localGameRepository.remove(id);
     const games = await localGameRepository.list();
     setSavedGames(games);
   }, []);
