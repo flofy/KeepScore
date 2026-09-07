@@ -3,6 +3,7 @@ import type {
   ChangeEvent,
   CSSProperties,
   PointerEvent as ReactPointerEvent,
+  ReactNode,
 } from 'react';
 import type { Game, Player } from '../domain/game/types';
 import { colorForIndex } from '../domain/game/colors';
@@ -26,9 +27,8 @@ import {
   createBrowserRouter,
   RouterProvider,
   useNavigate,
-  useLocation,
   useSearchParams,
-} from 'react-router-dom'
+} from 'react-router-dom';
 
 function haptic() {
   if ('vibrate' in navigator) navigator.vibrate(8);
@@ -38,7 +38,7 @@ type Screen = 'start' | 'chwatzi' | 'game' | 'saved';
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
-  return delta > 0 ? '+'.concat(String(delta)) : String(delta);
+  return delta > 0 ? `+${delta}` : `${delta}`;
 }
 
 // Shrinks an element's font-size so its content always fits its available width.
@@ -52,15 +52,14 @@ function useFitText<T extends HTMLElement>(content: unknown) {
       const natural = el.scrollWidth;
       if (natural > avail && avail > 0) {
         const current = parseFloat(window.getComputedStyle(el).fontSize);
-        el.style.fontSize = String(Math.max(12, current * (avail / natural))).concat('px');
+        el.style.fontSize = `${Math.max(12, current * (avail / natural))}px`;
       }
     };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [cont
-ent]);
+  }, [content]);
   return ref;
 }
 
@@ -69,8 +68,7 @@ type PlayerCardProps = {
   deltas: number[];
   rotation?: number;
   lastDelta?: number;
-  onRename: (name: string)
- => void;
+  onRename: (name: string) => void;
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
   onSetScore: (value: number) => void;
@@ -126,15 +124,13 @@ function PlayerCard({
     if (!longPressOrigin.current) return;
     if (
       Math.hypot(
-
         event.clientX - longPressOrigin.current.x,
         event.clientY - longPressOrigin.current.y,
       ) > 10
     )
       clearLongPress();
   };
-  const
- quick = (delta: number) => {
+  const quick = (delta: number) => {
     onQuickDelta(delta);
     setQuickOpen(false);
     setForcedSign(undefined);
@@ -200,13 +196,11 @@ function PlayerCard({
       closeCustom();
     };
     document.addEventListener('mousedown', onDown);
-    document.addEventListener('tou
-chstart', onDown);
+    document.addEventListener('touchstart', onDown);
     return () => {
       document.removeEventListener('mousedown', onDown);
       document.removeEventListener('touchstart', onDown);
-    }
-;
+    };
   }, [quickOpen, customOpen]);
 
   useEffect(() => {
@@ -245,7 +239,7 @@ chstart', onDown);
 
   return (
     <article
-      className={rotation ? 'player-card rotated-'.concat(String(rotation)) : 'player-card'}
+      className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
       style={{
         '--player-color': player.color ?? '#38bdf8',
         '--digits': String(Math.abs(player.score)).length,
@@ -275,14 +269,12 @@ chstart', onDown);
         </button>
       )}
       {deltas.length > 0 && (
-   
-     <div
+        <div
           className="player-deltas"
           aria-label={`${t('history')} — ${player.name}`}
         >
           {deltas.map((delta, index) => (
             <span
-
               key={index}
               className={delta > 0 ? 'delta-plus' : 'delta-minus'}
             >
@@ -293,7 +285,7 @@ chstart', onDown);
       )}
       <div
         className="card-content"
-        style={{ transform: rotation ? 'rotate('.concat(String(rotation), 'deg)') : undefined }}
+        style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}
       >
         <input
           className="player-name"
@@ -333,13 +325,11 @@ chstart', onDown);
                   startLongPress(event, 'negative');
                 }}
                 onPointerMove={moveLongPress}
-                onPointerUp={c
-learLongPress}
+                onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(-2)}
-                aria-label={`${
-t('removePoint')} 2 — ${player.name}`}
+                aria-label={`${t('removePoint')} 2 — ${player.name}`}
               >
                 −2
               </button>
@@ -391,14 +381,12 @@ t('removePoint')} 2 — ${player.name}`}
                 role="button"
                 tabIndex={0}
                 onKeyDown={(event) => {
-                  if
- (event.key === 'Enter' || event.key === ' ') {
+                  if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     onScoreClick();
                   }
                 }}
-                aria-label
-={`${t('setScore')} — ${player.name}`}
+                aria-label={`${t('setScore')} — ${player.name}`}
               >
                 {player.score}
               </div>
@@ -448,13 +436,11 @@ t('removePoint')} 2 — ${player.name}`}
                 }}
                 onPointerMove={moveLongPress}
                 onPointerUp={clearLongPress}
-                onPointerLeave=
-{clearLongPress}
+                onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(2)}
                 aria-label={`${t('addPoint')} 2 — ${player.name}`}
-             
- >
+              >
                 +2
               </button>
               <button
@@ -485,100 +471,25 @@ t('removePoint')} 2 — ${player.name}`}
           >
             {showNegative && (
               <>
-                <button
-                  type="button"
-                  className="delta-neg"
-                  role="menuitem"
-                  onClick={() => quick(-20)}
-                >
-                  −20
-                </button>
-                <button
-                  type="button"
-                  className="delta-neg"
-                  role="menuitem"
-                  onClick={() => quick(-10)}
-                >
-                  −10
-                </button>
-                <button
-                  type="button"
-                  className="delta-neg"
-                  role="menuitem"
-                  onClick={() => quick(-5)}
-                >
-                  −5
-                </button>
+                <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-20)}>−20</button>
+                <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-10)}>−10</button>
+                <button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-5)}>−5</button>
               </>
             )}
             {showPositive && (
               <>
-                <b
-utton
-                  type="button"
-                  className="delta-pos"
-                  role="menuitem"
-                  onClick={() => quick(5)}
-                >
-                  +5
- 
-               </button>
-                <button
-                  type="button"
-                  className="delta-pos"
-                  role="menuitem"
-                  onClick={() => quick(10)}
-                >
-                  +10
-                </button>
-                <button
-                  type="button"
-                  className="delta-pos"
-                  role="menuitem"
-                  onClick={() => quick(20)}
-                >
-                  +20
-                </button>
+                <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(5)}>+5</button>
+                <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(10)}>+10</button>
+                <button type="button" className="delta-pos" role="menuitem" onClick={() => quick(20)}>+20</button>
               </>
             )}
           </div>
         )}
         {customOpen && (
-          <div
-            ref={customTooltipRef}
-            className="score-tooltip"
-            role="tooltip"
-            aria-label={t('customDelta')}
-          >
-            <input
-              type="number"
-              inputMode="numeric"
-              value={customDraft}
-              onChange={(event) => setCustomDraft(event.target.value)}
-              autoFocus
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') saveCustom(1);
-                if (event.key === 'Escape') closeCustom();
-              }}
-              aria-label={t('customDelta')}
-              placeholder="0"
-            />
-            <button
-              type="button"
-              className="delta-neg"
-              onClick={() => saveCustom(-1)}
-              aria-label={`${t('removePoint')} — ${player.name}`}
-            >
-              −
-            </button>
-            <button
-              type="button"
-              className="delta-pos"
-              onClick={() => saveCustom(1)}
-              aria-label={`${t('addPoint')} — ${player.name}`}
-            >
-              +
-            </button>
+          <div ref={customTooltipRef} className="score-tooltip" role="tooltip" aria-label={t('customDelta')}>
+            <input type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} autoFocus onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(1); if (event.key === 'Escape') closeCustom(); }} aria-label={t('customDelta')} placeholder="0" />
+            <button type="button" className="delta-neg" onClick={() => saveCustom(-1)} aria-label={`${t('removePoint')} — ${player.name}`}>−</button>
+            <button type="button" className="delta-pos" onClick={() => saveCustom(1)} aria-label={`${t('addPoint')} — ${player.name}`}>+</button>
           </div>
         )}
       </div>
@@ -586,14 +497,11 @@ utton
   );
 }
 
-// Helper to create
- a temporary game for Chwatzi
 function createTempGame(playerCount: number): Game {
   const now = Date.now();
   const players: Player[] = [];
   for (let i = 0; i < playerCount; i++) {
-    players.p
-ush({
+    players.push({
       id: `temp-player-${i}`,
       name: `Player ${i + 1}`,
       score: 0,
@@ -610,50 +518,7 @@ ush({
   };
 }
 
-
-
-// BackButton component for React Router navigation
-function BackButton() {
-  const { t } = useI18n();
-  const navigate = useNavigate();
-  const location = useLocation();
-  if (location.pathname === '/') return null;
-  return (
-    <button className="back-button" type="button" onClick={() => navigate(-1)} aria-label={t('back')}>←</button>
-  );
-}
-
-// Wrapper components
-function StartScreenWrapper() {
-  const navigate = useNavigate();
-  return <StartScreen onNewGame={() => navigate('/setup')} onChwatzi={(c) => navigate('/chwatzi?players=' + String(c))} />;
-}
-function ChwatziScreenWrapper() {
-  const navigate = useNavigate();
-  const [sp] = useSearchParams();
-  const pc = Number(sp.get('players')) || 4;
-  const game = createTempGame(pc);
-  return <ChwatziScreen game={game} onSelect={(sid) => { localGameRepository.save({...game, startingPlayerId: sid}); navigate('/game?gameId=' + game.id); }} onBack={() => navigate(-1)} />;
-}
-function GameSetupWrapper() {
-  const navigate = useNavigate();
-  return <GameSetup onCreate={(g) => { localGameRepository.save(g); navigate('/game?gameId=' + g.id); }} onBack={() => navigate(-1)} />;
-}
-function GameScreenWrapper() {
-  const navigate = useNavigate();
-  const [sp] = useSearchParams();
-  const gid = sp.get('gameId');
-  const [game, setGame] = useState<Game | null>(null);
-  useEffect(() => { if (gid) { const l = localGameRepository.get(gid); if (l) setGame(l); else navigate('/'); } else navigate('/'); }, [gid, navigate]);
-  if (!game) return null;
-  return <GameScreenInnerInn
-er initialGame={game} onNewGame={() => navigate('/setup')} onSavedGames={() => navigate('/saved')} onChwatzi={() => navigate('/')} />;
-}
-function SavedGamesWrapper() {
-  const navigate = useNavigate();
-  return <SavedGames onNewGame={() => navigate('/setup')} onGameSelect={(g) => navigate('/game?gameId=' + g.id)} onBack={() => navigate(-1)} />;
-}
-function GameScreenInner({
+function GameScreen({
   initialGame,
   onNewGame,
   onSavedGames,
@@ -707,11 +572,9 @@ function GameScreenInner({
     setEditingEntry(null);
   };
 
-  const recentDe
-ltasFor = (playerId: string): number[] =>
+  const recentDeltasFor = (playerId: string): number[] =>
     game.history
-      .filter((entry) => e
-ntry.playerId === playerId)
+      .filter((entry) => entry.playerId === playerId)
       .slice(-RECENT_DELTAS)
       .map((entry) => entry.delta)
       .reverse();
@@ -765,11 +628,9 @@ ntry.playerId === playerId)
                         d="M16.8 3.8a2.4 2.4 0 013.4 3.4L7.6 19.7l-4.6 1.3 1.3-4.6L16.8 3.8z"
                         stroke="currentColor"
                         strokeWidth="2"
-                        strokeLinec
-ap="round"
+                        strokeLinecap="round"
                         strokeLinejoin="round"
-                        fill
-="none"
+                        fill="none"
                       />
                     </svg> 
                     {t('edit')}
@@ -821,11 +682,9 @@ ap="round"
                     </button>
                     <button
                       type="button"
-                      classNam
-e="secondary-button"
+                      className="secondary-button"
                       onClick={() => setEditingEntry(null)}
-      
-              >
+                    >
                       {t('cancel')}
                     </button>
                   </span>
@@ -888,10 +747,8 @@ e="secondary-button"
                   fill="none"
                 />
               </svg>
-   
-         ) : (
-              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="
-true">
+            ) : (
+              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
                   stroke="currentColor"
@@ -951,11 +808,9 @@ true">
                 }}
                 deltas={recentDeltasFor(player.id)}
                 rotation={rotation}
-                lastDelta={lastD
-eltaFor(player.id)}
+                lastDelta={lastDeltaFor(player.id)}
                 onRename={(name) =>
-                  dispatch({ type
-: 'RENAME_PLAYER', playerId: player.id, name })
+                  dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })
                 }
                 onDelta={(delta) => {
                   dispatch({ type: 'ADD_SCORE', playerId: player.id, delta });
@@ -1016,11 +871,9 @@ eltaFor(player.id)}
           </div>
         )}
       </main>
-      {men
-uOpen && (
+      {menuOpen && (
         <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
-  
-        <nav
+          <nav
             className="menu-drawer"
             aria-label={t('menu')}
             onClick={(event) => event.stopPropagation()}
@@ -1042,6 +895,224 @@ uOpen && (
               }}
             >
               🕘 {t('history')}
-            
+            </button>
+            <div className="menu-separator" />
+            <div className="menu-row">
+              <button
+                className="menu-item"
+                type="button"
+                onClick={() => {
+                  undo();
+                  setMenuOpen(false);
+                }}
+                disabled={!past.length}
+              >
+                ↩ {t('undo')}
+              </button>
+              <button
+                className="menu-item"
+                type="button"
+                onClick={() => {
+                  redo();
+                  setMenuOpen(false);
+                }}
+                disabled={!future.length}
+              >
+                ↪ {t('redo')}
+              </button>
+            </div>
+            <div className="menu-separator" />
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                dispatch({ type: 'ADD_PLAYER' });
+                haptic();
+                setMenuOpen(false);
+              }}
+            >
+              {t('addPlayerMenuItem')}
+            </button>
+            <div className="menu-separator" />
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onSavedGames();
+              }}
+            >
+              💾 {t('savedGames')}
+            </button>
+            <div className="menu-separator" />
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onNewGame();
+              }}
+            >
+              {t('newGameMenuItem')}
+            </button>
+            <div className="menu-separator" />
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onChwatzi();
+              }}
+            >
+              🎲 {t('whoStarts')}
+            </button>
+            <div className="menu-separator" />
+            <div className="menu-row lang-row">
+              <button
+                type="button"
+                className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'}
+                onClick={() => setLang('fr')}
+              >
+                🇫🇷 Français
+              </button>
+              <button
+                type="button"
+                className={lang === 'en' ? 'menu-item lang active' : 'menu-item lang'}
+                onClick={() => setLang('en')}
+              >
+                🇬🇧 English
+              </button>
+            </div>
+          </nav>
+        </div>
+      )}
+    </>
+  );
+}
 
-... [Content truncated]
+function BackButton() {
+  const { t } = useI18n();
+  const navigate = useNavigate();
+
+  return (
+    <button
+      className="back-button"
+      type="button"
+      onClick={() => navigate(-1)}
+      aria-label={t('back')}
+    >
+      ←
+    </button>
+  );
+}
+
+function StartScreenRoute() {
+  const navigate = useNavigate();
+  return (
+    <StartScreen
+      onNewGame={() => navigate('/setup')}
+      onChwatzi={(playerCount) => navigate('/chwatzi?players=' + String(playerCount))}
+    />
+  );
+}
+
+function GameSetupRoute() {
+  const navigate = useNavigate();
+  return (
+    <GameSetup
+      onCreate={(game) => {
+        localGameRepository.save(game);
+        navigate('/game?gameId=' + game.id);
+      }}
+    />
+  );
+}
+
+function ChwatziRoute() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const requestedCount = Number(searchParams.get('players'));
+  const playerCount = Number.isInteger(requestedCount) && requestedCount >= 2 ? requestedCount : 4;
+  const game = createTempGame(playerCount);
+
+  return (
+    <ChwatziScreen
+      game={game}
+      onSelect={(startingPlayerId) => {
+        localGameRepository.save({ ...game, startingPlayerId });
+        navigate('/game?gameId=' + game.id);
+      }}
+    />
+  );
+}
+
+function GameRoute() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
+  const game = gameId ? localGameRepository.get(gameId) : undefined;
+
+  useEffect(() => {
+    if (!game) navigate('/');
+  }, [game, navigate]);
+
+  if (!game) return null;
+
+  return (
+    <GameScreen
+      initialGame={game}
+      onNewGame={() => navigate('/setup')}
+      onSavedGames={() => navigate('/saved')}
+      onChwatzi={() => navigate('/chwatzi?players=' + String(game.players.length))}
+    />
+  );
+}
+
+function SavedGamesRoute() {
+  const navigate = useNavigate();
+  const [games, setGames] = useState<Game[]>(() => localGameRepository.list());
+
+  const refresh = useCallback(() => {
+    setGames(localGameRepository.list());
+  }, []);
+
+  return (
+    <SavedGames
+      games={games}
+      onResume={(game) => navigate('/game?gameId=' + game.id)}
+      onDelete={(id) => {
+        localGameRepository.remove(id);
+        refresh();
+      }}
+    />
+  );
+}
+
+function RouteShell({ children, showBack = true }: { children: ReactNode; showBack?: boolean }) {
+  return (
+    <div className="route-shell">
+      {showBack && <BackButton />}
+      {children}
+    </div>
+  );
+}
+
+const router = createBrowserRouter(
+  [
+    { path: '/', element: <RouteShell showBack={false}><StartScreenRoute /></RouteShell> },
+    { path: '/setup', element: <RouteShell><GameSetupRoute /></RouteShell> },
+    { path: '/chwatzi', element: <RouteShell><ChwatziRoute /></RouteShell> },
+    { path: '/game', element: <RouteShell><GameRoute /></RouteShell> },
+    { path: '/saved', element: <RouteShell><SavedGamesRoute /></RouteShell> },
+  ],
+  { basename: import.meta.env.BASE_URL },
+);
+
+export function App() {
+  return (
+    <I18nProvider>
+      <LangFlags />
+      <RouterProvider router={router} />
+    </I18nProvider>
+  );
+}

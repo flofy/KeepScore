@@ -28,9 +28,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startingScore: 'Starting score', startingScoreHint: 'Default 0',
     presets: 'PRESETS', presetCustom: 'Custom',
     players: 'PLAYERS', whoIsPlaying: "Who's playing?", addPlayer: '+ Add player', startGame: 'Start game',
-    playerNumber: 'Player', playerName: 'name', removePlayer: 'Remove player', colorF
-
-orPlayer: 'Color for player',
+    playerNumber: 'Player', playerName: 'name', removePlayer: 'Remove player', colorForPlayer: 'Color for player',
     setupTagline: 'Set up your players, then let the score battle begin.',
     undo: 'Undo', redo: 'Redo', savedGames: 'Saved games', history: 'History', moves: 'moves',
     noMoves: 'No moves yet.', movesPlaceholder: 'Score changes will appear here.',
@@ -61,9 +59,7 @@ orPlayer: 'Color for player',
     multitouchSingleHint: 'The app will randomly pick who starts.',
     multitouchOrderHint: 'The app will randomly set the play order.',
     multitouchWaiting: 'Waiting for more fingers...',
-    multitouchHold: 'Hold..
-.
- selecting!',
+    multitouchHold: 'Hold... selecting!',
     playOrder: 'Play order',
     tryAgain: 'Try again',
     startNewGame: 'Start a new game',
@@ -88,9 +84,7 @@ orPlayer: 'Color for player',
     language: 'Langue', newGameMenuItem: 'Nouvelle partie',
     install: 'Installer l app', importError: 'Le fichier selectionne n est pas un export KeepScore valide.', genericImportError: 'Impossible d importer ce fichier.',
     swapPlayers: 'Echanger la position des joueurs', addPlayerMenuItem: 'Ajouter un joueur', setScore: 'Definir le score',
-    removeHistoryEntry: 'Supprimer cette entree', editHistor
-yD
-elta: 'Nouveau delta de score', playerNameLabel: 'nom',
+    removeHistoryEntry: 'Supprimer cette entree', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Definir la couleur', playerCardRegion: 'Carte du joueur',
     closeHistory: 'Fermer l historique',
     flipHistory: 'Retourner l historique',
@@ -139,9 +133,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
 }
 
-export function useI18n
-():
- I18n {
+export function useI18n(): I18n {
   return useContext(I18nContext)
 }
 
