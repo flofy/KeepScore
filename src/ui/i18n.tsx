@@ -17,6 +17,9 @@ export type TranslationKey =
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
   | 'closeHistory' | 'flipHistory'
   | 'whoStarts' | 'chwatziTagline' | 'pickRandomly' | 'selectedPlayer' | 'continue' | 'determineWhoStarts'
+  | 'modeRoulette' | 'modeMultitouch' | 'pickSingle' | 'pickOrder'
+  | 'multitouchInstructions' | 'multitouchSingleHint' | 'multitouchOrderHint'
+  | 'multitouchWaiting' | 'multitouchHold' | 'playOrder' | 'tryAgain'
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -47,6 +50,17 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     selectedPlayer: 'Starting player',
     continue: 'Continue',
     determineWhoStarts: 'Determine who starts',
+    modeRoulette: 'Roulette',
+    modeMultitouch: 'Fingers',
+    pickSingle: 'One player',
+    pickOrder: 'Full order',
+    multitouchInstructions: 'Everyone place a finger on the screen',
+    multitouchSingleHint: 'The app will randomly pick who starts.',
+    multitouchOrderHint: 'The app will randomly set the play order.',
+    multitouchWaiting: 'Waiting for more fingers...',
+    multitouchHold: 'Hold... selecting!',
+    playOrder: 'Play order',
+    tryAgain: 'Try again',
   },
   fr: {
     appName: 'KeepScore', newGame: 'Nouvelle partie', gameName: 'Nom de la partie', gameNamePlaceholder: 'Vendredi soir', optional: 'Facultatif',
@@ -76,6 +90,17 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     selectedPlayer: 'Joueur selectionne',
     continue: 'Continuer',
     determineWhoStarts: 'Determiner qui commence',
+    modeRoulette: 'Roulette',
+    modeMultitouch: 'Doigts',
+    pickSingle: 'Un joueur',
+    pickOrder: 'Ordre complet',
+    multitouchInstructions: 'Chacun pose un doigt sur l ecran',
+    multitouchSingleHint: 'L appli tirera au sort qui commence.',
+    multitouchOrderHint: 'L appli definira l ordre de jeu au hasard.',
+    multitouchWaiting: 'En attente de plus de doigts...',
+    multitouchHold: 'Maintenez... selection !',
+    playOrder: 'Ordre de jeu',
+    tryAgain: 'Reessayer',
   },
 }
 

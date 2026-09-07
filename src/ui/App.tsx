@@ -7,6 +7,7 @@ import type {
 import type { Game, Player } from "../domain/game/types";
 import { colorForIndex } from "../domain/game/colors";
 import { GameSetup } from "./GameSetup";
+import { ChwatziScreen } from "./ChwatziScreen";
 import { SavedGames } from "./SavedGames";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import {
@@ -18,11 +19,12 @@ import { InstallButton } from "./InstallButton";
 import { I18nProvider, useI18n } from "./i18n";
 import { LangFlags } from "./LangFlags";
 import "./saved-games.css";
+import "./chwatzi.css";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
 }
-type Screen = "game" | "saved";
+type Screen = "chwatzi" | "game" | "saved";
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
@@ -565,10 +567,12 @@ function GameScreen({
   initialGame,
   onNewGame,
   onSavedGames,
+  onChwatzi,
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
+  onChwatzi: () => void;
 }) {
   const {
     present: game,
@@ -992,6 +996,17 @@ function GameScreen({
               {t("newGameMenuItem")}
             </button>
             <div className="menu-separator" />
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onChwatzi();
+              }}
+            >
+              🎲 {t("whoStarts")}
+            </button>
+            <div className="menu-separator" />
             <div className="menu-row lang-row">
               <button
                 type="button"
@@ -1030,6 +1045,7 @@ function SavedScreen({
   const [games, setGames] = useState<Game[]>(() => localGameRepository.list());
   const [portabilityError, setPortabilityError] = useState("");
   const importInput = useRef<HTMLInputElement>(null);
+
   const handleImport = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     event.target.value = "";
@@ -1043,6 +1059,7 @@ function SavedScreen({
       setPortabilityError(t("importError"));
     }
   };
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -1102,6 +1119,14 @@ export function App() {
     () => localGameRepository.list()[0],
   );
 
+  if (screen === "chwatzi" && game)
+    return (
+      <ChwatziScreen
+        game={game}
+        onSelect={() => setScreen("game")}
+        onBack={() => setScreen("game")}
+      />
+    );
   if (screen === "saved")
     return (
       <SavedScreen
@@ -1123,12 +1148,14 @@ export function App() {
         }
       />
     );
+
   return (
     <GameScreen
       key={game.id}
       initialGame={game}
       onNewGame={() => setGame(undefined)}
       onSavedGames={() => setScreen("saved")}
+      onChwatzi={() => setScreen("chwatzi")}
     />
   );
 }
