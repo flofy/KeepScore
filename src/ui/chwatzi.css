@@ -19,6 +19,7 @@
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.5);
   border: 1px solid rgb(255 255 255 / 10%);
   position: relative;
+  z-index: 101;
 }
 
 .chwatzi-header {
@@ -276,31 +277,28 @@
   cursor: not-allowed;
 }
 
-/* Multi-touch Zone - Full Screen */
-.multitouch-zone {
+/* ============================================
+   FULL-SCREEN MULTI-TOUCH OVERLAY
+   ============================================ */
+
+/* This overlay covers the ENTIRE viewport for touch detection */
+.multitouch-overlay {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   touch-action: none;
-  transition: background-color 0.2s ease;
-}
-
-.multitouch-zone.fullscreen {
-  background: rgba(0, 0, 0, 0.9);
+  cursor: pointer;
 }
 
 /* Countdown Overlay */
 .countdown-overlay {
-  position: absolute;
+  position: fixed;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 102;
+  pointer-events: none;
 }
 
 .countdown-number {
@@ -319,7 +317,7 @@
 
 /* Blink Ring Animation */
 .blink-ring {
-  position: absolute;
+  position: fixed;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -327,7 +325,7 @@
   transform: translate(-50%, -50%);
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.1s ease;
+  z-index: 102;
 }
 
 .blink-ring.blinking {
@@ -345,14 +343,9 @@
   }
 }
 
-/* Fingers dots */
-.multitouch-fingers {
-  position: absolute;
-  inset: 0;
-}
-
+/* Finger dots - positioned absolutely within viewport */
 .finger-dot {
-  position: absolute;
+  position: fixed;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -365,16 +358,12 @@
   font-size: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
   border: 3px solid;
-  transition: all 0.2s ease;
+  z-index: 101;
   pointer-events: none;
 }
 
-.finger-dot:hover {
-  transform: translate(-50%, -50%) scale(1.1);
-}
-
 .multitouch-count {
-  position: absolute;
+  position: fixed;
   bottom: 24px;
   right: 24px;
   font-size: 16px;
@@ -383,14 +372,15 @@
   background: rgba(0, 0, 0, 0.5);
   padding: 6px 16px;
   border-radius: 12px;
-  z-index: 10;
+  z-index: 102;
+  pointer-events: none;
 }
 
 /* Multi-touch Result */
 .multitouch-result {
   text-align: center;
   position: relative;
-  z-index: 101;
+  z-index: 1;
 }
 
 .result-label {
@@ -458,7 +448,6 @@
 .multitouch-instructions {
   text-align: center;
   padding: 24px;
-  z-index: 1;
 }
 
 .multitouch-icon {
@@ -513,5 +502,12 @@
   
   .countdown-number {
     font-size: 120px;
+  }
+  
+  .multitouch-count {
+    bottom: 16px;
+    right: 16px;
+    font-size: 14px;
+    padding: 4px 12px;
   }
 }
