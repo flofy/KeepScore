@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import type {
   ChangeEvent,
   CSSProperties,
   PointerEvent as ReactPointerEvent,
-  ReactNode,
 } from 'react';
 import type { Game, Player } from '../domain/game/types';
 import { colorForIndex } from '../domain/game/colors';
@@ -18,26 +17,28 @@ import {
 } from '../infrastructure/portability/gamesPortability';
 import { useGameHistory } from './useGameHistory';
 import { InstallButton } from './InstallButton';
-import { useI18n } from './i18n';
+import { I18nProvider, useI18n } from './i18n';
 import { LangFlags } from './LangFlags';
+import './saved-games.css';
+import './chwatzi.css';
+import './start.css';
 import {
   createBrowserRouter,
   RouterProvider,
   useNavigate,
+  useLocation,
   useSearchParams,
-} from 'react-router-dom';
-import './saved-games.css';
-import './chwatzi.css';
-import './start.css';
+} from 'react-router-dom'
 
 function haptic() {
   if ('vibrate' in navigator) navigator.vibrate(8);
 }
 
+type Screen = 'start' | 'chwatzi' | 'game' | 'saved';
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
-  return delta > 0 ? `+${delta}` : `${delta}`;
+  return delta > 0 ? '+'.concat(String(delta)) : String(delta);
 }
 
 // Shrinks an element's font-size so its content always fits its available width.
@@ -51,14 +52,15 @@ function useFitText<T extends HTMLElement>(content: unknown) {
       const natural = el.scrollWidth;
       if (natural > avail && avail > 0) {
         const current = parseFloat(window.getComputedStyle(el).fontSize);
-        el.style.fontSize = `${Math.max(12, current * (avail / natural))}px`;
+        el.style.fontSize = String(Math.max(12, current * (avail / natural))).concat('px');
       }
     };
     apply();
     const observer = new ResizeObserver(apply);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [content]);
+  }, [cont
+ent]);
   return ref;
 }
 
@@ -67,7 +69,8 @@ type PlayerCardProps = {
   deltas: number[];
   rotation?: number;
   lastDelta?: number;
-  onRename: (name: string) => void;
+  onRename: (name: string)
+ => void;
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
   onSetScore: (value: number) => void;
@@ -123,13 +126,15 @@ function PlayerCard({
     if (!longPressOrigin.current) return;
     if (
       Math.hypot(
+
         event.clientX - longPressOrigin.current.x,
         event.clientY - longPressOrigin.current.y,
       ) > 10
     )
       clearLongPress();
   };
-  const quick = (delta: number) => {
+  const
+ quick = (delta: number) => {
     onQuickDelta(delta);
     setQuickOpen(false);
     setForcedSign(undefined);
@@ -195,11 +200,13 @@ function PlayerCard({
       closeCustom();
     };
     document.addEventListener('mousedown', onDown);
-    document.addEventListener('touchstart', onDown);
+    document.addEventListener('tou
+chstart', onDown);
     return () => {
       document.removeEventListener('mousedown', onDown);
       document.removeEventListener('touchstart', onDown);
-    };
+    }
+;
   }, [quickOpen, customOpen]);
 
   useEffect(() => {
@@ -238,7 +245,7 @@ function PlayerCard({
 
   return (
     <article
-      className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
+      className={rotation ? 'player-card rotated-'.concat(String(rotation)) : 'player-card'}
       style={{
         '--player-color': player.color ?? '#38bdf8',
         '--digits': String(Math.abs(player.score)).length,
@@ -268,12 +275,14 @@ function PlayerCard({
         </button>
       )}
       {deltas.length > 0 && (
-        <div
+   
+     <div
           className="player-deltas"
-          aria-label={`${t('history')} — ${player.name}`}
+          aria-label={t('history').concat(' — ', player.name)}
         >
           {deltas.map((delta, index) => (
             <span
+
               key={index}
               className={delta > 0 ? 'delta-plus' : 'delta-minus'}
             >
@@ -284,13 +293,13 @@ function PlayerCard({
       )}
       <div
         className="card-content"
-        style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}
+        style={{ transform: rotation ? 'rotate('.concat(String(rotation), 'deg)') : undefined }}
       >
         <input
           className="player-name"
           value={player.name}
           onChange={(event) => onRename(event.target.value)}
-          aria-label={`${player.name} ${t('playerNameLabel')}`}
+          aria-label={player.name.concat(' ', t('playerNameLabel'))}
         />
         <div className="score-row">
           <div className="step-col">
@@ -303,7 +312,7 @@ function PlayerCard({
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               onClick={() => onStepClick(-1)}
-              aria-label={`${t('removePoint')} ${player.name}`}
+              aria-label={t('removePoint').concat(' ', player.name)}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -324,11 +333,13 @@ function PlayerCard({
                   startLongPress(event, 'negative');
                 }}
                 onPointerMove={moveLongPress}
-                onPointerUp={clearLongPress}
+               
+ onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(-2)}
-                aria-label={`${t('removePoint')} 2 — ${player.name}`}
+                aria-label={`${
+t('removePoint')} 2 — ${player.name}`}
               >
                 −2
               </button>
@@ -369,7 +380,7 @@ function PlayerCard({
                   cancelScoreEdit();
                 }
               }}
-              aria-label={`${t('setScore')} — ${player.name}`}
+              aria-label={t('setScore').concat(' — ', player.name)}
             />
           ) : (
             <div className="score-center">
@@ -380,12 +391,14 @@ function PlayerCard({
                 role="button"
                 tabIndex={0}
                 onKeyDown={(event) => {
+
                   if (event.key === 'Enter' || event.key === ' ') {
                     event.preventDefault();
                     onScoreClick();
                   }
                 }}
-                aria-label={`${t('setScore')} — ${player.name}`}
+                aria-label
+={`${t('setScore')} — ${player.name}`}
               >
                 {player.score}
               </div>
@@ -413,7 +426,7 @@ function PlayerCard({
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               onClick={() => onStepClick(1)}
-              aria-label={`${t('addPoint')} ${player.name}`}
+              aria-label={t('addPoint').concat(' ', player.name)}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
@@ -435,11 +448,13 @@ function PlayerCard({
                 }}
                 onPointerMove={moveLongPress}
                 onPointerUp={clearLongPress}
-                onPointerLeave={clearLongPress}
+      
+          onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(2)}
                 aria-label={`${t('addPoint')} 2 — ${player.name}`}
-              >
+             
+ >
                 +2
               </button>
               <button
@@ -464,9 +479,9 @@ function PlayerCard({
         {quickOpen && (
           <div
             ref={quickRef}
-            className={`score-tooltip${signClass}`}
+            className={'score-tooltip'.concat(signClass)}
             role="tooltip"
-            aria-label={`${t('quickScoreChange')} ${player.name}`}
+            aria-label={t('quickScoreChange').concat(' ', player.name)}
           >
             {showNegative && (
               <>
@@ -497,6 +512,7 @@ function PlayerCard({
               </>
             )}
             {showPositive && (
+
               <>
                 <button
                   type="button"
@@ -505,7 +521,8 @@ function PlayerCard({
                   onClick={() => quick(5)}
                 >
                   +5
-                </button>
+ 
+               </button>
                 <button
                   type="button"
                   className="delta-pos"
@@ -565,7 +582,8 @@ function PlayerCard({
           </div>
         )}
       </div>
-    </article>
+    </
+article>
   );
 }
 
@@ -574,7 +592,8 @@ function createTempGame(playerCount: number): Game {
   const now = Date.now();
   const players: Player[] = [];
   for (let i = 0; i < playerCount; i++) {
-    players.push({
+    players.p
+ush({
       id: `temp-player-${i}`,
       name: `Player ${i + 1}`,
       score: 0,
@@ -591,7 +610,108 @@ function createTempGame(playerCount: number): Game {
   };
 }
 
-function GameScreen({
+
+
+// BackButton component for React Router navigation
+function BackButton() {
+  const { t } = useI18n();
+  const navigate = useNavigate();
+  const location = useLocation();
+  
+  if (location.pathname === '/') return null;
+  
+  return (
+    <button
+      className="back-button"
+      type="button"
+      onClick={() => navigate(-1)}
+      aria-label={t('back')}
+    >
+      ←
+    </button>
+  );
+}
+
+// Wrapper components for route-based navigation
+function StartScreenWrapper() {
+  const navigate = useNavigate();
+  return (
+    <StartScreen
+      onNewGame={() => navigate('/setup')}
+      onChwatzi={(count) => navigate('/chwatzi?players=' + String(count))}
+    />
+  );
+}
+
+function ChwatziScreenWrapper() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const playerCount = Number(searchParams.get('players')) || 4;
+  const game = createTempGame(playerCount);
+  return (
+    <ChwatziScreen
+      game={game}
+      onSelect={(startingPlayerId) => {
+        const gameWithStartingPlayer = { ...game, startingPlayerId };
+        localGameRepository.save(gameWithStartingPlayer);
+        navigate('/game?gameId=' + gameWithStartingPlayer.id);
+      }}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+function GameSetupWrapper() {
+  const navigate = useNavigate();
+  return (
+    <GameSetup
+      onCreate={(game) => {
+        localGameRepository.save(game);
+        navigate('/game?gameId=' + game.id);
+      }}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+functi
+on GameScreenWrapper() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
+  const [game, setGame] = useState<Game | null>(null);
+  
+  useEffect(() => {
+    if (gameId) {
+      const loaded = localGameRepository.get(gameId);
+      if (loaded) setGame(loaded);
+      else navigate('/');
+    } else navigate('/');
+  }, [gameId, navigate]);
+  
+  if (!game) return null;
+  
+  return (
+    <GameScreenInnerInner
+      initialGame={game}
+      onNewGame={() => navigate('/setup')}
+      onSavedGames={() => navigate('/saved')}
+      onChwatzi={() => navigate('/')}
+    />
+  );
+}
+
+function SavedGamesWrapper() {
+  const navigate = useNavigate();
+  return (
+    <SavedGames
+      onNewGame={() => navigate('/setup')}
+      onGameSelect={(game) => navigate('/game?gameId=' + game.id)}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+function GameScreenInner({
   initialGame,
   onNewGame,
   onSavedGames,
@@ -625,7 +745,8 @@ function GameScreen({
   const orderedPlayers = isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
 
   useEffect(() => {
-    localStorage.setItem('keepscore-fullscreen', fullscreen ? '1' : '0');
+    localStorage.setItem('keepscore-fulls
+creen', fullscreen ? '1' : '0');
   }, [fullscreen]);
 
   useEffect(() => {
@@ -647,7 +768,8 @@ function GameScreen({
 
   const recentDeltasFor = (playerId: string): number[] =>
     game.history
-      .filter((entry) => entry.playerId === playerId)
+      .filter((entry) => e
+ntry.playerId === playerId)
       .slice(-RECENT_DELTAS)
       .map((entry) => entry.delta)
       .reverse();
@@ -688,7 +810,8 @@ function GameScreen({
                 <span className="history-actions">
                   <button
                     type="button"
-                    className="secondary-button"
+                    className="secondary-but
+ton"
                     onClick={() => beginEdit(entry.id, entry.delta)}
                     title={t('edit')}
                   >
@@ -703,7 +826,8 @@ function GameScreen({
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        fill="none"
+                        fill
+="none"
                       />
                     </svg> 
                     {t('edit')}
@@ -741,7 +865,8 @@ function GameScreen({
                   <span className="history-editor">
                     <input
                       autoFocus
-                      type="number"
+                      t
+ype="number"
                       value={draftDelta}
                       onChange={(event) => setDraftDelta(event.target.value)}
                       aria-label={t('editHistoryDelta')}
@@ -757,7 +882,8 @@ function GameScreen({
                       type="button"
                       className="secondary-button"
                       onClick={() => setEditingEntry(null)}
-                    >
+      
+              >
                       {t('cancel')}
                     </button>
                   </span>
@@ -806,6 +932,7 @@ function GameScreen({
             className="icon-fab"
             type="button"
             onClick={() => setFullscreen((current) => !current)}
+
             aria-pressed={fullscreen}
             aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}
           >
@@ -821,7 +948,8 @@ function GameScreen({
                 />
               </svg>
             ) : (
-              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="
+true">
                 <path
                   d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
                   stroke="currentColor"
@@ -866,7 +994,8 @@ function GameScreen({
                 ),
               } as CSSProperties) ||
             undefined
-          }
+  
+        }
           aria-label={t('players')}
         >
           {orderedPlayers.map((player, index) => {
@@ -883,7 +1012,8 @@ function GameScreen({
                 rotation={rotation}
                 lastDelta={lastDeltaFor(player.id)}
                 onRename={(name) =>
-                  dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })
+                  dispatch({ type
+: 'RENAME_PLAYER', playerId: player.id, name })
                 }
                 onDelta={(delta) => {
                   dispatch({ type: 'ADD_SCORE', playerId: player.id, delta });
@@ -925,7 +1055,8 @@ function GameScreen({
               className="history-close"
               type="button"
               onClick={() => setHistoryOpen(false)}
-              aria-label={t('closeHistory')}
+           
+   aria-label={t('closeHistory')}
               title={t('closeHistory')}
             >
               ✕
@@ -946,279 +1077,10 @@ function GameScreen({
       </main>
       {menuOpen && (
         <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
-          <nav
+  
+        <nav
             className="menu-drawer"
             aria-label={t('menu')}
-            onClick={(event) => event.stopPropagation()}
-          >
-            <button
-              className="menu-close"
-              type="button"
-              onClick={() => setMenuOpen(false)}
-              aria-label={t('closeMenu')}
-            >
-              ✕
-            </button>
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                setHistoryOpen((current) => !current);
-                setMenuOpen(false);
-              }}
-            >
-              🕘 {t('history')}
-            </button>
-            <div className="menu-separator" />
-            <div className="menu-row">
-              <button
-                className="menu-item"
-                type="button"
-                onClick={() => {
-                  undo();
-                  setMenuOpen(false);
-                }}
-                disabled={!past.length}
-              >
-                ↩ {t('undo')}
-              </button>
-              <button
-                className="menu-item"
-                type="button"
-                onClick={() => {
-                  redo();
-                  setMenuOpen(false);
-                }}
-                disabled={!future.length}
-              >
-                ↪ {t('redo')}
-              </button>
-            </div>
-            <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                dispatch({ type: 'ADD_PLAYER' });
-                haptic();
-                setMenuOpen(false);
-              }}
-            >
-              {t('addPlayerMenuItem')}
-            </button>
-            <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                onSavedGames();
-              }}
-            >
-              💾 {t('savedGames')}
-            </button>
-            <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                onNewGame();
-              }}
-            >
-              {t('newGameMenuItem')}
-            </button>
-            <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                setMenuOpen(false);
-                onChwatzi();
-              }}
-            >
-              🎲 {t('whoStarts')}
-            </button>
-            <div className="menu-separator" />
-            <div className="menu-row lang-row">
-              <button
-                type="button"
-                className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'}
-                onClick={() => setLang('fr')}
-              >
-                🇫🇷 Français
-              </button>
-              <button
-                type="button"
-                className={lang === 'en' ? 'menu-item lang active' : 'menu-item lang'}
-                onClick={() => setLang('en')}
-              >
-                🇬🇧 English
-              </button>
-            </div>
-          </nav>
-        </div>
-      )}
-    </>
-  );
-}
+            onClick={(event) 
 
-// Common chrome for every route: install banner and language switch,
-// floating over the screen content. The game screen opts out — it embeds
-// its own install button (header toolbar) and language switch (menu).
-function RouteShell({ children }: { children: ReactNode }) {
-  return (
-    <div className="route-shell">
-      <div className="route-chrome">
-        <InstallButton />
-        <LangFlags />
-      </div>
-      {children}
-    </div>
-  );
-}
-
-// Route element wrappers: replace the previous state-based `screen` switching
-// with URL-driven navigation so screens can be deep-linked and revisited.
-function StartScreenRoute() {
-  const navigate = useNavigate();
-  return (
-    <StartScreen
-      onNewGame={() => navigate('/setup')}
-      onChwatzi={(playerCount) =>
-        navigate(`/chwatzi?players=${encodeURIComponent(String(playerCount))}`)
-      }
-    />
-  );
-}
-
-function ChwatziScreenRoute() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const playerCount = Number(searchParams.get('players')) || 4;
-  const game = useMemo(() => createTempGame(playerCount), [playerCount]);
-  return (
-    <ChwatziScreen
-      game={game}
-      onSelect={(startingPlayerId) => {
-        const gameWithStartingPlayer = { ...game, startingPlayerId };
-        localGameRepository.save(gameWithStartingPlayer);
-        navigate(`/game?gameId=${encodeURIComponent(gameWithStartingPlayer.id)}`);
-      }}
-      onBack={() => navigate(-1)}
-    />
-  );
-}
-
-function GameSetupRoute() {
-  const navigate = useNavigate();
-  return (
-    <GameSetup
-      onCreate={(game) => {
-        localGameRepository.save(game);
-        navigate(`/game?gameId=${encodeURIComponent(game.id)}`);
-      }}
-      onBack={() => navigate(-1)}
-    />
-  );
-}
-
-function GameScreenRoute() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
-  const [game, setGame] = useState<Game | null>(null);
-
-  useEffect(() => {
-    if (gameId) {
-      const loaded = localGameRepository.get(gameId);
-      if (loaded) setGame(loaded);
-      else navigate('/');
-    } else {
-      navigate('/');
-    }
-  }, [gameId, navigate]);
-
-  if (!game) return null;
-
-  return (
-    <GameScreen
-      initialGame={game}
-      onNewGame={() => navigate('/setup')}
-      onSavedGames={() => navigate('/saved')}
-      onChwatzi={() => navigate('/')}
-    />
-  );
-}
-
-function SavedGamesRoute() {
-  const navigate = useNavigate();
-  const [savedGames, setSavedGames] = useState<Game[]>([]);
-
-  useEffect(() => {
-    setSavedGames(localGameRepository.list());
-  }, []);
-
-  return (
-    <SavedGames
-      games={savedGames}
-      onResume={(game) => navigate(`/game?gameId=${encodeURIComponent(game.id)}`)}
-      onDelete={async (id) => {
-        await localGameRepository.remove(id);
-        setSavedGames(localGameRepository.list());
-      }}
-      onBack={() => navigate(-1)}
-    />
-  );
-}
-
-// Vite serves the app under /KeepScore/ on GitHub Pages and / on Netlify
-// (see vite.config.ts `base`). The router basename must follow the same base
-// for routes to match on both deployments.
-const router = createBrowserRouter(
-  [
-    {
-      path: '/',
-      element: (
-        <RouteShell>
-          <StartScreenRoute />
-        </RouteShell>
-      ),
-    },
-    {
-      path: '/chwatzi',
-      element: (
-        <RouteShell>
-          <ChwatziScreenRoute />
-        </RouteShell>
-      ),
-    },
-    {
-      path: '/setup',
-      element: (
-        <RouteShell>
-          <GameSetupRoute />
-        </RouteShell>
-      ),
-    },
-    {
-      // The game screen renders its own chrome (install button in the header
-      // toolbar, language switch in the menu) — no RouteShell here.
-      path: '/game',
-      element: <GameScreenRoute />,
-    },
-    {
-      path: '/saved',
-      element: (
-        <RouteShell>
-          <SavedGamesRoute />
-        </RouteShell>
-      ),
-    },
-  ],
-  { basename: import.meta.env.BASE_URL },
-);
-
-export function App() {
-  return <RouterProvider router={router} />;
-}
+... [Content truncated]
