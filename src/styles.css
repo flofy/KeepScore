@@ -1092,6 +1092,27 @@ h2 {
 .back-button:active {
   transform: scale(0.93);
 }
+/* Route shell: common chrome wrapper for router-rendered screens. Provides
+   the positioning context for the floating language switch and back button. */
+.route-shell {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+}
+
+.route-shell .lang-switch {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  z-index: 10;
+}
+
+.route-shell .back-button {
+  top: 18px;
+  left: 18px;
+  z-index: 10;
+}
+
 .setup-header {
   margin-bottom: 34px;
 }

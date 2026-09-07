@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   ChangeEvent,
   CSSProperties,
   PointerEvent as ReactPointerEvent,
+  ReactNode,
 } from 'react';
 import type { Game, Player } from '../domain/game/types';
 import { colorForIndex } from '../domain/game/colors';
@@ -17,8 +18,15 @@ import {
 } from '../infrastructure/portability/gamesPortability';
 import { useGameHistory } from './useGameHistory';
 import { InstallButton } from './InstallButton';
-import { I18nProvider, useI18n } from './i18n';
+import { useI18n } from './i18n';
 import { LangFlags } from './LangFlags';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 import './saved-games.css';
 import './chwatzi.css';
 import './start.css';
@@ -27,7 +35,6 @@ function haptic() {
   if ('vibrate' in navigator) navigator.vibrate(8);
 }
 
-type Screen = 'start' | 'chwatzi' | 'game' | 'saved';
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
@@ -1057,102 +1064,184 @@ function GameScreen({
   );
 }
 
-export function App() {
-  const { t, lang } = useI18n();
-  const [screen, setScreen] = useState<Screen>('start');
-  const [currentGame, setCurrentGame] = useState<Game | null>(null);
+// BackButton: floating back control for React Router navigation.
+// Hidden on the home route — screens already render their own back buttons.
+function BackButton() {
+  const { t } = useI18n();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  if (location.pathname === '/') return null;
+
+  return (
+    <button
+      className="back-button"
+      type="button"
+      onClick={() => navigate(-1)}
+      aria-label={t('back')}
+    >
+      ←
+    </button>
+  );
+}
+
+// Common chrome for every route: language switch and (optionally) a floating
+// back button, positioned over the screen content.
+function RouteShell({ showBackButton = false, children }: {
+  showBackButton?: boolean;
+  children: ReactNode;
+}) {
+  return (
+    <div className="route-shell">
+      <LangFlags />
+      {showBackButton && <BackButton />}
+      {children}
+    </div>
+  );
+}
+
+// Route element wrappers: replace the previous state-based `screen` switching
+// with URL-driven navigation so screens can be deep-linked and revisited.
+function StartScreenRoute() {
+  const navigate = useNavigate();
+  return (
+    <StartScreen
+      onNewGame={() => navigate('/setup')}
+      onChwatzi={(playerCount) =>
+        navigate(`/chwatzi?players=${encodeURIComponent(String(playerCount))}`)
+      }
+    />
+  );
+}
+
+function ChwatziScreenRoute() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const playerCount = Number(searchParams.get('players')) || 4;
+  const game = useMemo(() => createTempGame(playerCount), [playerCount]);
+  return (
+    <ChwatziScreen
+      game={game}
+      onSelect={(startingPlayerId) => {
+        const gameWithStartingPlayer = { ...game, startingPlayerId };
+        localGameRepository.save(gameWithStartingPlayer);
+        navigate(`/game?gameId=${encodeURIComponent(gameWithStartingPlayer.id)}`);
+      }}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+function GameSetupRoute() {
+  const navigate = useNavigate();
+  return (
+    <GameSetup
+      onCreate={(game) => {
+        localGameRepository.save(game);
+        navigate(`/game?gameId=${encodeURIComponent(game.id)}`);
+      }}
+      onBack={() => navigate(-1)}
+    />
+  );
+}
+
+function GameScreenRoute() {
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get('gameId');
+  const [game, setGame] = useState<Game | null>(null);
+
+  useEffect(() => {
+    if (gameId) {
+      const loaded = localGameRepository.get(gameId);
+      if (loaded) setGame(loaded);
+      else navigate('/');
+    } else {
+      navigate('/');
+    }
+  }, [gameId, navigate]);
+
+  if (!game) return null;
+
+  return (
+    <GameScreen
+      initialGame={game}
+      onNewGame={() => navigate('/setup')}
+      onSavedGames={() => navigate('/saved')}
+      onChwatzi={() => navigate('/')}
+    />
+  );
+}
+
+function SavedGamesRoute() {
+  const navigate = useNavigate();
   const [savedGames, setSavedGames] = useState<Game[]>([]);
 
   useEffect(() => {
-    const loadSavedGames = async () => {
-      const games = await localGameRepository.list();
-      setSavedGames(games);
-    };
-    loadSavedGames();
-  }, []);
-
-  const handleNewGame = useCallback(() => {
-    setScreen('game');
-  }, []);
-
-  const handleSavedGames = useCallback(() => {
-    setScreen('saved');
-  }, []);
-
-  const handleChwatzi = useCallback(() => {
-    setScreen('chwatzi');
-  }, []);
-
-  const handleStartChwatzi = useCallback((playerCount: number) => {
-    const tempGame = createTempGame(playerCount);
-    setCurrentGame(tempGame);
-    setScreen('chwatzi');
-  }, []);
-
-  const handleGameSelect = useCallback((game: Game) => {
-    setCurrentGame(game);
-    setScreen('game');
-  }, []);
-
-  const handleBackFromChwatzi = useCallback(() => {
-    setScreen('start');
-    setCurrentGame(null);
-  }, []);
-
-  const handleBackFromGame = useCallback(() => {
-    setScreen('start');
-    setCurrentGame(null);
-  }, []);
-
-  const handleBackFromSaved = useCallback(() => {
-    setScreen('start');
-  }, []);
-
-  const handleResumeGame = useCallback((game: Game) => {
-    setCurrentGame(game);
-    setScreen('game');
-  }, []);
-
-  const handleDeleteGame = useCallback(async (id: string) => {
-    await localGameRepository.remove(id);
-    const games = await localGameRepository.list();
-    setSavedGames(games);
+    setSavedGames(localGameRepository.list());
   }, []);
 
   return (
-    <I18nProvider>
-      <LangFlags />
-      {screen === 'start' && (
-        <StartScreen
-          onNewGame={handleNewGame}
-          onChwatzi={handleStartChwatzi}
-        />
-      )}
-      {screen === 'game' && currentGame && (
-        <GameScreen
-          initialGame={currentGame}
-          onNewGame={handleNewGame}
-          onSavedGames={handleSavedGames}
-          onChwatzi={handleChwatzi}
-        />
-      )}
-      {screen === 'chwatzi' && currentGame && (
-        <ChwatziScreen
-          game={currentGame}
-          onSelect={(startingPlayerId) => {
-            setCurrentGame(prev => prev ? { ...prev, startingPlayerId } : null);
-            setScreen('game');
-          }}
-          onBack={handleBackFromChwatzi}
-        />
-      )}
-      {screen === 'saved' && (
-        <SavedGames
-          games={savedGames}
-          onResume={handleResumeGame}
-          onDelete={handleDeleteGame}
-        />
-      )}
-    </I18nProvider>
+    <SavedGames
+      games={savedGames}
+      onResume={(game) => navigate(`/game?gameId=${encodeURIComponent(game.id)}`)}
+      onDelete={async (id) => {
+        await localGameRepository.remove(id);
+        setSavedGames(localGameRepository.list());
+      }}
+    />
   );
+}
+
+// Vite serves the app under /KeepScore/ on GitHub Pages and / on Netlify
+// (see vite.config.ts `base`). The router basename must follow the same base
+// for routes to match on both deployments.
+const router = createBrowserRouter(
+  [
+    {
+      path: '/',
+      element: (
+        <RouteShell>
+          <StartScreenRoute />
+        </RouteShell>
+      ),
+    },
+    {
+      path: '/chwatzi',
+      element: (
+        <RouteShell showBackButton>
+          <ChwatziScreenRoute />
+        </RouteShell>
+      ),
+    },
+    {
+      path: '/setup',
+      element: (
+        <RouteShell showBackButton>
+          <GameSetupRoute />
+        </RouteShell>
+      ),
+    },
+    {
+      path: '/game',
+      element: (
+        <RouteShell>
+          <GameScreenRoute />
+        </RouteShell>
+      ),
+    },
+    {
+      path: '/saved',
+      element: (
+        <RouteShell showBackButton>
+          <SavedGamesRoute />
+        </RouteShell>
+      ),
+    },
+  ],
+  { basename: import.meta.env.BASE_URL },
+);
+
+export function App() {
+  return <RouterProvider router={router} />;
 }
