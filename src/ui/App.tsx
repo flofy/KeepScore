@@ -22,6 +22,13 @@ import { LangFlags } from './LangFlags';
 import './saved-games.css';
 import './chwatzi.css';
 import './start.css';
+import {
+  createBrowserRouter,
+  RouterProvider,
+  useNavigate,
+  useLocation,
+  useSearchParams,
+} from 'react-router-dom'
 
 function haptic() {
   if ('vibrate' in navigator) navigator.vibrate(8);
@@ -31,7 +38,7 @@ type Screen = 'start' | 'chwatzi' | 'game' | 'saved';
 const RECENT_DELTAS = 6;
 
 function formatDelta(delta: number): string {
-  return delta > 0 ? `+${delta}` : `${delta}`;
+  return delta > 0 ? '+'.concat(String(delta)) : String(delta);
 }
 
 // Shrinks an element's font-size so its content always fits its available width.
@@ -45,7 +52,7 @@ function useFitText<T extends HTMLElement>(content: unknown) {
       const natural = el.scrollWidth;
       if (natural > avail && avail > 0) {
         const current = parseFloat(window.getComputedStyle(el).fontSize);
-        el.style.fontSize = `${Math.max(12, current * (avail / natural))}px`;
+        el.style.fontSize = String(Math.max(12, current * (avail / natural))).concat('px');
       }
     };
     apply();
@@ -61,7 +68,8 @@ type PlayerCardProps = {
   deltas: number[];
   rotation?: number;
   lastDelta?: number;
-  onRename: (name: string) => void;
+  onRename: (name: string)
+ => void;
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
   onSetScore: (value: number) => void;
@@ -123,7 +131,8 @@ function PlayerCard({
     )
       clearLongPress();
   };
-  const quick = (delta: number) => {
+  const
+ quick = (delta: number) => {
     onQuickDelta(delta);
     setQuickOpen(false);
     setForcedSign(undefined);
@@ -193,7 +202,8 @@ function PlayerCard({
     return () => {
       document.removeEventListener('mousedown', onDown);
       document.removeEventListener('touchstart', onDown);
-    };
+    }
+;
   }, [quickOpen, customOpen]);
 
   useEffect(() => {
@@ -232,7 +242,7 @@ function PlayerCard({
 
   return (
     <article
-      className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
+      className={rotation ? 'player-card rotated-'.concat(String(rotation)) : 'player-card'}
       style={{
         '--player-color': player.color ?? '#38bdf8',
         '--digits': String(Math.abs(player.score)).length,
@@ -268,6 +278,7 @@ function PlayerCard({
         >
           {deltas.map((delta, index) => (
             <span
+
               key={index}
               className={delta > 0 ? 'delta-plus' : 'delta-minus'}
             >
@@ -278,7 +289,7 @@ function PlayerCard({
       )}
       <div
         className="card-content"
-        style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}
+        style={{ transform: rotation ? 'rotate('.concat(String(rotation), 'deg)') : undefined }}
       >
         <input
           className="player-name"
@@ -322,7 +333,8 @@ function PlayerCard({
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(-2)}
-                aria-label={`${t('removePoint')} 2 — ${player.name}`}
+                aria-label={`${
+t('removePoint')} 2 — ${player.name}`}
               >
                 −2
               </button>
@@ -379,7 +391,8 @@ function PlayerCard({
                     onScoreClick();
                   }
                 }}
-                aria-label={`${t('setScore')} — ${player.name}`}
+                aria-label
+={`${t('setScore')} — ${player.name}`}
               >
                 {player.score}
               </div>
@@ -433,7 +446,8 @@ function PlayerCard({
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickDelta(2)}
                 aria-label={`${t('addPoint')} 2 — ${player.name}`}
-              >
+             
+ >
                 +2
               </button>
               <button
@@ -499,7 +513,8 @@ function PlayerCard({
                   onClick={() => quick(5)}
                 >
                   +5
-                </button>
+ 
+               </button>
                 <button
                   type="button"
                   className="delta-pos"
@@ -568,7 +583,8 @@ function createTempGame(playerCount: number): Game {
   const now = Date.now();
   const players: Player[] = [];
   for (let i = 0; i < playerCount; i++) {
-    players.push({
+    players.p
+ush({
       id: `temp-player-${i}`,
       name: `Player ${i + 1}`,
       score: 0,
@@ -585,7 +601,49 @@ function createTempGame(playerCount: number): Game {
   };
 }
 
-function GameScreen({
+
+
+// BackButton component for React Router navigation
+function BackButton() {
+  const { t } = useI18n();
+  const navigate = useNavigate();
+  const location = useLocation();
+  if (location.pathname === '/') return null;
+  return (
+    <button className="back-button" type="button" onClick={() => navigate(-1)} aria-label={t('back')}>←</button>
+  );
+}
+
+// Wrapper components
+function StartScreenWrapper() {
+  const navigate = useNavigate();
+  return <StartScreen onNewGame={() => navigate('/setup')} onChwatzi={(c) => navigate('/chwatzi?players=' + String(c))} />;
+}
+function ChwatziScreenWrapper() {
+  const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const pc = Number(sp.get('players')) || 4;
+  const game = createTempGame(pc);
+  return <ChwatziScreen game={game} onSelect={(sid) => { localGameRepository.save({...game, startingPlayerId: sid}); navigate('/game?gameId=' + game.id); }} onBack={() => navigate(-1)} />;
+}
+function GameSetupWrapper() {
+  const navigate = useNavigate();
+  return <GameSetup onCreate={(g) => { localGameRepository.save(g); navigate('/game?gameId=' + g.id); }} onBack={() => navigate(-1)} />;
+}
+function GameScreenWrapper() {
+  const navigate = useNavigate();
+  const [sp] = useSearchParams();
+  const gid = sp.get('gameId');
+  const [game, setGame] = useState<Game | null>(null);
+  useEffect(() => { if (gid) { const l = localGameRepository.get(gid); if (l) setGame(l); else navigate('/'); } else navigate('/'); }, [gid, navigate]);
+  if (!game) return null;
+  return <GameScreenInnerInner initialGame={game} onNewGame={() => navigate('/setup')} onSavedGames={() => navigate('/saved')} onChwatzi={() => navigate('/')} />;
+}
+function SavedGamesWrapper() {
+  const navigate = useNavigate();
+  return <SavedGames onNewGame={() => navigate('/setup')} onGameSelect={(g) => navigate('/game?gameId=' + g.id)} onBack={() => navigate(-1)} />;
+}
+function GameScreenInner({
   initialGame,
   onNewGame,
   onSavedGames,
@@ -641,7 +699,8 @@ function GameScreen({
 
   const recentDeltasFor = (playerId: string): number[] =>
     game.history
-      .filter((entry) => entry.playerId === playerId)
+      .filter((entry) => e
+ntry.playerId === playerId)
       .slice(-RECENT_DELTAS)
       .map((entry) => entry.delta)
       .reverse();
@@ -697,7 +756,8 @@ function GameScreen({
                         strokeWidth="2"
                         strokeLinecap="round"
                         strokeLinejoin="round"
-                        fill="none"
+                        fill
+="none"
                       />
                     </svg> 
                     {t('edit')}
@@ -751,7 +811,8 @@ function GameScreen({
                       type="button"
                       className="secondary-button"
                       onClick={() => setEditingEntry(null)}
-                    >
+      
+              >
                       {t('cancel')}
                     </button>
                   </span>
@@ -815,7 +876,8 @@ function GameScreen({
                 />
               </svg>
             ) : (
-              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="
+true">
                 <path
                   d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"
                   stroke="currentColor"
@@ -877,7 +939,8 @@ function GameScreen({
                 rotation={rotation}
                 lastDelta={lastDeltaFor(player.id)}
                 onRename={(name) =>
-                  dispatch({ type: 'RENAME_PLAYER', playerId: player.id, name })
+                  dispatch({ type
+: 'RENAME_PLAYER', playerId: player.id, name })
                 }
                 onDelta={(delta) => {
                   dispatch({ type: 'ADD_SCORE', playerId: player.id, delta });
@@ -940,7 +1003,8 @@ function GameScreen({
       </main>
       {menuOpen && (
         <div className="drawer-backdrop" onClick={() => setMenuOpen(false)}>
-          <nav
+  
+        <nav
             className="menu-drawer"
             aria-label={t('menu')}
             onClick={(event) => event.stopPropagation()}
@@ -1006,7 +1070,8 @@ function GameScreen({
               type="button"
               onClick={() => {
                 setMenuOpen(false);
-                onSavedGames();
+                onSavedGam
+es();
               }}
             >
               💾 {t('savedGames')}
@@ -1033,126 +1098,6 @@ function GameScreen({
             >
               🎲 {t('whoStarts')}
             </button>
-            <div className="menu-separator" />
-            <div className="menu-row lang-row">
-              <button
-                type="button"
-                className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'}
-                onClick={() => setLang('fr')}
-              >
-                🇫🇷 Français
-              </button>
-              <button
-                type="button"
-                className={lang === 'en' ? 'menu-item lang active' : 'menu-item lang'}
-                onClick={() => setLang('en')}
-              >
-                🇬🇧 English
-              </button>
-            </div>
-          </nav>
-        </div>
-      )}
-    </>
-  );
-}
+            <div className="m
 
-export function App() {
-  const { t, lang } = useI18n();
-  const [screen, setScreen] = useState<Screen>('start');
-  const [currentGame, setCurrentGame] = useState<Game | null>(null);
-  const [savedGames, setSavedGames] = useState<Game[]>([]);
-
-  useEffect(() => {
-    const loadSavedGames = async () => {
-      const games = await localGameRepository.list();
-      setSavedGames(games);
-    };
-    loadSavedGames();
-  }, []);
-
-  const handleNewGame = useCallback(() => {
-    setScreen('game');
-  }, []);
-
-  const handleSavedGames = useCallback(() => {
-    setScreen('saved');
-  }, []);
-
-  const handleChwatzi = useCallback(() => {
-    setScreen('chwatzi');
-  }, []);
-
-  const handleStartChwatzi = useCallback((playerCount: number) => {
-    const tempGame = createTempGame(playerCount);
-    setCurrentGame(tempGame);
-    setScreen('chwatzi');
-  }, []);
-
-  const handleGameSelect = useCallback((game: Game) => {
-    setCurrentGame(game);
-    setScreen('game');
-  }, []);
-
-  const handleBackFromChwatzi = useCallback(() => {
-    setScreen('start');
-    setCurrentGame(null);
-  }, []);
-
-  const handleBackFromGame = useCallback(() => {
-    setScreen('start');
-    setCurrentGame(null);
-  }, []);
-
-  const handleBackFromSaved = useCallback(() => {
-    setScreen('start');
-  }, []);
-
-  const handleResumeGame = useCallback((game: Game) => {
-    setCurrentGame(game);
-    setScreen('game');
-  }, []);
-
-  const handleDeleteGame = useCallback(async (id: string) => {
-    await localGameRepository.remove(id);
-    const games = await localGameRepository.list();
-    setSavedGames(games);
-  }, []);
-
-  return (
-    <I18nProvider>
-      <LangFlags />
-      {screen === 'start' && (
-        <StartScreen
-          onNewGame={handleNewGame}
-          onChwatzi={handleStartChwatzi}
-        />
-      )}
-      {screen === 'game' && currentGame && (
-        <GameScreen
-          initialGame={currentGame}
-          onNewGame={handleNewGame}
-          onSavedGames={handleSavedGames}
-          onChwatzi={handleChwatzi}
-        />
-      )}
-      {screen === 'chwatzi' && currentGame && (
-        <ChwatziScreen
-          game={currentGame}
-          onSelect={(startingPlayerId) => {
-            setCurrentGame(prev => prev ? { ...prev, startingPlayerId } : null);
-            setScreen('game');
-          }}
-          onBack={handleBackFromChwatzi}
-        />
-      )}
-      {screen === 'saved' && (
-        <SavedGames
-          games={savedGames}
-          onResume={handleResumeGame}
-          onDelete={handleDeleteGame}
-        />
-      )}
-    </I18nProvider>
-  );
-}
+... [Content truncated]
