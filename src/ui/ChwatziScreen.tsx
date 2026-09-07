@@ -19,6 +19,8 @@ type FingerSlot = {
   player?: Player
 }
 
+type CountdownState = 'idle' | 'counting' | 'blinking' | 'done'
+
 export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const { t } = useI18n()
   const [mode, setMode] = useState<ChwatziMode>('roulette')
@@ -34,8 +36,12 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const [pickMode, setPickMode] = useState<PickMode>('single')
   const [fingers, setFingers] = useState<FingerSlot[]>([])
   const [multiResult, setMultiResult] = useState<Player[] | null>(null)
-  const [isSelecting, setIsSelecting] = useState(false)
+  const [countdown, setCountdown] = useState<CountdownState>('idle')
+  const [countdownValue, setCountdownValue] = useState(3)
+  const [blinkingIndex, setBlinkingIndex] = useState(0)
   const holdTimerRef = useRef<number | null>(null)
+  const countdownTimerRef = useRef<number | null>(null)
+  const blinkTimerRef = useRef<number | null>(null)
   const zoneRef = useRef<HTMLDivElement | null>(null)
 
   // Joueurs avec leurs couleurs
@@ -122,6 +128,8 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
       if (slowdownTimerRef.current) clearTimeout(slowdownTimerRef.current)
       if (finalTimeoutRef.current) clearTimeout(finalTimeoutRef.current)
       if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+      if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current)
+      if (blinkTimerRef.current) clearInterval(blinkTimerRef.current)
     }
   }, [])
 
@@ -133,83 +141,118 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   // --- Multi-touch logic ---
 
   const handlePointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (isSelecting) return
+    if (countdown !== 'idle') return
     e.preventDefault()
     const pointerId = e.pointerId
     setFingers(prev => {
       if (prev.some(f => f.pointerId === pointerId)) return prev
-      return [...prev, { pointerId, x: e.clientX, y: e.clientY }]
+      // Calculate position relative to zone
+      const rect = zoneRef.current?.getBoundingClientRect()
+      const x = rect ? e.clientX - rect.left : e.clientX
+      const y = rect ? e.clientY - rect.top : e.clientY
+      return [...prev, { pointerId, x, y }]
     })
-    // Haptic feedback
     if ('vibrate' in navigator) navigator.vibrate(30)
-  }, [isSelecting])
+  }, [countdown])
 
   const handlePointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (isSelecting) return
+    if (countdown !== 'idle') return
     const pointerId = e.pointerId
+    const rect = zoneRef.current?.getBoundingClientRect()
+    const x = rect ? e.clientX - rect.left : e.clientX
+    const y = rect ? e.clientY - rect.top : e.clientY
     setFingers(prev =>
-      prev.map(f => f.pointerId === pointerId ? { ...f, x: e.clientX, y: e.clientY } : f)
+      prev.map(f => f.pointerId === pointerId ? { ...f, x, y } : f)
     )
-  }, [isSelecting])
+  }, [countdown])
 
   const handlePointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
-    if (isSelecting) return
+    if (countdown !== 'idle') return
     const pointerId = e.pointerId
     setFingers(prev => prev.filter(f => f.pointerId !== pointerId))
-  }, [isSelecting])
+  }, [countdown])
 
-  const runMultiTouchSelection = useCallback(() => {
-    setIsSelecting(true)
+  const resetMultiTouch = useCallback(() => {
+    setFingers([])
+    setMultiResult(null)
+    setSelectedPlayer(null)
+    setCountdown('idle')
+    setCountdownValue(3)
+    setBlinkingIndex(0)
     if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
+    if (countdownTimerRef.current) clearTimeout(countdownTimerRef.current)
+    if (blinkTimerRef.current) clearInterval(blinkTimerRef.current)
+  }, [])
 
-    // Shuffle players
-    const shuffled = [...playersWithColors].sort(() => Math.random() - 0.5)
-
-    if (pickMode === 'single') {
-      // Pick one random player
-      const winner = shuffled[0]
-      setMultiResult([winner])
-      setSelectedPlayer(winner)
-      if ('vibrate' in navigator) navigator.vibrate([100, 50, 100])
-    } else {
-      // Full order mode
-      setMultiResult(shuffled)
-      setSelectedPlayer(shuffled[0])
-      if ('vibrate' in navigator) navigator.vibrate([100, 50, 100, 50, 100])
-    }
-
-    setTimeout(() => {
-      setIsSelecting(false)
-      setFingers([])
-    }, 600)
-  }, [playersWithColors, pickMode])
-
-  // Auto-trigger selection when enough fingers are down and held for a moment
+  // Auto-trigger countdown when enough fingers are down
   useEffect(() => {
-    if (mode !== 'multitouch' || isSelecting) return
+    if (mode !== 'multitouch' || countdown !== 'idle') return
     if (fingers.length >= playersWithColors.length && fingers.length > 0) {
-      // All players placed fingers - start hold timer
       if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
       holdTimerRef.current = window.setTimeout(() => {
-        runMultiTouchSelection()
-      }, 800)
+        startCountdown()
+      }, 500)
     } else {
       if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
     }
-  }, [fingers, mode, isSelecting, playersWithColors.length, runMultiTouchSelection])
+  }, [fingers, mode, countdown, playersWithColors.length])
+
+  const startCountdown = useCallback(() => {
+    if (countdown !== 'idle' || fingers.length < playersWithColors.length) return
+    setCountdown('counting')
+    setCountdownValue(3)
+    if ('vibrate' in navigator) navigator.vibrate(100)
+
+    let count = 3
+    const timer = setInterval(() => {
+      count--
+      setCountdownValue(count)
+      if ('vibrate' in navigator) navigator.vibrate(50)
+      if (count <= 0) {
+        clearInterval(timer)
+        startBlinking()
+      }
+    }, 1000)
+    countdownTimerRef.current = timer as unknown as number
+  }, [countdown, fingers.length, playersWithColors.length])
+
+  const startBlinking = useCallback(() => {
+    setCountdown('blinking')
+    setBlinkingIndex(0)
+    
+    // Assign players to fingers (shuffle players and assign by index)
+    const shuffled = [...playersWithColors].sort(() => Math.random() - 0.5)
+    const assignedFingers = fingers.map((f, i) => ({
+      ...f,
+      player: shuffled[i % shuffled.length]
+    }))
+    
+    // If single mode, just take the first player
+    const resultPlayers = pickMode === 'single' ? [shuffled[0]] : shuffled
+    
+    // Start blinking animation
+    let index = 0
+    const blinkInterval = setInterval(() => {
+      if (index >= assignedFingers.length) {
+        clearInterval(blinkInterval)
+        setCountdown('done')
+        setMultiResult(resultPlayers)
+        setSelectedPlayer(resultPlayers[0])
+        return
+      }
+      setBlinkingIndex(index)
+      if ('vibrate' in navigator) navigator.vibrate(30)
+      index++
+    }, 300)
+    
+    blinkTimerRef.current = blinkInterval as unknown as number
+  }, [fingers, playersWithColors, pickMode])
 
   const confirmMultiResult = useCallback(() => {
     if (multiResult && multiResult.length > 0) {
       onSelect(multiResult[0].id)
     }
   }, [multiResult, onSelect])
-
-  const resetMultiTouch = useCallback(() => {
-    setFingers([])
-    setMultiResult(null)
-    setSelectedPlayer(null)
-    if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
-  }, [])
 
   const wheelClass = isSpinning ? 'roulette-wheel spinning' : 'roulette-wheel'
 
@@ -222,7 +265,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
             type="button"
             onClick={onBack}
             aria-label={t('back')}
-            disabled={isSpinning || isSelecting}
+            disabled={isSpinning || countdown !== 'idle'}
           >
             ←
           </button>
@@ -240,15 +283,15 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
             type="button"
             className={mode === 'roulette' ? 'mode-btn active' : 'mode-btn'}
             onClick={() => { setMode('roulette'); resetMultiTouch(); }}
-            disabled={isSpinning || isSelecting}
+            disabled={isSpinning || countdown !== 'idle'}
           >
             🎰 {t('modeRoulette')}
           </button>
           <button
             type="button"
             className={mode === 'multitouch' ? 'mode-btn active' : 'mode-btn'}
-            onClick={() => { setMode('multitouch'); setSelectedPlayer(null); setMultiResult(null); }}
-            disabled={isSpinning || isSelecting}
+            onClick={() => { setMode('multitouch'); setSelectedPlayer(null); setMultiResult(null); resetMultiTouch(); }}
+            disabled={isSpinning || countdown !== 'idle'}
           >
             👆 {t('modeMultitouch')}
           </button>
@@ -320,7 +363,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                 type="button"
                 className={pickMode === 'single' ? 'pick-btn active' : 'pick-btn'}
                 onClick={() => { setPickMode('single'); resetMultiTouch(); }}
-                disabled={isSelecting}
+                disabled={countdown !== 'idle'}
               >
                 {t('pickSingle')}
               </button>
@@ -328,57 +371,91 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                 type="button"
                 className={pickMode === 'order' ? 'pick-btn active' : 'pick-btn'}
                 onClick={() => { setPickMode('order'); resetMultiTouch(); }}
-                disabled={isSelecting}
+                disabled={countdown !== 'idle'}
               >
                 {t('pickOrder')}
               </button>
             </div>
 
-            {!multiResult && (
-              <div
-                className="multitouch-zone"
-                ref={zoneRef}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={handlePointerUp}
-                onPointerCancel={handlePointerUp}
-                onPointerLeave={handlePointerUp}
-              >
-                {fingers.length === 0 ? (
-                  <div className="multitouch-instructions">
-                    <span className="multitouch-icon" role="img" aria-label="fingers">👆</span>
-                    <p>{t('multitouchInstructions')}</p>
-                    <p className="muted small">
-                      {pickMode === 'single'
-                        ? t('multitouchSingleHint')
-                        : t('multitouchOrderHint')}
-                    </p>
+            <div
+              className="multitouch-zone fullscreen"
+              ref={zoneRef}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerCancel={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+            >
+              {/* Countdown overlay */}
+              {countdown === 'counting' && (
+                <div className="countdown-overlay">
+                  <span className="countdown-number">{countdownValue}</span>
+                </div>
+              )}
+
+              {/* Blinking overlay */}
+              {countdown === 'blinking' && fingers.map((f, i) => {
+                const player = playersWithColors[i % playersWithColors.length]
+                const isBlinking = i === blinkingIndex
+                return (
+                  <div
+                    key={f.pointerId}
+                    className={`blink-ring ${isBlinking ? 'blinking' : ''}`}
+                    style={{
+                      left: `${f.x}px`,
+                      top: `${f.y}px`,
+                      borderColor: player.color,
+                      boxShadow: `0 0 30px 10px ${player.color}`,
+                    }}
+                  />
+                )
+              })}
+
+              {/* Fingers dots */}
+              {countdown === 'idle' && fingers.length > 0 && (
+                <div className="multitouch-fingers">
+                  {fingers.map((f, i) => {
+                    const player = playersWithColors[i % playersWithColors.length]
+                    return (
+                      <div
+                        key={f.pointerId}
+                        className="finger-dot"
+                        style={{
+                          left: `${f.x}px`,
+                          top: `${f.y}px`,
+                          backgroundColor: player.color,
+                          borderColor: player.color,
+                        }}
+                      >
+                        <span>{i + 1}</span>
+                      </div>
+                    )
+                  })}
+                  <div className="multitouch-count">
+                    {fingers.length} / {playersWithColors.length}
                   </div>
-                ) : (
-                  <div className="multitouch-fingers">
-                    {fingers.map((f, i) => {
-                      const player = playersWithColors[i]
-                      return (
-                        <div
-                          key={f.pointerId}
-                          className="finger-dot"
-                          style={{
-                            left: `${f.x}px`,
-                            top: `${f.y}px`,
-                            backgroundColor: player?.color ?? '#475569',
-                          }}
-                        >
-                          <span>{i + 1}</span>
-                        </div>
-                      )
-                    })}
-                    <div className="multitouch-count">
-                      {fingers.length} / {playersWithColors.length}
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+                </div>
+              )}
+
+              {/* Instructions */}
+              {countdown === 'idle' && fingers.length === 0 && (
+                <div className="multitouch-instructions">
+                  <span className="multitouch-icon" role="img" aria-label="fingers">👆</span>
+                  <p>{t('multitouchInstructions')}</p>
+                  <p className="muted small">
+                    {pickMode === 'single'
+                      ? t('multitouchSingleHint')
+                      : t('multitouchOrderHint')}
+                  </p>
+                </div>
+              )}
+
+              {countdown === 'idle' && fingers.length > 0 && fingers.length < playersWithColors.length && (
+                <p className="muted small center-text waiting-text">
+                  {t('multitouchWaiting')}
+                </p>
+              )}
+            </div>
 
             {multiResult && (
               <div className="multitouch-result">
@@ -435,15 +512,6 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                   </button>
                 </div>
               </div>
-            )}
-
-            {!multiResult && fingers.length > 0 && fingers.length < playersWithColors.length && (
-              <p className="muted small center-text">
-                {t('multitouchWaiting')}
-              </p>
-            )}
-            {!multiResult && fingers.length >= playersWithColors.length && !isSelecting && (
-              <p className="muted small center-text">{t('multitouchHold')}</p>
             )}
           </>
         )}
