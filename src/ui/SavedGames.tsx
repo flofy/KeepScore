@@ -5,12 +5,23 @@ interface SavedGamesProps {
   games: Game[]
   onResume: (game: Game) => void
   onDelete: (id: string) => void
+  onBack?: () => void
 }
 
-export function SavedGames({ games, onResume, onDelete }: SavedGamesProps) {
+export function SavedGames({ games, onResume, onDelete, onBack }: SavedGamesProps) {
   const { t } = useI18n()
   return (
     <>
+      {onBack && (
+        <button
+          className="saved-back-button"
+          type="button"
+          onClick={onBack}
+          aria-label={t('back')}
+        >
+          ←
+        </button>
+      )}
       {games.length === 0 ? (
         <section className="history"><p className="empty-state">{t('noSavedGames')}</p></section>
       ) : (

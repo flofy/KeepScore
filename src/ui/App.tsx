@@ -23,7 +23,6 @@ import { LangFlags } from './LangFlags';
 import {
   createBrowserRouter,
   RouterProvider,
-  useLocation,
   useNavigate,
   useSearchParams,
 } from 'react-router-dom';
@@ -1064,37 +1063,16 @@ function GameScreen({
   );
 }
 
-// BackButton: floating back control for React Router navigation.
-// Hidden on the home route — screens already render their own back buttons.
-function BackButton() {
-  const { t } = useI18n();
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  if (location.pathname === '/') return null;
-
-  return (
-    <button
-      className="back-button"
-      type="button"
-      onClick={() => navigate(-1)}
-      aria-label={t('back')}
-    >
-      ←
-    </button>
-  );
-}
-
-// Common chrome for every route: language switch and (optionally) a floating
-// back button, positioned over the screen content.
-function RouteShell({ showBackButton = false, children }: {
-  showBackButton?: boolean;
-  children: ReactNode;
-}) {
+// Common chrome for every route: install banner and language switch,
+// floating over the screen content. The game screen opts out — it embeds
+// its own install button (header toolbar) and language switch (menu).
+function RouteShell({ children }: { children: ReactNode }) {
   return (
     <div className="route-shell">
-      <LangFlags />
-      {showBackButton && <BackButton />}
+      <div className="route-chrome">
+        <InstallButton />
+        <LangFlags />
+      </div>
       {children}
     </div>
   );
@@ -1189,6 +1167,7 @@ function SavedGamesRoute() {
         await localGameRepository.remove(id);
         setSavedGames(localGameRepository.list());
       }}
+      onBack={() => navigate(-1)}
     />
   );
 }
@@ -1209,7 +1188,7 @@ const router = createBrowserRouter(
     {
       path: '/chwatzi',
       element: (
-        <RouteShell showBackButton>
+        <RouteShell>
           <ChwatziScreenRoute />
         </RouteShell>
       ),
@@ -1217,23 +1196,21 @@ const router = createBrowserRouter(
     {
       path: '/setup',
       element: (
-        <RouteShell showBackButton>
+        <RouteShell>
           <GameSetupRoute />
         </RouteShell>
       ),
     },
     {
+      // The game screen renders its own chrome (install button in the header
+      // toolbar, language switch in the menu) — no RouteShell here.
       path: '/game',
-      element: (
-        <RouteShell>
-          <GameScreenRoute />
-        </RouteShell>
-      ),
+      element: <GameScreenRoute />,
     },
     {
       path: '/saved',
       element: (
-        <RouteShell showBackButton>
+        <RouteShell>
           <SavedGamesRoute />
         </RouteShell>
       ),
