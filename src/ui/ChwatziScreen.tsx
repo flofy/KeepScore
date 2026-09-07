@@ -303,7 +303,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
             </div>
           )}
 
-          {/* Blinking rings */}
+          {/* Blinking rings - starting from each touch point */}
           {countdown === 'blinking' && fingers.map((f, i) => {
             const player = playersWithColors[i % playersWithColors.length]
             const isBlinking = i === blinkingIndex
@@ -315,7 +315,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                   left: `${f.x}px`,
                   top: `${f.y}px`,
                   borderColor: player.color,
-                  boxShadow: `0 0 30px 10px ${player.color}`,
+                  boxShadow: `0 0 40px 15px ${player.color}`,
                 }}
               />
             )
@@ -337,7 +337,7 @@ export function ChwatziScreen({ game, onSelect, onBack }: Props) {
                       borderColor: player.color,
                     }}
                   >
-                    <span>{i + 1}</span>
+                    <span className="finger-number">{i + 1}</span>
                   </div>
                 )
               })}
