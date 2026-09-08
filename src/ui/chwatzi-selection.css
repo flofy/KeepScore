@@ -1,0 +1,19 @@
+.multitouch-color-wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+  transform-origin: top center;
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.finger-dot-selected {
+  animation: selectedFingerPulse 900ms ease-in-out infinite alternate;
+  box-shadow: 0 0 28px currentColor, 0 4px 16px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes selectedFingerPulse {
+  from { transform: translate(-50%, -50%) scale(1); }
+  to { transform: translate(-50%, -50%) scale(1.12); }
+}
