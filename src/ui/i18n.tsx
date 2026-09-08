@@ -118,3 +118,26 @@ export function getInitialLang(): Lang {
   if (stored === 'fr' || stored === 'en') return stored
   return navigator.language?.toLowerCase().startsWith('fr') ? 'fr' : 'en'
 }
+
+type I18n = { lang: Lang; setLang: (lang: Lang) => void; t: (key: TranslationKey) => string }
+
+const I18nContext = createContext<I18n>({ lang: 'en', setLang: () => {}, t: (key) => translations.en[key] })
+
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const [lang, setLangState] = useState<Lang>(getInitialLang)
+  const value = useMemo<I18n>(() => ({
+    lang,
+    setLang: (next) => { setLangState(next); localStorage.setItem(STORAGE_KEY, next) },
+    t: (key) => translations[lang][key] ?? translations.en[key],
+  }), [lang])
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
+}
+
+export function useI18n(): I18n {
+  return useContext(I18nContext)
+}
+
+export function useDocumentLang(): void {
+  const { lang } = useI18n()
+  useEffect(() => { document.documentElement.lang = lang }, [lang])
+}
