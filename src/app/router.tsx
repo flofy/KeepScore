@@ -10,12 +10,6 @@ type RouteComponents = {
   saved: ReactElement;
 };
 
-/**
- * Builds the application route objects from screen route elements.
- *
- * Keeping route composition separate from the browser router makes the
- * application routing contract easy to test without requiring a DOM.
- */
 export function createAppRouteObjects(components: RouteComponents): RouteObject[] {
   return [
     { path: routes.home(), element: components.home },
@@ -26,12 +20,6 @@ export function createAppRouteObjects(components: RouteComponents): RouteObject[
   ];
 }
 
-/**
- * Builds the application router from screen route elements.
- *
- * Keeping the router in the application layer lets feature-specific route
- * wrappers be extracted incrementally.
- */
 export function createAppRouter(components: RouteComponents) {
   return createBrowserRouter(createAppRouteObjects(components), {
     basename: import.meta.env.BASE_URL,
