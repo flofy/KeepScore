@@ -6,6 +6,7 @@ import './ui/start.css'
 import './ui/saved-games.css'
 import './ui/chwatzi.css'
 import './ui/intro.css'
+import './ui/install.css'
 import { App } from './app/App'
 import { AppProviders } from './app/providers'
 

@@ -161,7 +161,7 @@ export function GameScreen({
             <p className="eyebrow">SCORE KEEPER</p>
             <input className="game-name" value={game.name ?? ''} placeholder={t('appName')} onChange={(event) => dispatch({ type: 'RENAME_GAME', name: event.target.value })} aria-label={t('gameName')} />
           </div>
-          <div className="toolbar"><InstallButton /></div>
+          <div className="toolbar"><InstallButton variant="header" /></div>
         </header>
         <div className="quick-actions">
           {isDuo && (
@@ -227,6 +227,8 @@ export function GameScreen({
             <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onNewGame(); }}>{t('newGameMenuItem')}</button>
             <div className="menu-separator" />
             <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onChwatzi(); }}>🎲 {t('whoStarts')}</button>
+            <div className="menu-separator" />
+            <InstallButton variant="menu" />
             <div className="menu-separator" />
             <div className="menu-row lang-row">
               <button type="button" className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'} onClick={() => setLang('fr')}>🇫🇷 Français</button>

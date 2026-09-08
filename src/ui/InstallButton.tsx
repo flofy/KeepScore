@@ -1,10 +1,17 @@
 import { useEffect, useState } from 'react'
 import { useI18n } from './i18n'
+import {
+  clearInstallPrompt,
+  getInstallPrompt,
+  subscribeToInstallPrompt,
+  type BeforeInstallPromptEvent,
+} from './installPrompt'
 
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
+type InstallButtonProps = {
+  variant?: 'header' | 'menu'
 }
+
+const HEADER_DISMISSED_KEY = 'keepscore-install-header-dismissed'
 
 declare global {
   interface WindowEventMap {
@@ -19,44 +26,65 @@ function isStandalone() {
     || (navigator as Navigator & { standalone?: boolean }).standalone === true
 }
 
-export function InstallButton() {
+export function InstallButton({ variant = 'menu' }: InstallButtonProps) {
   const { t } = useI18n()
-  const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(() => getInstallPrompt())
   const [standalone, setStandalone] = useState(() => isStandalone())
+  const [headerDismissed, setHeaderDismissed] = useState(false)
 
   useEffect(() => {
     const media = window.matchMedia('(display-mode: standalone)')
-    const onDisplayModeChange = () => setStandalone(isStandalone())
-    const onBeforeInstallPrompt = (event: BeforeInstallPromptEvent) => {
-      event.preventDefault()
-      if (!isStandalone()) setPrompt(event)
-    }
-    const onInstalled = () => {
-      setPrompt(null)
-      setStandalone(true)
+    const unsubscribe = subscribeToInstallPrompt(setPrompt)
+
+    if (variant === 'header') {
+      setHeaderDismissed(sessionStorage.getItem(HEADER_DISMISSED_KEY) === '1')
     }
 
+    const onDisplayModeChange = () => setStandalone(isStandalone())
     media.addEventListener('change', onDisplayModeChange)
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-    window.addEventListener('appinstalled', onInstalled)
 
     return () => {
       media.removeEventListener('change', onDisplayModeChange)
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
+      unsubscribe()
     }
-  }, [])
+  }, [variant])
 
-  if (standalone || !prompt) return null
+  if (standalone || !prompt || (variant === 'header' && headerDismissed)) return null
 
   async function install() {
     const installPrompt = prompt
     if (!installPrompt) return
 
     await installPrompt.prompt()
-    const choice = await installPrompt.userChoice
-    if (choice.outcome === 'accepted') setPrompt(null)
+    await installPrompt.userChoice
+    clearInstallPrompt()
   }
 
-  return <button className="install-button" type="button" onClick={install}>{t('install')}</button>
+  if (variant === 'header') {
+    const dismiss = () => {
+      sessionStorage.setItem(HEADER_DISMISSED_KEY, '1')
+      setHeaderDismissed(true)
+    }
+
+    return (
+      <div className="install-notice" role="status">
+        <button className="install-notice-action" type="button" onClick={install}>
+          <svg className="install-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v2h14v-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          </svg>
+          <span>{t('install')}</span>
+        </button>
+        <button className="install-notice-close" type="button" onClick={dismiss} aria-label={t('dismissInstall')}>×</button>
+      </div>
+    )
+  }
+
+  return (
+    <button className="install-menu-button" type="button" onClick={install}>
+      <svg className="install-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v2h14v-2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+      </svg>
+      {t('install')}
+    </button>
+  )
 }
