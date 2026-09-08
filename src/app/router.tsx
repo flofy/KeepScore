@@ -1,20 +1,13 @@
+import type { ReactElement } from 'react';
 import { createBrowserRouter, type RouteObject } from 'react-router-dom';
 import { routes } from './routes';
-import {
-  ChwatziRoute,
-  GameRoute,
-  GameSetupRoute,
-  RouteShell,
-  SavedGamesRoute,
-  StartScreenRoute,
-} from './route-wrappers';
 
 type RouteComponents = {
-  home: React.ReactElement;
-  setup: React.ReactElement;
-  chwatzi: React.ReactElement;
-  game: React.ReactElement;
-  saved: React.ReactElement;
+  home: ReactElement;
+  setup: ReactElement;
+  chwatzi: ReactElement;
+  game: ReactElement;
+  saved: ReactElement;
 };
 
 export function createAppRouteObjects(components: RouteComponents): RouteObject[] {
@@ -32,11 +25,3 @@ export function createAppRouter(components: RouteComponents) {
     basename: import.meta.env.BASE_URL,
   });
 }
-
-export const router = createAppRouter({
-  home: <RouteShell showBack={false}><StartScreenRoute /></RouteShell>,
-  setup: <RouteShell><GameSetupRoute /></RouteShell>,
-  chwatzi: <RouteShell><ChwatziRoute /></RouteShell>,
-  game: <RouteShell><GameRoute /></RouteShell>,
-  saved: <RouteShell><SavedGamesRoute /></RouteShell>,
-});
