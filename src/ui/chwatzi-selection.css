@@ -8,12 +8,59 @@
   will-change: transform;
 }
 
+.finger-dot-neutral {
+  filter: grayscale(1);
+  opacity: 0.45;
+}
+
 .finger-dot-selected {
-  animation: selectedFingerPulse 900ms ease-in-out infinite alternate;
   box-shadow: 0 0 28px currentColor, 0 4px 16px rgba(0, 0, 0, 0.6);
 }
 
-@keyframes selectedFingerPulse {
-  from { transform: translate(-50%, -50%) scale(1); }
-  to { transform: translate(-50%, -50%) scale(1.12); }
+.multitouch-result {
+  position: absolute;
+  inset: 0;
+  z-index: 1100;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: auto;
+}
+
+.multitouch-result-card {
+  width: min(420px, 100%);
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+  padding: 28px;
+  border: 2px solid var(--selected-color);
+  border-radius: 24px;
+  background: rgba(15, 23, 42, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  color: white;
+}
+
+.multitouch-result-label {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.multitouch-result-color {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: var(--selected-color);
+  box-shadow: 0 0 36px var(--selected-color);
+}
+
+.multitouch-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.multitouch-result-actions button {
+  min-width: 150px;
 }
