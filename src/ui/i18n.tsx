@@ -13,7 +13,7 @@ export type TranslationKey =
   | 'resume' | 'untitledGame' | 'noSavedGames' | 'export' | 'import' | 'back'
   | 'menu' | 'closeMenu' | 'fullscreen' | 'exitFullscreen' | 'language' | 'newGameMenuItem'
   | 'swapPlayers' | 'addPlayerMenuItem' | 'setScore'
-  | 'install' | 'importError' | 'genericImportError'
+  | 'install' | 'dismissInstall' | 'importError' | 'genericImportError'
   | 'removeHistoryEntry' | 'editHistoryDelta' | 'playerNameLabel' | 'setPlayerColor' | 'playerCardRegion'
   | 'closeHistory' | 'flipHistory'
   | 'whoStarts' | 'chwatziTagline' | 'pickRandomly' | 'selectedPlayer' | 'continue' | 'determineWhoStarts'
@@ -39,7 +39,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: 'Export', import: 'Import', back: 'Back',
     menu: 'Open menu', closeMenu: 'Close', fullscreen: 'Fullscreen', exitFullscreen: 'Exit fullscreen',
     language: 'Language', newGameMenuItem: 'New game',
-    install: 'Install app', importError: 'The selected file is not a valid KeepScore export.', genericImportError: 'Unable to import this file.',
+    install: 'Install app', dismissInstall: 'Dismiss install prompt', importError: 'The selected file is not a valid KeepScore export.', genericImportError: 'Unable to import this file.',
     swapPlayers: 'Swap player positions', addPlayerMenuItem: 'Add player', setScore: 'Set score',
     removeHistoryEntry: 'Remove this entry', editHistoryDelta: 'New score delta', playerNameLabel: 'name',
     setPlayerColor: 'Set color', playerCardRegion: 'Player card',
@@ -82,7 +82,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: 'Exporter', import: 'Importer', back: 'Retour',
     menu: 'Ouvrir le menu', closeMenu: 'Fermer', fullscreen: 'Plein ecran', exitFullscreen: 'Quitter le plein ecran',
     language: 'Langue', newGameMenuItem: 'Nouvelle partie',
-    install: 'Installer l app', importError: 'Le fichier selectionne n est pas un export KeepScore valide.', genericImportError: 'Impossible d importer ce fichier.',
+    install: 'Installer l app', dismissInstall: 'Masquer la suggestion d installation', importError: 'Le fichier selectionne n est pas un export KeepScore valide.', genericImportError: 'Impossible d importer ce fichier.',
     swapPlayers: 'Echanger la position des joueurs', addPlayerMenuItem: 'Ajouter un joueur', setScore: 'Definir le score',
     removeHistoryEntry: 'Supprimer cette entree', editHistoryDelta: 'Nouveau delta de score', playerNameLabel: 'nom',
     setPlayerColor: 'Definir la couleur', playerCardRegion: 'Carte du joueur',
@@ -117,27 +117,4 @@ export function getInitialLang(): Lang {
   const stored = localStorage.getItem(STORAGE_KEY)
   if (stored === 'fr' || stored === 'en') return stored
   return navigator.language?.toLowerCase().startsWith('fr') ? 'fr' : 'en'
-}
-
-type I18n = { lang: Lang; setLang: (lang: Lang) => void; t: (key: TranslationKey) => string }
-
-const I18nContext = createContext<I18n>({ lang: 'en', setLang: () => {}, t: (key) => translations.en[key] })
-
-export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(getInitialLang)
-  const value = useMemo<I18n>(() => ({
-    lang,
-    setLang: (next) => { setLangState(next); localStorage.setItem(STORAGE_KEY, next) },
-    t: (key) => translations[lang][key] ?? translations.en[key],
-  }), [lang])
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
-}
-
-export function useI18n(): I18n {
-  return useContext(I18nContext)
-}
-
-export function useDocumentLang(): void {
-  const { lang } = useI18n()
-  useEffect(() => { document.documentElement.lang = lang }, [lang])
 }
