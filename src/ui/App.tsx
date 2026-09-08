@@ -26,6 +26,7 @@ import {
   createBrowserRouter,
   RouterProvider,
   useNavigate,
+  useLocation,
   useSearchParams,
 } from 'react-router-dom';
 
@@ -992,6 +993,8 @@ function GameScreen({
 function BackButton() {
   const { t } = useI18n();
   const navigate = useNavigate();
+  const location = useLocation();
+  if (location.pathname === '/') return null;
 
   return (
     <button
