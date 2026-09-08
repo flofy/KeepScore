@@ -228,6 +228,8 @@ export function GameScreen({
             <div className="menu-separator" />
             <button className="menu-item" type="button" onClick={() => { setMenuOpen(false); onChwatzi(); }}>🎲 {t('whoStarts')}</button>
             <div className="menu-separator" />
+            <InstallButton />
+            <div className="menu-separator" />
             <div className="menu-row lang-row">
               <button type="button" className={lang === 'fr' ? 'menu-item lang active' : 'menu-item lang'} onClick={() => setLang('fr')}>🇫🇷 Français</button>
               <button type="button" className={lang === 'en' ? 'menu-item lang active' : 'menu-item lang'} onClick={() => setLang('en')}>🇬🇧 English</button>
