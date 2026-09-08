@@ -19,7 +19,6 @@ import {
 import { useGameHistory } from './useGameHistory';
 import { InstallButton } from './InstallButton';
 import { I18nProvider, useI18n } from './i18n';
-import { LangFlags } from './LangFlags';
 import './saved-games.css';
 import './chwatzi.css';
 import './start.css';
@@ -1110,9 +1109,7 @@ const router = createBrowserRouter(
 
 export function App() {
   return (
-    <I18nProvider>
-      <LangFlags />
-      <RouterProvider router={router} />
+    <I18nProvider><RouterProvider router={router} />
     </I18nProvider>
   );
 }
