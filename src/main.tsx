@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './styles.css'
-import { App } from './ui/App'
-import { I18nProvider } from './ui/i18n'
+import { App } from './app/App'
+import { AppProviders } from './app/providers'
 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -14,8 +14,8 @@ if ('serviceWorker' in navigator) {
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <I18nProvider>
+    <AppProviders>
       <App />
-    </I18nProvider>
+    </AppProviders>
   </StrictMode>,
 )
