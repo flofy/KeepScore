@@ -28,9 +28,14 @@ export function InstallButton() {
   useEffect(() => {
     const media = window.matchMedia('(display-mode: standalone)')
     const onDisplayModeChange = () => setStandalone(isStandalone())
+    const unsubscribe = subscribeToInstallPrompt(setPrompt)
 
     media.addEventListener('change', onDisplayModeChange)
-    return subscribeToInstallPrompt(setPrompt)
+
+    return () => {
+      media.removeEventListener('change', onDisplayModeChange)
+      unsubscribe()
+    }
   }, [])
 
   if (standalone || !prompt) return null
