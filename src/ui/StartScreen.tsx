@@ -62,9 +62,7 @@ export function StartScreen({ onNewGame, onChwatzi }: Props) {
               disabled={playerCount < 2}
             >
               <span className="option-icon">🎲</span>
-  
-
-            <span className="option-label">{t('whoStarts')}</span>
+              <span className="option-label">{t('whoStarts')}</span>
               <span className="option-desc">{t('startChwatzi')}</span>
             </button>
 
