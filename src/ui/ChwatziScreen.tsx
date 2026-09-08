@@ -3,6 +3,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from 'react'
 import type { Game, Player } from '../domain/game/types'
 import { colorForIndex } from '../domain/game/colors'
 import { useI18n } from './i18n'
+import './chwatzi-selection.css'
 
 type Props = { game: Game; onSelect: (startingPlayerId: string) => void; onBack?: () => void }
 type ChwatziMode = 'roulette' | 'multitouch'
@@ -12,7 +13,7 @@ type ColoredPlayer = Player & { color: string }
 
 const COUNTDOWN_TICK_MS = 450
 const BLINK_STEP_MS = 300
-const SELECTED_BACKGROUND_MS = 2000
+const SELECTED_BACKGROUND_MS = 5000
 
 export function ChwatziScreen({ game, onSelect, onBack }: Props) {
   const { t } = useI18n()
