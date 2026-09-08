@@ -48,11 +48,33 @@ export function GameScreen({
   }, [fullscreen]);
 
   useEffect(() => {
+    const handleFullscreenChange = () => {
+      setFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
+  }, []);
+
+  useEffect(() => {
     document.body.style.overflow = historyOpen ? 'hidden' : '';
     return () => {
       document.body.style.overflow = '';
     };
   }, [historyOpen]);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else if (document.documentElement.requestFullscreen) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        setFullscreen((current) => !current);
+      }
+    } catch {
+      setFullscreen((current) => !current);
+    }
+  };
 
   const beginEdit = (id: string, delta: number) => {
     setEditingEntry(id);
@@ -145,7 +167,7 @@ export function GameScreen({
           {isDuo && (
             <button className="icon-fab" type="button" onClick={() => setSwapped((current) => !current)} aria-pressed={swapped} aria-label={t('swapPlayers')}>⇅</button>
           )}
-          <button className="icon-fab" type="button" onClick={() => setFullscreen((current) => !current)} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>
+          <button className="icon-fab" type="button" onClick={toggleFullscreen} aria-pressed={fullscreen} aria-label={fullscreen ? t('exitFullscreen') : t('fullscreen')}>
             {fullscreen ? (
               <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
             ) : (
