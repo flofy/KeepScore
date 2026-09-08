@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useI18n } from './i18n'
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
+import {
+  clearInstallPrompt,
+  getInstallPrompt,
+  subscribeToInstallPrompt,
+  type BeforeInstallPromptEvent,
+} from './installPrompt'
 
 declare global {
   interface WindowEventMap {
@@ -21,30 +22,15 @@ function isStandalone() {
 
 export function InstallButton() {
   const { t } = useI18n()
-  const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(null)
+  const [prompt, setPrompt] = useState<BeforeInstallPromptEvent | null>(() => getInstallPrompt())
   const [standalone, setStandalone] = useState(() => isStandalone())
 
   useEffect(() => {
     const media = window.matchMedia('(display-mode: standalone)')
     const onDisplayModeChange = () => setStandalone(isStandalone())
-    const onBeforeInstallPrompt = (event: BeforeInstallPromptEvent) => {
-      event.preventDefault()
-      if (!isStandalone()) setPrompt(event)
-    }
-    const onInstalled = () => {
-      setPrompt(null)
-      setStandalone(true)
-    }
 
     media.addEventListener('change', onDisplayModeChange)
-    window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-    window.addEventListener('appinstalled', onInstalled)
-
-    return () => {
-      media.removeEventListener('change', onDisplayModeChange)
-      window.removeEventListener('beforeinstallprompt', onBeforeInstallPrompt)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
+    return subscribeToInstallPrompt(setPrompt)
   }, [])
 
   if (standalone || !prompt) return null
@@ -54,8 +40,8 @@ export function InstallButton() {
     if (!installPrompt) return
 
     await installPrompt.prompt()
-    const choice = await installPrompt.userChoice
-    if (choice.outcome === 'accepted') setPrompt(null)
+    await installPrompt.userChoice
+    clearInstallPrompt()
   }
 
   return <button className="install-button" type="button" onClick={install}>{t('install')}</button>
