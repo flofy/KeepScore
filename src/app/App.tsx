@@ -1,11 +1,9 @@
-import { App as UiApp } from '../ui/App';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './app-router';
+import '../ui/saved-games.css';
+import '../ui/chwatzi.css';
+import '../ui/start.css';
 
-/**
- * Application entry point.
- *
- * Routing and providers will live in this application layer as the UI is
- * progressively split into feature boundaries.
- */
 export function App() {
-  return <UiApp />;
+  return <RouterProvider router={router} />;
 }
