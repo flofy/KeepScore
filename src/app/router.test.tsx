@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createAppRouter } from './router';
+import { createAppRouteObjects } from './router';
 
 function createComponents() {
   return {
@@ -12,10 +12,10 @@ function createComponents() {
 }
 
 describe('application router', () => {
-  it('creates a browser router from the application route contract', () => {
-    const router = createAppRouter(createComponents());
+  it('creates route objects from the application route contract', () => {
+    const routeObjects = createAppRouteObjects(createComponents());
 
-    expect(router.routes.map((route) => route.path)).toEqual([
+    expect(routeObjects.map((route) => route.path)).toEqual([
       '/',
       '/setup',
       '/chwatzi',
