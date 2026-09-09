@@ -23,6 +23,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const fingersRef = useRef<Finger[]>([]);
+  const selectedFingerRef = useRef<Finger | null>(null);
   const countdownTimerRef = useRef<number | null>(null);
   const wipeTimerRef = useRef<number | null>(null);
 
@@ -59,6 +60,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const reset = useCallback(() => {
     clearTimers();
     fingersRef.current = [];
+    selectedFingerRef.current = null;
     setFingers([]);
     setPhase("idle");
     setCountdown(3);
@@ -105,6 +107,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
         return;
       }
 
+      selectedFingerRef.current = winner;
       setSelectedFingerId(winner.pointerId);
       setSelectedColor(winner.color);
       setPhase("wiping");
@@ -147,13 +150,19 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const handlePointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       if (phase === "done") return;
-      updateFingers((current) =>
+      const next = updateFingers((current) =>
         current.map((finger) =>
           finger.pointerId === event.pointerId
             ? { ...finger, x: event.clientX, y: event.clientY }
             : finger,
         ),
       );
+      const movedFinger = next.find(
+        (finger) => finger.pointerId === event.pointerId,
+      );
+      if (movedFinger?.pointerId === selectedFingerRef.current?.pointerId) {
+        selectedFingerRef.current = movedFinger;
+      }
     },
     [phase, updateFingers],
   );
@@ -172,9 +181,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
     [finish, phase, updateFingers],
   );
 
-  const selectedFinger = fingers.find(
-    (finger) => finger.pointerId === selectedFingerId,
-  );
+  const selectedFinger = selectedFingerRef.current;
   const waterStyle =
     selectedFinger && selectedColor
       ? ({
@@ -207,25 +214,28 @@ export function ChwatziScreenV2({ onBack }: Props) {
         )}
 
         {phase !== "done" &&
-          fingers.map((finger) => (
-            <div
-              key={finger.pointerId}
-              className={`chwatzi-v2-finger${
-                finger.pointerId === selectedFingerId
-                  ? " chwatzi-v2-finger--selected"
-                  : ""
-              }`}
-              style={{
-                left: finger.x,
-                top: finger.y,
-                backgroundColor: finger.color,
-                borderColor: finger.color,
-              }}
-              aria-hidden="true"
-            />
-          ))}
+          fingers.map((finger) => {
+            const isSelected = finger.pointerId === selectedFingerId;
+            if (phase === "wiping" && !isSelected) return null;
 
-        {phase === "wiping" && selectedFinger && selectedColor && (
+            return (
+              <div
+                key={finger.pointerId}
+                className={`chwatzi-v2-finger${
+                  isSelected ? " chwatzi-v2-finger--selected" : ""
+                }`}
+                style={{
+                  left: finger.x,
+                  top: finger.y,
+                  backgroundColor: finger.color,
+                  borderColor: finger.color,
+                }}
+                aria-hidden="true"
+              />
+            );
+          })}
+
+        {phase === "wiping" && selectedColor && (
           <div
             className="chwatzi-v2-water"
             style={waterStyle}
