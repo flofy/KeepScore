@@ -46,11 +46,15 @@
 
 .chwatzi-v2-water {
   position: absolute;
-  inset: 0;
+  left: var(--water-x);
+  top: var(--water-y);
   z-index: 30;
-  overflow: hidden;
+  width: 200vmax;
+  height: 200vmax;
+  border-radius: 50%;
   background: var(--water-color);
-  clip-path: circle(0% at var(--water-x) var(--water-y));
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center;
   animation: chwatzi-water-fill 5s linear forwards;
   pointer-events: none;
 }
@@ -58,10 +62,11 @@
 .chwatzi-v2-water::before {
   content: "";
   position: absolute;
-  inset: -12% -8%;
+  inset: 0;
+  border-radius: inherit;
   background: radial-gradient(
-    ellipse at 50% 50%,
-    rgb(255 255 255 / 0.13),
+    circle at 50% 50%,
+    rgb(255 255 255 / 0.16),
     transparent 58%
   );
   opacity: 0.9;
@@ -70,45 +75,42 @@
 .chwatzi-v2-water::after {
   content: "";
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 180vmax;
-  height: 180vmax;
-  border: 2px solid rgb(255 255 255 / 0.16);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) scale(0);
+  inset: 0;
+  border: 3px solid rgb(255 255 255 / 0.18);
+  border-radius: inherit;
+  transform: scale(0);
   animation: chwatzi-water-ripple 5s ease-out forwards;
 }
 
 @keyframes chwatzi-water-fill {
   0% {
-    clip-path: circle(0% at var(--water-x) var(--water-y));
+    transform: translate(-50%, -50%) scale(0);
   }
-  20% {
-    clip-path: circle(8% at var(--water-x) var(--water-y));
+  15% {
+    transform: translate(-50%, -50%) scale(0.08);
   }
-  45% {
-    clip-path: circle(28% at var(--water-x) var(--water-y));
+  40% {
+    transform: translate(-50%, -50%) scale(0.32);
   }
   70% {
-    clip-path: circle(65% at var(--water-x) var(--water-y));
+    transform: translate(-50%, -50%) scale(0.7);
   }
   100% {
-    clip-path: circle(150% at var(--water-x) var(--water-y));
+    transform: translate(-50%, -50%) scale(1);
   }
 }
 
 @keyframes chwatzi-water-ripple {
   0% {
-    transform: translate(-50%, -50%) scale(0);
+    transform: scale(0);
     opacity: 0.55;
   }
   55% {
-    transform: translate(-50%, -50%) scale(0.55);
+    transform: scale(0.55);
     opacity: 0.18;
   }
   100% {
-    transform: translate(-50%, -50%) scale(1);
+    transform: scale(1);
     opacity: 0;
   }
 }
