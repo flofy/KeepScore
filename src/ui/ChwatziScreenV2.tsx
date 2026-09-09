@@ -23,6 +23,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const fingersRef = useRef<Finger[]>([]);
+  const fingerColorsRef = useRef(new Map<number, string>());
   const selectedFingerRef = useRef<Finger | null>(null);
   const settleTimerRef = useRef<number | null>(null);
   const countdownTimerRef = useRef<number | null>(null);
@@ -141,6 +142,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const reset = useCallback(() => {
     clearTimers();
     fingersRef.current = [];
+    fingerColorsRef.current.clear();
     selectedFingerRef.current = null;
     setFingers([]);
     setPhase("idle");
@@ -159,13 +161,21 @@ export function ChwatziScreenV2({ onBack }: Props) {
         if (current.some((finger) => finger.pointerId === event.pointerId)) {
           return current;
         }
+
+        const color =
+          fingerColorsRef.current.get(event.pointerId) ??
+          PLAYER_COLORS[
+            fingerColorsRef.current.size % PLAYER_COLORS.length
+          ];
+        fingerColorsRef.current.set(event.pointerId, color);
+
         return [
           ...current,
           {
             pointerId: event.pointerId,
             x: event.clientX,
             y: event.clientY,
-            color: PLAYER_COLORS[current.length % PLAYER_COLORS.length],
+            color,
           },
         ];
       });
