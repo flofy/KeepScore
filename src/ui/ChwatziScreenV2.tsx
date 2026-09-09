@@ -139,13 +139,14 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const selectedFinger = fingers.find(
     (finger) => finger.pointerId === selectedFingerId,
   );
-  const waterStyle = selectedFinger && selectedColor
-    ? ({
-        "--water-color": selectedColor,
-        "--water-x": `${selectedFinger.x}px`,
-        "--water-y": `${selectedFinger.y}px`,
-      } as CSSProperties)
-    : undefined;
+  const waterStyle =
+    selectedFinger && selectedColor
+      ? ({
+          "--water-color": selectedColor,
+          "--water-x": `${selectedFinger.x}px`,
+          "--water-y": `${selectedFinger.y}px`,
+        } as CSSProperties)
+      : undefined;
 
   return (
     <main
