@@ -63,7 +63,11 @@ export function ChwatziScreenV2({ onBack }: Props) {
         return;
       }
 
-      clearTimers();
+      if (countdownTimerRef.current !== null) {
+        window.clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+
       const winner = fingers[Math.floor(Math.random() * fingers.length)];
       setSelectedFingerId(winner.pointerId);
       setSelectedColor(winner.color);
@@ -73,9 +77,10 @@ export function ChwatziScreenV2({ onBack }: Props) {
       wipeTimerRef.current = window.setTimeout(() => {
         setPhase("done");
         setShowResult(true);
+        wipeTimerRef.current = null;
       }, WATER_FILL_MS);
     }, COUNTDOWN_MS);
-  }, [clearTimers, fingers, phase]);
+  }, [fingers, phase]);
 
   useEffect(() => {
     if (phase === "idle" && fingers.length >= 2) {
@@ -145,7 +150,11 @@ export function ChwatziScreenV2({ onBack }: Props) {
   return (
     <main
       className="chwatzi-v2"
-      style={selectedColor ? { "--selected-color": selectedColor } as CSSProperties : undefined}
+      style={
+        selectedColor
+          ? ({ "--selected-color": selectedColor } as CSSProperties)
+          : undefined
+      }
     >
       <div
         className={`chwatzi-v2-stage chwatzi-v2-stage--${phase}`}
@@ -160,7 +169,8 @@ export function ChwatziScreenV2({ onBack }: Props) {
           </div>
         )}
 
-        {phase !== "wiping" && phase !== "done" &&
+        {phase !== "wiping" &&
+          phase !== "done" &&
           fingers.map((finger) => (
             <div
               key={finger.pointerId}
@@ -183,11 +193,15 @@ export function ChwatziScreenV2({ onBack }: Props) {
           />
         )}
 
-        {phase === "done" && <div className="chwatzi-v2-background" aria-hidden="true" />}
+        {phase === "done" && (
+          <div className="chwatzi-v2-background" aria-hidden="true" />
+        )}
 
         {phase === "idle" && fingers.length === 0 && (
           <div className="chwatzi-v2-instructions">
-            <span className="chwatzi-v2-icon" aria-hidden="true">👆</span>
+            <span className="chwatzi-v2-icon" aria-hidden="true">
+              👆
+            </span>
             <p>{t("multitouchInstructions")}</p>
           </div>
         )}
@@ -199,15 +213,26 @@ export function ChwatziScreenV2({ onBack }: Props) {
         {showResult && selectedColor && (
           <div className="chwatzi-v2-result" role="dialog" aria-modal="true">
             <div className="chwatzi-v2-result-card">
-              <span className="chwatzi-v2-result-color" style={{ backgroundColor: selectedColor }} />
+              <span
+                className="chwatzi-v2-result-color"
+                style={{ backgroundColor: selectedColor }}
+              />
               <strong>{t("selectedPlayer")}</strong>
               <div className="chwatzi-v2-result-actions">
                 {onBack && (
-                  <button className="secondary-button" type="button" onClick={onBack}>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={onBack}
+                  >
                     ← {t("back")}
                   </button>
                 )}
-                <button className="primary-button" type="button" onClick={reset}>
+                <button
+                  className="primary-button"
+                  type="button"
+                  onClick={reset}
+                >
                   {t("tryAgain")}
                 </button>
               </div>
