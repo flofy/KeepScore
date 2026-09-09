@@ -66,3 +66,101 @@
 .multitouch-result-actions button {
   min-width: 150px;
 }
+
+/* Chwatzi selection animation polish */
+.finger-dot {
+  width: 88px !important;
+  height: 88px !important;
+  font-size: 28px !important;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 180ms ease,
+    filter 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.finger-number {
+  font-size: 28px !important;
+}
+
+/* Only the selected finger pulses; the other pointers remain stable. */
+.finger-dot-blinking {
+  animation: selectedFingerPulse 300ms ease-in-out 2;
+  z-index: 1003;
+}
+
+.finger-dot-blinking .finger-number {
+  animation: selectedFingerNumberPulse 300ms ease-in-out 2;
+}
+
+.blink-ring {
+  width: 92px;
+  height: 92px;
+  border-width: 5px;
+  transform: translate(-50%, -50%) scale(0.65);
+}
+
+.blink-ring.blinking {
+  animation: selectedFingerRing 600ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes selectedFingerPulse {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    filter: brightness(1);
+    box-shadow:
+      0 0 28px currentColor,
+      0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+
+  50% {
+    transform: translate(-50%, -50%) scale(1.16);
+    filter: brightness(1.25);
+    box-shadow:
+      0 0 46px currentColor,
+      0 0 76px currentColor,
+      0 8px 24px rgba(0, 0, 0, 0.65);
+  }
+}
+
+@keyframes selectedFingerNumberPulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
+}
+
+@keyframes selectedFingerRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.65);
+    opacity: 0.95;
+  }
+
+  55% {
+    opacity: 0.55;
+  }
+
+  100% {
+    transform: translate(-50%, -50%) scale(2.35);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .finger-dot-blinking,
+  .finger-dot-blinking .finger-number,
+  .blink-ring.blinking {
+    animation: none;
+  }
+
+  .finger-dot-blinking {
+    box-shadow:
+      0 0 34px currentColor,
+      0 4px 16px rgba(0, 0, 0, 0.6);
+  }
+}
