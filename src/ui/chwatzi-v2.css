@@ -190,7 +190,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chwatzi-v2-water,
   .chwatzi-v2-water::after {
     animation-duration: 0.01ms;
   }
