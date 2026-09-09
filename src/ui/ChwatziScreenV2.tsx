@@ -11,7 +11,7 @@ type Props = {
 type Phase = "idle" | "counting" | "wiping" | "done";
 type Finger = { pointerId: number; x: number; y: number; color: string };
 
-const COUNTDOWN_MS = 1000;
+const FINGER_SETTLE_MS = 3000;
 const WATER_FILL_MS = 5000;
 
 export function ChwatziScreenV2({ onBack }: Props) {
@@ -24,6 +24,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const [showResult, setShowResult] = useState(false);
   const fingersRef = useRef<Finger[]>([]);
   const selectedFingerRef = useRef<Finger | null>(null);
+  const settleTimerRef = useRef<number | null>(null);
   const countdownTimerRef = useRef<number | null>(null);
   const wipeTimerRef = useRef<number | null>(null);
 
@@ -38,6 +39,10 @@ export function ChwatziScreenV2({ onBack }: Props) {
   );
 
   const clearTimers = useCallback(() => {
+    if (settleTimerRef.current !== null) {
+      window.clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
+    }
     if (countdownTimerRef.current !== null) {
       window.clearInterval(countdownTimerRef.current);
       countdownTimerRef.current = null;
@@ -57,20 +62,17 @@ export function ChwatziScreenV2({ onBack }: Props) {
     wipeTimerRef.current = null;
   }, [clearTimers]);
 
-  const reset = useCallback(() => {
-    clearTimers();
-    fingersRef.current = [];
-    selectedFingerRef.current = null;
-    setFingers([]);
-    setPhase("idle");
-    setCountdown(3);
-    setSelectedFingerId(null);
-    setSelectedColor(null);
-    setShowResult(false);
-  }, [clearTimers]);
+  const startCountdown = useCallback(() => {
+    if (fingersRef.current.length < 2) return;
 
-  const startSelection = useCallback(() => {
-    if (phase !== "idle" || fingersRef.current.length < 2) return;
+    if (settleTimerRef.current !== null) {
+      window.clearTimeout(settleTimerRef.current);
+      settleTimerRef.current = null;
+    }
+    if (countdownTimerRef.current !== null) {
+      window.clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
 
     setPhase("counting");
     setCountdown(3);
@@ -114,21 +116,46 @@ export function ChwatziScreenV2({ onBack }: Props) {
       if ("vibrate" in navigator) navigator.vibrate([80, 50, 180]);
 
       wipeTimerRef.current = window.setTimeout(finish, WATER_FILL_MS);
-    }, COUNTDOWN_MS);
-  }, [finish, phase]);
+    }, 1000);
+  }, [finish]);
 
-  useEffect(() => {
-    if (phase === "idle" && fingers.length >= 2) {
-      startSelection();
+  const scheduleCountdown = useCallback(() => {
+    if (fingersRef.current.length < 2) return;
+
+    if (settleTimerRef.current !== null) {
+      window.clearTimeout(settleTimerRef.current);
     }
-  }, [fingers.length, phase, startSelection]);
+    if (countdownTimerRef.current !== null) {
+      window.clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+
+    setPhase("idle");
+    setCountdown(3);
+    settleTimerRef.current = window.setTimeout(() => {
+      settleTimerRef.current = null;
+      startCountdown();
+    }, FINGER_SETTLE_MS);
+  }, [startCountdown]);
+
+  const reset = useCallback(() => {
+    clearTimers();
+    fingersRef.current = [];
+    selectedFingerRef.current = null;
+    setFingers([]);
+    setPhase("idle");
+    setCountdown(3);
+    setSelectedFingerId(null);
+    setSelectedColor(null);
+    setShowResult(false);
+  }, [clearTimers]);
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (phase !== "idle") return;
+      if (phase !== "idle" && phase !== "counting") return;
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
-      updateFingers((current) => {
+      const next = updateFingers((current) => {
         if (current.some((finger) => finger.pointerId === event.pointerId)) {
           return current;
         }
@@ -143,8 +170,12 @@ export function ChwatziScreenV2({ onBack }: Props) {
         ];
       });
       if ("vibrate" in navigator) navigator.vibrate(25);
+
+      if (next.length >= 2) {
+        scheduleCountdown();
+      }
     },
-    [phase, updateFingers],
+    [phase, scheduleCountdown, updateFingers],
   );
 
   const handlePointerMove = useCallback(
@@ -176,6 +207,19 @@ export function ChwatziScreenV2({ onBack }: Props) {
       const next = updateFingers((current) =>
         current.filter((finger) => finger.pointerId !== event.pointerId),
       );
+
+      if (next.length < 2 && phase !== "wiping") {
+        if (settleTimerRef.current !== null) {
+          window.clearTimeout(settleTimerRef.current);
+          settleTimerRef.current = null;
+        }
+        if (countdownTimerRef.current !== null) {
+          window.clearInterval(countdownTimerRef.current);
+          countdownTimerRef.current = null;
+        }
+        setCountdown(3);
+        setPhase("idle");
+      }
 
       if (phase === "wiping" && next.length === 0) {
         finish();
