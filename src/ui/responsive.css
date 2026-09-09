@@ -22,7 +22,7 @@ body {
 
 body::before,
 body::after {
-  content: '';
+  content: "";
   position: fixed;
   inset: 0;
   pointer-events: none;
@@ -39,7 +39,11 @@ body::before {
 }
 
 body::after {
-  background: radial-gradient(circle at center, transparent 45%, rgb(0 0 0 / 28%) 100%);
+  background: radial-gradient(
+    circle at center,
+    transparent 45%,
+    rgb(0 0 0 / 28%) 100%
+  );
 }
 
 .app-shell {
@@ -67,7 +71,9 @@ body::after {
 }
 
 .app-shell.fullscreen .players {
-  min-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  min-height: calc(
+    100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+  );
 }
 
 .player-card {

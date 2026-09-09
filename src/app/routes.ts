@@ -1,7 +1,7 @@
 export const routes = {
-  home: () => '/',
-  setup: () => '/setup',
+  home: () => "/",
+  setup: () => "/setup",
   chwatzi: (playerCount: number) => `/chwatzi?players=${String(playerCount)}`,
   game: (gameId: string) => `/game?gameId=${encodeURIComponent(gameId)}`,
-  saved: () => '/saved',
+  saved: () => "/saved",
 } as const;
