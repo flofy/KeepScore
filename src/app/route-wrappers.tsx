@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
-import { ChwatziScreen } from "../ui/ChwatziScreen";
+import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
 import { SavedGames } from "../ui/SavedGames";
 import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
 import { GameScreen } from "../features/game/GameScreen";
-import { createTempGame } from "../features/chwatzi/createTempGame";
 
 function BackButton() {
   const { t } = useI18n();
@@ -49,9 +48,7 @@ export function StartScreenRoute() {
   return (
     <StartScreen
       onNewGame={() => navigate("/setup")}
-      onChwatzi={(playerCount) =>
-        navigate("/chwatzi?players=" + String(playerCount))
-      }
+      onChwatzi={() => navigate("/chwatzi")}
     />
   );
 }
@@ -70,29 +67,13 @@ export function GameSetupRoute() {
 
 export function ChwatziRoute() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const requestedCount = Number(searchParams.get("players"));
-  const playerCount =
-    Number.isInteger(requestedCount) && requestedCount >= 2
-      ? requestedCount
-      : 4;
-  const game = createTempGame(playerCount);
 
-  return (
-    <ChwatziScreen
-      game={game}
-      onSelect={(startingPlayerId) => {
-        localGameRepository.save({ ...game, startingPlayerId });
-        navigate("/game?gameId=" + game.id);
-      }}
-    />
-  );
+  return <ChwatziScreenV2 onBack={() => navigate(-1)} />;
 }
 
 export function GameRoute() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const gameId = searchParams.get("gameId");
+  const gameId = new URLSearchParams(window.location.search).get("gameId");
   const game = gameId ? localGameRepository.get(gameId) : undefined;
 
   useEffect(() => {
@@ -106,9 +87,7 @@ export function GameRoute() {
       initialGame={game}
       onNewGame={() => navigate("/setup")}
       onSavedGames={() => navigate("/saved")}
-      onChwatzi={() =>
-        navigate("/chwatzi?players=" + String(game.players.length))
-      }
+      onChwatzi={() => navigate("/chwatzi")}
     />
   );
 }
