@@ -10,17 +10,25 @@ export function HistoryGroupingToggle({
   value,
   onChange,
 }: HistoryGroupingToggleProps) {
-  const { t } = useI18n();
+  const { lang } = useI18n();
+  const labels =
+    lang === "fr"
+      ? { group: "Regrouper", round: "Par tour", player: "Par joueur" }
+      : { group: "Group history", round: "By round", player: "By player" };
 
   return (
-    <div className="history-grouping-toggle" role="group" aria-label={t("historyGrouping")}>
+    <div
+      className="history-grouping-toggle"
+      role="group"
+      aria-label={labels.group}
+    >
       <button
         type="button"
         className={value === "round" ? "active" : ""}
         aria-pressed={value === "round"}
         onClick={() => onChange("round")}
       >
-        {t("historyByRound")}
+        {labels.round}
       </button>
       <button
         type="button"
@@ -28,7 +36,7 @@ export function HistoryGroupingToggle({
         aria-pressed={value === "player"}
         onClick={() => onChange("player")}
       >
-        {t("historyByPlayer")}
+        {labels.player}
       </button>
     </div>
   );
