@@ -1,6 +1,6 @@
-import type { ReactElement } from 'react';
-import { createBrowserRouter, type RouteObject } from 'react-router-dom';
-import { routes } from './routes';
+import type { ReactElement } from "react";
+import { createBrowserRouter, type RouteObject } from "react-router-dom";
+import { routes } from "./routes";
 
 type RouteComponents = {
   home: ReactElement;
@@ -10,12 +10,14 @@ type RouteComponents = {
   saved: ReactElement;
 };
 
-export function createAppRouteObjects(components: RouteComponents): RouteObject[] {
+export function createAppRouteObjects(
+  components: RouteComponents,
+): RouteObject[] {
   return [
     { path: routes.home(), element: components.home },
     { path: routes.setup(), element: components.setup },
-    { path: '/chwatzi', element: components.chwatzi },
-    { path: '/game', element: components.game },
+    { path: "/chwatzi", element: components.chwatzi },
+    { path: "/game", element: components.game },
     { path: routes.saved(), element: components.saved },
   ];
 }

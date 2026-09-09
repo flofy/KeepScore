@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { createAppRouteObjects } from './router';
+import { describe, expect, it } from "vitest";
+import { createAppRouteObjects } from "./router";
 
 function createComponents() {
   return {
@@ -11,16 +11,16 @@ function createComponents() {
   };
 }
 
-describe('application router', () => {
-  it('creates route objects from the application route contract', () => {
+describe("application router", () => {
+  it("creates route objects from the application route contract", () => {
     const routeObjects = createAppRouteObjects(createComponents());
 
     expect(routeObjects.map((route) => route.path)).toEqual([
-      '/',
-      '/setup',
-      '/chwatzi',
-      '/game',
-      '/saved',
+      "/",
+      "/setup",
+      "/chwatzi",
+      "/game",
+      "/saved",
     ]);
   });
 });

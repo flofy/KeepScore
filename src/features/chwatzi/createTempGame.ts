@@ -1,5 +1,5 @@
-import type { Game, Player } from '../../domain/game/types';
-import { colorForIndex } from '../../domain/game/colors';
+import type { Game, Player } from "../../domain/game/types";
+import { colorForIndex } from "../../domain/game/colors";
 
 export function createTempGame(playerCount: number): Game {
   const now = Date.now();
@@ -14,7 +14,7 @@ export function createTempGame(playerCount: number): Game {
   }
   return {
     id: `temp-game-${now}`,
-    name: 'Chwatzi Game',
+    name: "Chwatzi Game",
     players,
     history: [],
     createdAt: now,

@@ -36,7 +36,10 @@
   font-weight: 750;
   cursor: pointer;
   box-shadow: none;
-  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .install-notice-action:hover {
@@ -69,7 +72,9 @@
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .install-notice-close:hover {
@@ -93,7 +98,11 @@
   font-size: 16px;
   font-weight: 650;
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    transform 0.1s ease;
 }
 
 .install-menu-button:hover {
@@ -113,7 +122,8 @@
   justify-content: flex-start;
   align-items: stretch;
   gap: 6px;
-  padding: max(72px, calc(env(safe-area-inset-top) + 56px)) 20px max(28px, env(safe-area-inset-bottom));
+  padding: max(72px, calc(env(safe-area-inset-top) + 56px)) 20px
+    max(28px, env(safe-area-inset-bottom));
   overflow-y: auto;
   overscroll-behavior: contain;
   border-left: 1px solid rgb(255 255 255 / 10%);

@@ -1,13 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
-import type {
-  CSSProperties,
-  PointerEvent as ReactPointerEvent,
-} from 'react';
-import type { Player } from '../../domain/game/types';
-import { useI18n } from '../../ui/i18n';
+import { useEffect, useRef, useState } from "react";
+import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
+import type { Player } from "../../domain/game/types";
+import { useI18n } from "../../ui/i18n";
 
 function haptic() {
-  if ('vibrate' in navigator) navigator.vibrate(8);
+  if ("vibrate" in navigator) navigator.vibrate(8);
 }
 
 function formatDelta(delta: number): string {
@@ -67,11 +64,13 @@ export function PlayerCard({
   const customTooltipRef = useRef<HTMLDivElement>(null);
   const scoreInputRef = useRef<HTMLInputElement>(null);
   const [quickOpen, setQuickOpen] = useState(false);
-  const [forcedSign, setForcedSign] = useState<'positive' | 'negative' | undefined>(undefined);
+  const [forcedSign, setForcedSign] = useState<
+    "positive" | "negative" | undefined
+  >(undefined);
   const [scoreEditing, setScoreEditing] = useState(false);
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
   const [customOpen, setCustomOpen] = useState(false);
-  const [customDraft, setCustomDraft] = useState('');
+  const [customDraft, setCustomDraft] = useState("");
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
       clearTimeout(longPressTimer.current);
@@ -81,7 +80,7 @@ export function PlayerCard({
   };
   const startLongPress = (
     event: ReactPointerEvent<HTMLElement>,
-    sign?: 'positive' | 'negative',
+    sign?: "positive" | "negative",
   ) => {
     event.stopPropagation();
     longPressOrigin.current = { x: event.clientX, y: event.clientY };
@@ -138,11 +137,11 @@ export function PlayerCard({
       haptic();
     }
     setCustomOpen(false);
-    setCustomDraft('');
+    setCustomDraft("");
   };
   const closeCustom = () => {
     setCustomOpen(false);
-    setCustomDraft('');
+    setCustomDraft("");
   };
 
   useEffect(() => {
@@ -159,11 +158,11 @@ export function PlayerCard({
       closeQuick();
       closeCustom();
     };
-    document.addEventListener('mousedown', onDown);
-    document.addEventListener('touchstart', onDown);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown);
     return () => {
-      document.removeEventListener('mousedown', onDown);
-      document.removeEventListener('touchstart', onDown);
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
     };
   }, [quickOpen, customOpen]);
 
@@ -173,7 +172,9 @@ export function PlayerCard({
       scoreInputRef.current?.select();
     }
   }, [scoreEditing]);
-  const scoreValueRef = useFitText<HTMLDivElement>(JSON.stringify(player.score));
+  const scoreValueRef = useFitText<HTMLDivElement>(
+    JSON.stringify(player.score),
+  );
   const onScoreClick = () => {
     if (longPressFired.current) {
       longPressFired.current = false;
@@ -186,26 +187,28 @@ export function PlayerCard({
     (lastDelta === undefined
       ? undefined
       : lastDelta > 0
-        ? 'positive'
-        : 'negative');
+        ? "positive"
+        : "negative");
   const showPositive =
-    effectiveSign === undefined || effectiveSign === 'positive';
+    effectiveSign === undefined || effectiveSign === "positive";
   const showNegative =
-    effectiveSign === undefined || effectiveSign === 'negative';
+    effectiveSign === undefined || effectiveSign === "negative";
   const signClass =
-    effectiveSign === 'positive'
-      ? ' positive'
-      : effectiveSign === 'negative'
-        ? ' negative'
-        : '';
+    effectiveSign === "positive"
+      ? " positive"
+      : effectiveSign === "negative"
+        ? " negative"
+        : "";
 
   return (
     <article
-      className={rotation ? `player-card rotated-${rotation}` : 'player-card'}
-      style={{
-        '--player-color': player.color ?? '#38bdf8',
-        '--digits': String(Math.abs(player.score)).length,
-      } as CSSProperties}
+      className={rotation ? `player-card rotated-${rotation}` : "player-card"}
+      style={
+        {
+          "--player-color": player.color ?? "#38bdf8",
+          "--digits": String(Math.abs(player.score)).length,
+        } as CSSProperties
+      }
       onPointerDown={(event) => startLongPress(event)}
       onPointerMove={moveLongPress}
       onPointerUp={clearLongPress}
@@ -225,7 +228,7 @@ export function PlayerCard({
             onFlip();
           }}
           aria-pressed={rotation > 0}
-          aria-label={t('flipPlayer')}
+          aria-label={t("flipPlayer")}
         >
           ↻
         </button>
@@ -233,12 +236,12 @@ export function PlayerCard({
       {deltas.length > 0 && (
         <div
           className="player-deltas"
-          aria-label={`${t('history')} — ${player.name}`}
+          aria-label={`${t("history")} — ${player.name}`}
         >
           {deltas.map((delta, index) => (
             <span
               key={index}
-              className={delta > 0 ? 'delta-plus' : 'delta-minus'}
+              className={delta > 0 ? "delta-plus" : "delta-minus"}
             >
               {formatDelta(delta)}
             </span>
@@ -253,28 +256,64 @@ export function PlayerCard({
           className="player-name"
           value={player.name}
           onChange={(event) => onRename(event.target.value)}
-          aria-label={`${player.name} ${t('playerNameLabel')}`}
+          aria-label={`${player.name} ${t("playerNameLabel")}`}
         />
         <div className="score-row">
           <div className="step-col">
             <button
               type="button"
               className="inline-step inline-neg"
-              onPointerDown={(event) => startLongPress(event, 'negative')}
+              onPointerDown={(event) => startLongPress(event, "negative")}
               onPointerMove={moveLongPress}
               onPointerUp={clearLongPress}
               onPointerLeave={clearLongPress}
               onPointerCancel={clearLongPress}
               onClick={() => onStepClick(-1)}
-              aria-label={`${t('removePoint')} ${player.name}`}
+              aria-label={`${t("removePoint")} ${player.name}`}
             >
               <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 12h14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" />
+                <path
+                  d="M5 12h14"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  fill="none"
+                />
               </svg>
             </button>
             <div className="quick-stack">
-              <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative'); }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-2)} aria-label={`${t('removePoint')} 2 — ${player.name}`}>−2</button>
-              <button type="button" className="quick-step neg" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'negative'); }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(-3)} aria-label={`${t('removePoint')} 3 — ${player.name}`}>−3</button>
+              <button
+                type="button"
+                className="quick-step neg"
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  startLongPress(event, "negative");
+                }}
+                onPointerMove={moveLongPress}
+                onPointerUp={clearLongPress}
+                onPointerLeave={clearLongPress}
+                onPointerCancel={clearLongPress}
+                onClick={() => onQuickDelta(-2)}
+                aria-label={`${t("removePoint")} 2 — ${player.name}`}
+              >
+                −2
+              </button>
+              <button
+                type="button"
+                className="quick-step neg"
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  startLongPress(event, "negative");
+                }}
+                onPointerMove={moveLongPress}
+                onPointerUp={clearLongPress}
+                onPointerLeave={clearLongPress}
+                onPointerCancel={clearLongPress}
+                onClick={() => onQuickDelta(-3)}
+                aria-label={`${t("removePoint")} 3 — ${player.name}`}
+              >
+                −3
+              </button>
             </div>
           </div>
           {scoreEditing ? (
@@ -287,40 +326,208 @@ export function PlayerCard({
               onChange={(event) => setScoreDraft(event.target.value)}
               onBlur={saveScore}
               onKeyDown={(event) => {
-                if (event.key === 'Enter') { event.preventDefault(); saveScore(); }
-                if (event.key === 'Escape') { event.preventDefault(); cancelScoreEdit(); }
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  saveScore();
+                }
+                if (event.key === "Escape") {
+                  event.preventDefault();
+                  cancelScoreEdit();
+                }
               }}
-              aria-label={`${t('setScore')} — ${player.name}`}
+              aria-label={`${t("setScore")} — ${player.name}`}
             />
           ) : (
             <div className="score-center">
-              <div ref={scoreValueRef} className="score-value" onClick={onScoreClick} role="button" tabIndex={0} onKeyDown={(event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); onScoreClick(); } }} aria-label={`${t('setScore')} — ${player.name}`}>
+              <div
+                ref={scoreValueRef}
+                className="score-value"
+                onClick={onScoreClick}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onScoreClick();
+                  }
+                }}
+                aria-label={`${t("setScore")} — ${player.name}`}
+              >
                 {player.score}
               </div>
-              <button ref={customBtnRef} type="button" className="custom-delta-btn" onClick={(event) => { event.stopPropagation(); setCustomOpen((current) => !current); }} aria-label={t('customDelta')}>⋯</button>
+              <button
+                ref={customBtnRef}
+                type="button"
+                className="custom-delta-btn"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setCustomOpen((current) => !current);
+                }}
+                aria-label={t("customDelta")}
+              >
+                ⋯
+              </button>
             </div>
           )}
           <div className="step-col">
-            <button type="button" className="inline-step inline-pos" onPointerDown={(event) => startLongPress(event, 'positive')} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onStepClick(1)} aria-label={`${t('addPoint')} ${player.name}`}>
-              <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5v14" stroke="currentColor" strokeWidth="4" strokeLinecap="round" fill="none" /></svg>
+            <button
+              type="button"
+              className="inline-step inline-pos"
+              onPointerDown={(event) => startLongPress(event, "positive")}
+              onPointerMove={moveLongPress}
+              onPointerUp={clearLongPress}
+              onPointerLeave={clearLongPress}
+              onPointerCancel={clearLongPress}
+              onClick={() => onStepClick(1)}
+              aria-label={`${t("addPoint")} ${player.name}`}
+            >
+              <svg className="step-icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  d="M5 12h14M12 5v14"
+                  stroke="currentColor"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
             </button>
             <div className="quick-stack">
-              <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive'); }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(2)} aria-label={`${t('addPoint')} 2 — ${player.name}`}>+2</button>
-              <button type="button" className="quick-step pos" onPointerDown={(event) => { event.stopPropagation(); startLongPress(event, 'positive'); }} onPointerMove={moveLongPress} onPointerUp={clearLongPress} onPointerLeave={clearLongPress} onPointerCancel={clearLongPress} onClick={() => onQuickDelta(3)} aria-label={`${t('addPoint')} 3 — ${player.name}`}>+3</button>
+              <button
+                type="button"
+                className="quick-step pos"
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  startLongPress(event, "positive");
+                }}
+                onPointerMove={moveLongPress}
+                onPointerUp={clearLongPress}
+                onPointerLeave={clearLongPress}
+                onPointerCancel={clearLongPress}
+                onClick={() => onQuickDelta(2)}
+                aria-label={`${t("addPoint")} 2 — ${player.name}`}
+              >
+                +2
+              </button>
+              <button
+                type="button"
+                className="quick-step pos"
+                onPointerDown={(event) => {
+                  event.stopPropagation();
+                  startLongPress(event, "positive");
+                }}
+                onPointerMove={moveLongPress}
+                onPointerUp={clearLongPress}
+                onPointerLeave={clearLongPress}
+                onPointerCancel={clearLongPress}
+                onClick={() => onQuickDelta(3)}
+                aria-label={`${t("addPoint")} 3 — ${player.name}`}
+              >
+                +3
+              </button>
             </div>
           </div>
         </div>
         {quickOpen && (
-          <div ref={quickRef} className={`score-tooltip${signClass}`} role="tooltip" aria-label={`${t('quickScoreChange')} ${player.name}`}>
-            {showNegative && <><button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-20)}>−20</button><button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-10)}>−10</button><button type="button" className="delta-neg" role="menuitem" onClick={() => quick(-5)}>−5</button></>}
-            {showPositive && <><button type="button" className="delta-pos" role="menuitem" onClick={() => quick(5)}>+5</button><button type="button" className="delta-pos" role="menuitem" onClick={() => quick(10)}>+10</button><button type="button" className="delta-pos" role="menuitem" onClick={() => quick(20)}>+20</button></>}
+          <div
+            ref={quickRef}
+            className={`score-tooltip${signClass}`}
+            role="tooltip"
+            aria-label={`${t("quickScoreChange")} ${player.name}`}
+          >
+            {showNegative && (
+              <>
+                <button
+                  type="button"
+                  className="delta-neg"
+                  role="menuitem"
+                  onClick={() => quick(-20)}
+                >
+                  −20
+                </button>
+                <button
+                  type="button"
+                  className="delta-neg"
+                  role="menuitem"
+                  onClick={() => quick(-10)}
+                >
+                  −10
+                </button>
+                <button
+                  type="button"
+                  className="delta-neg"
+                  role="menuitem"
+                  onClick={() => quick(-5)}
+                >
+                  −5
+                </button>
+              </>
+            )}
+            {showPositive && (
+              <>
+                <button
+                  type="button"
+                  className="delta-pos"
+                  role="menuitem"
+                  onClick={() => quick(5)}
+                >
+                  +5
+                </button>
+                <button
+                  type="button"
+                  className="delta-pos"
+                  role="menuitem"
+                  onClick={() => quick(10)}
+                >
+                  +10
+                </button>
+                <button
+                  type="button"
+                  className="delta-pos"
+                  role="menuitem"
+                  onClick={() => quick(20)}
+                >
+                  +20
+                </button>
+              </>
+            )}
           </div>
         )}
         {customOpen && (
-          <div ref={customTooltipRef} className="score-tooltip" role="tooltip" aria-label={t('customDelta')}>
-            <input type="number" inputMode="numeric" value={customDraft} onChange={(event) => setCustomDraft(event.target.value)} autoFocus onKeyDown={(event) => { if (event.key === 'Enter') saveCustom(1); if (event.key === 'Escape') closeCustom(); }} aria-label={t('customDelta')} placeholder="0" />
-            <button type="button" className="delta-neg" onClick={() => saveCustom(-1)} aria-label={`${t('removePoint')} — ${player.name}`}>−</button>
-            <button type="button" className="delta-pos" onClick={() => saveCustom(1)} aria-label={`${t('addPoint')} — ${player.name}`}>+</button>
+          <div
+            ref={customTooltipRef}
+            className="score-tooltip"
+            role="tooltip"
+            aria-label={t("customDelta")}
+          >
+            <input
+              type="number"
+              inputMode="numeric"
+              value={customDraft}
+              onChange={(event) => setCustomDraft(event.target.value)}
+              autoFocus
+              onKeyDown={(event) => {
+                if (event.key === "Enter") saveCustom(1);
+                if (event.key === "Escape") closeCustom();
+              }}
+              aria-label={t("customDelta")}
+              placeholder="0"
+            />
+            <button
+              type="button"
+              className="delta-neg"
+              onClick={() => saveCustom(-1)}
+              aria-label={`${t("removePoint")} — ${player.name}`}
+            >
+              −
+            </button>
+            <button
+              type="button"
+              className="delta-pos"
+              onClick={() => saveCustom(1)}
+              aria-label={`${t("addPoint")} — ${player.name}`}
+            >
+              +
+            </button>
           </div>
         )}
       </div>

@@ -100,7 +100,7 @@
 
 .option-divider::before,
 .option-divider::after {
-  content: '';
+  content: "";
   flex: 1;
   height: 1px;
   background: rgba(255, 255, 255, 0.1);
@@ -207,34 +207,34 @@
     margin: 0 12px;
     padding: 24px;
   }
-  
+
   .start-header h1 {
     font-size: 28px;
   }
-  
+
   .start-option-btn {
     padding: 20px 12px;
   }
-  
+
   .option-icon {
     font-size: 28px;
   }
-  
+
   .option-label {
     font-size: 16px;
   }
-  
+
   .player-count-selector {
     padding: 10px 16px;
     gap: 10px;
   }
-  
+
   .count-btn {
     width: 32px;
     height: 32px;
     font-size: 18px;
   }
-  
+
   .count-value {
     font-size: 16px;
   }

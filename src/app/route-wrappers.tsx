@@ -1,30 +1,41 @@
-import { useCallback, useEffect, useState } from 'react';
-import type { ReactNode } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import type { Game } from '../domain/game/types';
-import { GameSetup } from '../ui/GameSetup';
-import { ChwatziScreen } from '../ui/ChwatziScreen';
-import { SavedGames } from '../ui/SavedGames';
-import { StartScreen } from '../ui/StartScreen';
-import { localGameRepository } from '../infrastructure/persistence/gameRepository';
-import { useI18n } from '../ui/i18n';
-import { GameScreen } from '../features/game/GameScreen';
-import { createTempGame } from '../features/chwatzi/createTempGame';
+import { useCallback, useEffect, useState } from "react";
+import type { ReactNode } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import type { Game } from "../domain/game/types";
+import { GameSetup } from "../ui/GameSetup";
+import { ChwatziScreen } from "../ui/ChwatziScreen";
+import { SavedGames } from "../ui/SavedGames";
+import { StartScreen } from "../ui/StartScreen";
+import { localGameRepository } from "../infrastructure/persistence/gameRepository";
+import { useI18n } from "../ui/i18n";
+import { GameScreen } from "../features/game/GameScreen";
+import { createTempGame } from "../features/chwatzi/createTempGame";
 
 function BackButton() {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
-  if (location.pathname === '/') return null;
+  if (location.pathname === "/") return null;
 
   return (
-    <button className="back-button" type="button" onClick={() => navigate(-1)} aria-label={t('back')}>
+    <button
+      className="back-button"
+      type="button"
+      onClick={() => navigate(-1)}
+      aria-label={t("back")}
+    >
       ←
     </button>
   );
 }
 
-export function RouteShell({ children, showBack = true }: { children: ReactNode; showBack?: boolean }) {
+export function RouteShell({
+  children,
+  showBack = true,
+}: {
+  children: ReactNode;
+  showBack?: boolean;
+}) {
   return (
     <div className="route-shell">
       {showBack && <BackButton />}
@@ -37,8 +48,10 @@ export function StartScreenRoute() {
   const navigate = useNavigate();
   return (
     <StartScreen
-      onNewGame={() => navigate('/setup')}
-      onChwatzi={(playerCount) => navigate('/chwatzi?players=' + String(playerCount))}
+      onNewGame={() => navigate("/setup")}
+      onChwatzi={(playerCount) =>
+        navigate("/chwatzi?players=" + String(playerCount))
+      }
     />
   );
 }
@@ -49,7 +62,7 @@ export function GameSetupRoute() {
     <GameSetup
       onCreate={(game) => {
         localGameRepository.save(game);
-        navigate('/game?gameId=' + game.id);
+        navigate("/game?gameId=" + game.id);
       }}
     />
   );
@@ -58,8 +71,11 @@ export function GameSetupRoute() {
 export function ChwatziRoute() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const requestedCount = Number(searchParams.get('players'));
-  const playerCount = Number.isInteger(requestedCount) && requestedCount >= 2 ? requestedCount : 4;
+  const requestedCount = Number(searchParams.get("players"));
+  const playerCount =
+    Number.isInteger(requestedCount) && requestedCount >= 2
+      ? requestedCount
+      : 4;
   const game = createTempGame(playerCount);
 
   return (
@@ -67,7 +83,7 @@ export function ChwatziRoute() {
       game={game}
       onSelect={(startingPlayerId) => {
         localGameRepository.save({ ...game, startingPlayerId });
-        navigate('/game?gameId=' + game.id);
+        navigate("/game?gameId=" + game.id);
       }}
     />
   );
@@ -76,11 +92,11 @@ export function ChwatziRoute() {
 export function GameRoute() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const gameId = searchParams.get('gameId');
+  const gameId = searchParams.get("gameId");
   const game = gameId ? localGameRepository.get(gameId) : undefined;
 
   useEffect(() => {
-    if (!game) navigate('/');
+    if (!game) navigate("/");
   }, [game, navigate]);
 
   if (!game) return null;
@@ -88,9 +104,11 @@ export function GameRoute() {
   return (
     <GameScreen
       initialGame={game}
-      onNewGame={() => navigate('/setup')}
-      onSavedGames={() => navigate('/saved')}
-      onChwatzi={() => navigate('/chwatzi?players=' + String(game.players.length))}
+      onNewGame={() => navigate("/setup")}
+      onSavedGames={() => navigate("/saved")}
+      onChwatzi={() =>
+        navigate("/chwatzi?players=" + String(game.players.length))
+      }
     />
   );
 }
@@ -106,7 +124,7 @@ export function SavedGamesRoute() {
   return (
     <SavedGames
       games={games}
-      onResume={(game) => navigate('/game?gameId=' + game.id)}
+      onResume={(game) => navigate("/game?gameId=" + game.id)}
       onDelete={(id) => {
         localGameRepository.remove(id);
         refresh();
