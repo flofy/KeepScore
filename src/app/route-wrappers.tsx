@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
@@ -73,7 +73,8 @@ export function ChwatziRoute() {
 
 export function GameRoute() {
   const navigate = useNavigate();
-  const gameId = new URLSearchParams(window.location.search).get("gameId");
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get("gameId");
   const game = gameId ? localGameRepository.get(gameId) : undefined;
 
   useEffect(() => {
