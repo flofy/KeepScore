@@ -42,30 +42,67 @@
 
 .chwatzi-v2-water {
   position: absolute;
+  inset: 0;
   z-index: 30;
-  left: var(--water-x);
-  top: var(--water-y);
-  width: 100vmax;
-  height: 100vmax;
+  overflow: hidden;
+  background: var(--water-color);
+  clip-path: circle(0% at var(--water-x) var(--water-y));
+  animation: chwatzi-water-fill 5s linear forwards;
+  pointer-events: none;
+}
+
+.chwatzi-v2-water::before {
+  content: "";
+  position: absolute;
+  inset: -12% -8%;
+  background: radial-gradient(
+    ellipse at 50% 50%,
+    rgb(255 255 255 / 0.13),
+    transparent 58%
+  );
+  opacity: 0.9;
+}
+
+.chwatzi-v2-water::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 180vmax;
+  height: 180vmax;
+  border: 2px solid rgb(255 255 255 / 0.16);
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
-  background:
-    radial-gradient(circle at 45% 40%, rgb(255 255 255 / 0.18), transparent 32%),
-    var(--water-color);
-  box-shadow: 0 0 80px rgb(255 255 255 / 0.12);
-  animation: chwatzi-water-fill 5s cubic-bezier(0.2, 0.75, 0.25, 1) forwards;
-  pointer-events: none;
+  animation: chwatzi-water-ripple 5s ease-out forwards;
 }
 
 @keyframes chwatzi-water-fill {
   0% {
-    transform: translate(-50%, -50%) scale(0);
+    clip-path: circle(0% at var(--water-x) var(--water-y));
   }
-  65% {
-    transform: translate(-50%, -50%) scale(1.35);
+  35% {
+    clip-path: circle(22% at var(--water-x) var(--water-y));
+  }
+  70% {
+    clip-path: circle(65% at var(--water-x) var(--water-y));
   }
   100% {
-    transform: translate(-50%, -50%) scale(2.1);
+    clip-path: circle(150% at var(--water-x) var(--water-y));
+  }
+}
+
+@keyframes chwatzi-water-ripple {
+  0% {
+    transform: translate(-50%, -50%) scale(0);
+    opacity: 0.55;
+  }
+  55% {
+    transform: translate(-50%, -50%) scale(0.55);
+    opacity: 0.18;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
   }
 }
 
@@ -105,8 +142,8 @@
   left: 50%;
   bottom: 72px;
   z-index: 5;
-  transform: translateX(-50%);
   width: min(90vw, 560px);
+  transform: translateX(-50%);
   text-align: center;
   pointer-events: none;
 }
@@ -153,7 +190,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chwatzi-v2-water {
+  .chwatzi-v2-water,
+  .chwatzi-v2-water::after {
     animation-duration: 0.01ms;
   }
 }
