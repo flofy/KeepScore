@@ -160,7 +160,10 @@ export function ChwatziScreenV2({ onBack }: Props) {
       const movedFinger = next.find(
         (finger) => finger.pointerId === event.pointerId,
       );
-      if (movedFinger?.pointerId === selectedFingerRef.current?.pointerId) {
+      if (
+        movedFinger &&
+        movedFinger.pointerId === selectedFingerRef.current?.pointerId
+      ) {
         selectedFingerRef.current = movedFinger;
       }
     },
