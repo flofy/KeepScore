@@ -27,6 +27,10 @@
   pointer-events: none;
 }
 
+.chwatzi-v2-finger--selected {
+  z-index: 35;
+}
+
 .chwatzi-v2-countdown {
   position: absolute;
   inset: 0;
@@ -80,8 +84,11 @@
   0% {
     clip-path: circle(0% at var(--water-x) var(--water-y));
   }
-  35% {
-    clip-path: circle(22% at var(--water-x) var(--water-y));
+  20% {
+    clip-path: circle(8% at var(--water-x) var(--water-y));
+  }
+  45% {
+    clip-path: circle(28% at var(--water-x) var(--water-y));
   }
   70% {
     clip-path: circle(65% at var(--water-x) var(--water-y));
