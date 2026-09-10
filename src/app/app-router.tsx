@@ -15,7 +15,7 @@ export const router = createAppRouter({
     </RouteShell>
   ),
   setup: (
-    <RouteShell close>
+    <RouteShell showBack={false}>
       <GameSetupRoute />
     </RouteShell>
   ),
