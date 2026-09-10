@@ -55,6 +55,8 @@ export type TranslationKey =
   | "setScore"
   | "install"
   | "dismissInstall"
+  | "update"
+  | "updating"
   | "importError"
   | "genericImportError"
   | "removeHistoryEntry"
@@ -136,6 +138,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     newGameMenuItem: "New game",
     install: "Install app",
     dismissInstall: "Dismiss install prompt",
+    update: "Update app",
+    updating: "Updating…",
     importError: "The selected file is not a valid KeepScore export.",
     genericImportError: "Unable to import this file.",
     swapPlayers: "Swap player positions",
@@ -220,6 +224,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     newGameMenuItem: "Nouvelle partie",
     install: "Installer l app",
     dismissInstall: "Masquer la suggestion d installation",
+    update: "Mettre a jour",
+    updating: "Mise a jour…",
     importError: "Le fichier selectionne n est pas un export KeepScore valide.",
     genericImportError: "Impossible d importer ce fichier.",
     swapPlayers: "Echanger la position des joueurs",
