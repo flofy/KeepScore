@@ -21,6 +21,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const [countdown, setCountdown] = useState(3);
   const [selectedFingerId, setSelectedFingerId] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [waterSize, setWaterSize] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
   const fingersRef = useRef<Finger[]>([]);
   const fingerColorsRef = useRef(new Map<number, string>());
@@ -110,9 +111,15 @@ export function ChwatziScreenV2({ onBack }: Props) {
         return;
       }
 
+      const maxHorizontal = Math.max(winner.x, window.innerWidth - winner.x);
+      const maxVertical = Math.max(winner.y, window.innerHeight - winner.y);
+      const radius = Math.hypot(maxHorizontal, maxVertical);
+      const diameter = Math.ceil(radius * 2 + 32);
+
       selectedFingerRef.current = winner;
       setSelectedFingerId(winner.pointerId);
       setSelectedColor(winner.color);
+      setWaterSize(diameter);
       setPhase("wiping");
       if ("vibrate" in navigator) navigator.vibrate([80, 50, 180]);
 
@@ -149,6 +156,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
     setCountdown(3);
     setSelectedFingerId(null);
     setSelectedColor(null);
+    setWaterSize(null);
     setShowResult(false);
   }, [clearTimers]);
 
@@ -238,11 +246,13 @@ export function ChwatziScreenV2({ onBack }: Props) {
 
   const selectedFinger = selectedFingerRef.current;
   const waterStyle =
-    selectedFinger && selectedColor
+    selectedFinger && selectedColor && waterSize
       ? ({
           "--water-color": selectedColor,
-          "--water-x": `${selectedFinger.x}px`,
-          "--water-y": `${selectedFinger.y}px`,
+          left: selectedFinger.x,
+          top: selectedFinger.y,
+          width: waterSize,
+          height: waterSize,
         } as CSSProperties)
       : undefined;
 
