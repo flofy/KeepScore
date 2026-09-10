@@ -478,17 +478,6 @@ export function GameScreen({
               className="menu-item"
               type="button"
               onClick={() => {
-                setMenuOpen(false);
-                onHome();
-              }}
-            >
-              ⌂ {t("home")}
-            </button>
-            <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
                 setHistoryOpen((current) => !current);
                 setMenuOpen(false);
               }}
