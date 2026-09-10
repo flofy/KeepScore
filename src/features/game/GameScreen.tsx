@@ -26,13 +26,11 @@ export function GameScreen({
   onSavedGames,
   onChwatzi,
   onHome,
-  onHome,
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
   onChwatzi: () => void;
-  onHome: () => void;
   onHome: () => void;
 }) {
   const {
