@@ -1,7 +1,8 @@
 .app-shell:has(.players.duo) .quick-actions {
   left: 50%;
   right: auto;
-  transform: translateX(-50%);
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .custom-score-backdrop {
@@ -9,9 +10,10 @@
   inset: 0;
   z-index: 300;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
-  padding: 24px;
+  overflow-y: auto;
+  padding: max(16px, env(safe-area-inset-top)) 16px 16px;
   background: rgb(2 6 23 / 72%);
   backdrop-filter: blur(8px);
   animation: overlay-in 0.18s ease;
@@ -19,6 +21,7 @@
 
 .custom-score-modal {
   width: min(420px, 100%);
+  margin-top: clamp(16px, 12vh, 96px);
   padding: 24px;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 24px;
@@ -104,12 +107,20 @@
   background: rgb(255 255 255 / 6%);
 }
 
+@media (max-width: 700px) {
+  .app-shell:has(.players.duo) .quick-actions {
+    top: max(16px, env(safe-area-inset-top));
+    transform: translateX(-50%);
+  }
+}
+
 @media (max-width: 520px) {
   .custom-score-backdrop {
-    padding: 16px;
+    padding-inline: 16px;
   }
 
   .custom-score-modal {
+    margin-top: clamp(16px, 8vh, 64px);
     padding: 20px;
     border-radius: 20px;
   }
