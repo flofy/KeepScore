@@ -533,12 +533,17 @@ export function PlayerCard({
           onClick={closeCustom}
         >
           <div
+            ref={customTooltipRef}
             className="custom-score-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby={`custom-score-title-${player.id}`}
             onClick={(event) => event.stopPropagation()}
-            style={{ "--player-color": player.color ?? "#38bdf8" } as CSSProperties}
+            style={
+              {
+                "--player-color": player.color ?? "#38bdf8",
+              } as CSSProperties
+            }
           >
             <h2
               id={`custom-score-title-${player.id}`}
