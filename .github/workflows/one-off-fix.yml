@@ -1,75 +1,52 @@
 name: one-off-fix
+
 on:
   push:
-    branches: [fix/game-controls-and-pwa-updates]
+    branches:
+      - fix/game-controls-and-pwa-updates
+
 permissions:
   contents: write
+
 jobs:
   fix:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - name: Apply requested UI fixes
+
+      - name: Apply fixes
         run: |
           python3 - <<'PY'
           from pathlib import Path
 
-          p = Path('src/styles.css')
-          s = p.read_text()
-          marker = '''.players.duo {
-            grid-template-columns: 1fr;
-            gap: 10px;
-          }'''
-          addition = '''.players.duo {
-            grid-template-columns: 1fr;
-            gap: 10px;
-          }
+          styles = Path("src/styles.css")
+          text = styles.read_text()
+          marker = ".players.duo {\n  grid-template-columns: 1fr;\n  gap: 10px;\n}"
+          addition = marker + """\n\n.app-shell:has(.players.duo) .quick-actions {\n  left: 50%;\n  right: auto;\n  top: 50%;\n  bottom: auto;\n  transform: translate(-50%, -50%);\n}\n\n@media (max-width: 700px) {\n  .app-shell:has(.players.duo) .quick-actions {\n    top: max(16px, env(safe-area-inset-top));\n    transform: translateX(-50%);\n  }\n}\n"""
+          if ".app-shell:has(.players.duo) .quick-actions" not in text:
+              if marker not in text:
+                  raise SystemExit("duo marker not found")
+              text = text.replace(marker, addition, 1)
+              styles.write_text(text)
 
-          .app-shell:has(.players.duo) .quick-actions {
-            left: 50%;
-            right: auto;
-            top: 50%;
-            bottom: auto;
-            transform: translate(-50%, -50%);
-          }
-
-          @media (max-width: 700px) {
-            .app-shell:has(.players.duo) .quick-actions {
-              top: max(16px, env(safe-area-inset-top));
-              transform: translateX(-50%);
-            }
-          }'''
-          if marker not in s:
-              raise SystemExit('duo styles marker not found')
-          if '.app-shell:has(.players.duo) .quick-actions' not in s:
-              s = s.replace(marker, addition, 1)
-          p.write_text(s)
-
-          p = Path('src/features/game/PlayerCard.tsx')
-          s = p.read_text()
-          s = s.replace('''  const onQuickStepClick = (delta: number) => {
-  if (longPressFired.current) {
-    longPressFired.current = false;
-    return;
-  }
-  onQuickDelta(delta);
-};
-
-''', '')
-          for old, new in [
-              ('onClick={() => onQuickStepClick(-2)}', 'onClick={() => onQuickDelta(-2)}'),
-              ('onClick={() => onQuickStepClick(-3)}', 'onClick={() => onQuickDelta(-3)}'),
-              ('onClick={() => onQuickStepClick(2)}', 'onClick={() => onQuickDelta(2)}'),
-              ('onClick={() => onQuickStepClick(3)}', 'onClick={() => onQuickDelta(3)}'),
-          ]:
-              s = s.replace(old, new)
-          p.write_text(s)
+          player = Path("src/features/game/PlayerCard.tsx")
+          text = player.read_text()
+          start = '  const onQuickStepClick = (delta: number) => {'
+          if start in text:
+              begin = text.index(start)
+              end = text.index("  };\n\n", begin) + len("  };\n\n")
+              text = text[:begin] + text[end:]
+          text = text.replace("onClick={() => onQuickStepClick(-2)}", "onClick={() => onQuickDelta(-2)}")
+          text = text.replace("onClick={() => onQuickStepClick(-3)}", "onClick={() => onQuickDelta(-3)}")
+          text = text.replace("onClick={() => onQuickStepClick(2)}", "onClick={() => onQuickDelta(2)}")
+          text = text.replace("onClick={() => onQuickStepClick(3)}", "onClick={() => onQuickDelta(3)}")
+          player.write_text(text)
           PY
 
           npx oxfmt src/features/game/PlayerCard.tsx src/styles.css
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           rm -f .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.trigger2 .github/workflows/.ui-fix-trigger
-          git add src/features/game/PlayerCard.tsx src/styles.css .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.trigger2 .github/workflows/.ui-fix-trigger
+          git add -A
           git commit -m "fix(game): center duo actions and restore quick controls" || exit 0
           git push
