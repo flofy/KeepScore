@@ -1,0 +1,63 @@
+name: Correct duo action responsive positioning
+
+on:
+  push:
+    branches:
+      - fix/game-controls-and-pwa-updates
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    if: "!contains(github.event.head_commit.message, 'correct duo action responsive positioning')"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: fix/game-controls-and-pwa-updates
+      - name: Apply correct positioning
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("src/styles.css")
+          text = path.read_text()
+          old = '''.app-shell:has(.players.duo) .quick-actions {
+            left: 50%;
+            right: auto;
+            top: max(16px, env(safe-area-inset-top));
+            bottom: auto;
+            transform: translateX(-50%);
+          }
+
+          @media (min-width: 701px) {
+            .app-shell:has(.players.duo) .quick-actions {
+              top: 50%;
+              transform: translate(-50%, -50%);
+            }
+          }'''
+          new = '''.app-shell:has(.players.duo) .quick-actions {
+            left: 50%;
+            right: auto;
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+          }
+
+          @media (min-width: 701px) {
+            .app-shell:has(.players.duo) .quick-actions {
+              top: max(14px, env(safe-area-inset-top));
+              transform: translateX(-50%);
+            }
+          }'''
+          if old not in text:
+              raise SystemExit("expected CSS block not found")
+          path.write_text(text.replace(old, new, 1))
+          PY
+          rm .github/workflows/fix-duo-actions-position-2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/styles.css .github/workflows/fix-duo-actions-position-2.yml
+          git commit -m "fix: correct duo action responsive positioning"
+          git push origin HEAD:fix/game-controls-and-pwa-updates
