@@ -126,14 +126,6 @@ export function PlayerCard({
     onDelta(delta);
   };
 
-  const onQuickStepClick = (delta: number) => {
-    if (longPressFired.current) {
-      longPressFired.current = false;
-      return;
-    }
-    onQuickDelta(delta);
-  };
-
   const openScoreEditor = () => {
     setScoreDraft(String(player.score));
     setScoreEditing(true);
@@ -325,7 +317,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickStepClick(-2)}
+                onClick={() => onQuickDelta(-2)}
                 aria-label={`${t("removePoint")} 2 — ${player.name}`}
               >
                 −2
@@ -341,7 +333,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickStepClick(-3)}
+                onClick={() => onQuickDelta(-3)}
                 aria-label={`${t("removePoint")} 3 — ${player.name}`}
               >
                 −3
@@ -436,7 +428,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickStepClick(2)}
+                onClick={() => onQuickDelta(2)}
                 aria-label={`${t("addPoint")} 2 — ${player.name}`}
               >
                 +2
@@ -452,7 +444,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickStepClick(3)}
+                onClick={() => onQuickDelta(3)}
                 aria-label={`${t("addPoint")} 3 — ${player.name}`}
               >
                 +3

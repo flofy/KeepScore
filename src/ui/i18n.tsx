@@ -44,6 +44,7 @@ export type TranslationKey =
   | "export"
   | "import"
   | "back"
+  | "home"
   | "menu"
   | "closeMenu"
   | "fullscreen"
@@ -130,6 +131,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: "Export",
     import: "Import",
     back: "Back",
+    home: "Home",
     menu: "Open menu",
     closeMenu: "Close",
     fullscreen: "Fullscreen",
@@ -216,6 +218,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: "Exporter",
     import: "Importer",
     back: "Retour",
+    home: "Accueil",
     menu: "Ouvrir le menu",
     closeMenu: "Fermer",
     fullscreen: "Plein ecran",

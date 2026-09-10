@@ -25,11 +25,13 @@ export function GameScreen({
   onNewGame,
   onSavedGames,
   onChwatzi,
+  onHome,
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
   onChwatzi: () => void;
+  onHome: () => void;
 }) {
   const {
     present: game,
@@ -461,6 +463,17 @@ export function GameScreen({
             >
               ✕
             </button>
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                setMenuOpen(false);
+                onHome();
+              }}
+            >
+              ⌂ {t("home")}
+            </button>
+            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
