@@ -1,0 +1,61 @@
+name: Fix duo actions layout
+
+on:
+  push:
+    branches:
+      - fix/game-controls-and-pwa-updates
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Fix layout
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          path = Path("src/styles.css")
+          text = path.read_text()
+          old = '''.app-shell:has(.players.duo) .quick-actions {
+            left: 50%;
+            right: auto;
+            top: 50%;
+            bottom: auto;
+            transform: translate(-50%, -50%);
+          }
+
+          @media (min-width: 701px) {
+            .app-shell:has(.players.duo) .quick-actions {
+              top: max(14px, env(safe-area-inset-top));
+              transform: translateX(-50%);
+            }
+          }'''
+          new = '''@media (max-width: 700px) {
+            .app-shell:has(.players.duo) .quick-actions {
+              top: 50%;
+              right: auto;
+              bottom: auto;
+              left: 50%;
+              transform: translate(-50%, -50%);
+            }
+          }'''
+          if old not in text:
+              raise SystemExit("Expected duo layout block not found")
+          path.write_text(text.replace(old, new, 1))
+          PY
+          npx oxfmt src/styles.css
+      - name: Commit and clean up
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/styles.css .github/workflows/fix-duo-actions-layout.yml
+          git commit -m "fix(game): position duo actions by viewport" || exit 0
+          git rm .github/workflows/fix-duo-actions-layout.yml
+          git commit -m "chore: remove temporary duo layout workflow"
+          git push
