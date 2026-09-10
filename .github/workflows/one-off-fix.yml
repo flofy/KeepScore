@@ -45,18 +45,17 @@ jobs:
               s = s.replace(marker, addition, 1)
           p.write_text(s)
 
-          # Keep the quick +2/-2/+3/-3 buttons on their original click behavior.
           p = Path('src/features/game/PlayerCard.tsx')
           s = p.read_text()
           s = s.replace('''  const onQuickStepClick = (delta: number) => {
-            if (longPressFired.current) {
-              longPressFired.current = false;
-              return;
-            }
-            onQuickDelta(delta);
-          };
+  if (longPressFired.current) {
+    longPressFired.current = false;
+    return;
+  }
+  onQuickDelta(delta);
+};
 
-          ''', '')
+''', '')
           for old, new in [
               ('onClick={() => onQuickStepClick(-2)}', 'onClick={() => onQuickDelta(-2)}'),
               ('onClick={() => onQuickStepClick(-3)}', 'onClick={() => onQuickDelta(-3)}'),
@@ -70,7 +69,7 @@ jobs:
           npx oxfmt src/features/game/PlayerCard.tsx src/styles.css
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          rm -f .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.ui-fix-trigger
-          git add src/features/game/PlayerCard.tsx src/styles.css .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.ui-fix-trigger
+          rm -f .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.trigger2 .github/workflows/.ui-fix-trigger
+          git add src/features/game/PlayerCard.tsx src/styles.css .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.trigger2 .github/workflows/.ui-fix-trigger
           git commit -m "fix(game): center duo actions and restore quick controls" || exit 0
           git push
