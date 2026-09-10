@@ -1,0 +1,167 @@
+.chwatzi-v2 {
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
+
+.chwatzi-v2-stage {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #000;
+  touch-action: none;
+}
+
+.chwatzi-v2-stage--done {
+  background: var(--selected-color, #000);
+}
+
+.chwatzi-v2-finger {
+  position: absolute;
+  z-index: 10;
+  width: 88px;
+  height: 88px;
+  border: 4px solid;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 6px 24px rgb(0 0 0 / 0.55);
+  pointer-events: none;
+}
+
+.chwatzi-v2-finger--selected {
+  z-index: 35;
+}
+
+.chwatzi-v2-countdown {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  font-size: clamp(120px, 28vw, 240px);
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 0 60px rgb(255 255 255 / 0.45);
+  pointer-events: none;
+}
+
+.chwatzi-v2-water {
+  position: absolute;
+  left: var(--water-x);
+  top: var(--water-y);
+  z-index: 30;
+  width: 300vmax;
+  height: 300vmax;
+  border-radius: 50%;
+  background: var(--water-color);
+  transform: translate(-50%, -50%) scale(0);
+  transform-origin: center;
+  animation: chwatzi-water-fill 5s ease-out forwards;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.chwatzi-v2-water::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    circle,
+    rgb(255 255 255 / 0.2) 0,
+    rgb(255 255 255 / 0) 45%
+  );
+}
+
+@keyframes chwatzi-water-fill {
+  from {
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  to {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.chwatzi-v2-background {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background: var(--selected-color, #000);
+}
+
+.chwatzi-v2-instructions {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  pointer-events: none;
+}
+
+.chwatzi-v2-icon {
+  font-size: 64px;
+}
+
+.chwatzi-v2-instructions p,
+.chwatzi-v2-hint {
+  margin: 0;
+  color: rgb(255 255 255 / 0.78);
+  font-size: 18px;
+}
+
+.chwatzi-v2-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 72px;
+  z-index: 5;
+  width: min(90vw, 560px);
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.chwatzi-v2-result {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 0.28);
+}
+
+.chwatzi-v2-result-card {
+  width: min(420px, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  padding: 28px;
+  border: 2px solid rgb(255 255 255 / 0.65);
+  border-radius: 24px;
+  background: rgb(15 23 42 / 0.94);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.5);
+}
+
+.chwatzi-v2-result-card strong {
+  font-size: 1.2rem;
+}
+
+.chwatzi-v2-result-color {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  box-shadow: 0 0 42px currentColor;
+}
+
+.chwatzi-v2-result-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
