@@ -9,6 +9,7 @@ import "./ui/intro.css";
 import "./ui/install.css";
 import { App } from "./app/App";
 import { AppProviders } from "./app/providers";
+import { UpdateButton } from "./ui/UpdateButton";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
@@ -25,6 +26,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppProviders>
       <App />
+      <UpdateButton />
     </AppProviders>
   </StrictMode>,
 );
