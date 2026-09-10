@@ -1,0 +1,47 @@
+name: one-off-fix
+
+on:
+  push:
+    branches:
+      - fix/game-controls-and-pwa-updates
+
+permissions:
+  contents: write
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Clean up UI fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          game = Path("src/features/game/GameScreen.tsx")
+          text = game.read_text()
+          text = text.replace(
+              "  onChwatzi,\n  onHome,\n  onHome,",
+              "  onChwatzi,\n  onHome,",
+              1,
+          )
+          text = text.replace(
+              "  onChwatzi: () => void;\n  onHome: () => void;\n  onHome: () => void;",
+              "  onChwatzi: () => void;\n  onHome: () => void;",
+              1,
+          )
+          home_block = '''            <button\n              className="menu-item"\n              type="button"\n              onClick={() => {\n                setMenuOpen(false);\n                onHome();\n              }}\n            >\n              ⌂ {t("home")}\n            </button>\n            <div className="menu-separator" />'''
+          duplicate = home_block + home_block
+          if duplicate in text:
+              text = text.replace(duplicate, home_block, 1)
+          game.write_text(text)
+          PY
+
+          npx oxfmt src/features/game/GameScreen.tsx src/features/game/PlayerCard.tsx src/styles.css
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/one-off-fix.yml .github/workflows/.trigger .github/workflows/.trigger2 .github/workflows/.ui-fix-trigger
+          git add -A
+          git commit -m "fix(game): clean up player navigation changes" || exit 0
+          git push
