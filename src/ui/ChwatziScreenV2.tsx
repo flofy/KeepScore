@@ -164,9 +164,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
 
         const color =
           fingerColorsRef.current.get(event.pointerId) ??
-          PLAYER_COLORS[
-            fingerColorsRef.current.size % PLAYER_COLORS.length
-          ];
+          PLAYER_COLORS[fingerColorsRef.current.size % PLAYER_COLORS.length];
         fingerColorsRef.current.set(event.pointerId, color);
 
         return [
