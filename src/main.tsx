@@ -12,8 +12,18 @@ import { AppProviders } from "./app/providers";
 
 if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    let reloading = false;
+
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (!hadController || reloading) return;
+      reloading = true;
+      window.location.reload();
+    });
+
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
+      .then((registration) => registration.update())
       .catch((error) => {
         console.warn("KeepScore service worker registration failed.", error);
       });
