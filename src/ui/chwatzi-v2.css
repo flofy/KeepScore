@@ -47,7 +47,11 @@
 
 .chwatzi-v2-water {
   position: absolute;
+  left: var(--water-x);
+  top: var(--water-y);
   z-index: 30;
+  width: 300vmax;
+  height: 300vmax;
   border-radius: 50%;
   background: var(--water-color);
   transform: translate(-50%, -50%) scale(0);
