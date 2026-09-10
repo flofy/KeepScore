@@ -165,3 +165,24 @@
   gap: 12px;
   width: 100%;
 }
+
+/* Temporary A/B toggle to compare Chwatzi V1 and V2 screens */
+.chwatzi-version-toggle {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  right: 14px;
+  z-index: 100;
+  padding: 10px 16px;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 12px;
+  background: rgb(15 23 42 / 88%);
+  color: #7dd3fc;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+}
+
+.chwatzi-version-toggle:hover {
+  background: rgb(30 41 59 / 96%);
+}

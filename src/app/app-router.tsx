@@ -15,12 +15,12 @@ export const router = createAppRouter({
     </RouteShell>
   ),
   setup: (
-    <RouteShell>
+    <RouteShell close>
       <GameSetupRoute />
     </RouteShell>
   ),
   chwatzi: (
-    <RouteShell>
+    <RouteShell close>
       <ChwatziRoute />
     </RouteShell>
   ),

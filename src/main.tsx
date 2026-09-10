@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import "./styles.css";
 import "./ui/responsive.css";
 import "./ui/start.css";
+import "./ui/error.css";
 import "./ui/saved-games.css";
 import "./ui/chwatzi.css";
 import "./ui/intro.css";

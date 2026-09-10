@@ -44,6 +44,7 @@ export type TranslationKey =
   | "export"
   | "import"
   | "back"
+  | "close"
   | "home"
   | "menu"
   | "closeMenu"
@@ -86,7 +87,11 @@ export type TranslationKey =
   | "tryAgain"
   | "startNewGame"
   | "startChwatzi"
-  | "or";
+  | "or"
+  | "errorTitle"
+  | "errorMessage"
+  | "errorUnknown"
+  | "errorReload";
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -131,6 +136,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: "Export",
     import: "Import",
     back: "Back",
+    close: "Close",
     home: "Home",
     menu: "Open menu",
     closeMenu: "Close",
@@ -174,6 +180,11 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startNewGame: "Start a new game",
     startChwatzi: "Pick a random starter",
     or: "or",
+    errorTitle: "Something went wrong",
+    errorMessage:
+      "An unexpected error occurred. Your scores are saved — you can safely return home.",
+    errorUnknown: "Unknown error",
+    errorReload: "Reload",
   },
   fr: {
     appName: "KeepScore",
@@ -218,6 +229,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     export: "Exporter",
     import: "Importer",
     back: "Retour",
+    close: "Fermer",
     home: "Accueil",
     menu: "Ouvrir le menu",
     closeMenu: "Fermer",
@@ -261,6 +273,11 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startNewGame: "Demarrer une nouvelle partie",
     startChwatzi: "Lancer Chwatzi",
     or: "ou",
+    errorTitle: "Une erreur est survenue",
+    errorMessage:
+      "Une erreur inattendue s est produite. Vos scores sont sauvegardes — vous pouvez revenir a l accueil sans risque.",
+    errorUnknown: "Erreur inconnue",
+    errorReload: "Recharger",
   },
 };
 

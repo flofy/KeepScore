@@ -3,9 +3,8 @@ import { useI18n } from "./i18n";
 
 export function UpdateButton() {
   const { t } = useI18n();
-  const [registration, setRegistration] = useState<ServiceWorkerRegistration | null>(
-    null,
-  );
+  const [registration, setRegistration] =
+    useState<ServiceWorkerRegistration | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
 
@@ -24,7 +23,10 @@ export function UpdateButton() {
       if (!worker || worker === installing) return;
       installing = worker;
       worker.addEventListener("statechange", () => {
-        if (worker.state === "installed" && navigator.serviceWorker.controller) {
+        if (
+          worker.state === "installed" &&
+          navigator.serviceWorker.controller
+        ) {
           setUpdateAvailable(true);
         }
       });

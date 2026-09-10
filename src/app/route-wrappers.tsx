@@ -5,12 +5,14 @@ import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
 import { SavedGames } from "../ui/SavedGames";
+import { ChwatziScreen } from "../ui/ChwatziScreen";
+import { createTempGame } from "../features/chwatzi/createTempGame";
 import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
 import { GameScreen } from "../features/game/GameScreen";
 
-function BackButton() {
+function BackButton({ close = false }: { close?: boolean }) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,12 +20,12 @@ function BackButton() {
 
   return (
     <button
-      className="back-button"
+      className={close ? "back-button close-button" : "back-button"}
       type="button"
-      onClick={() => navigate(-1)}
-      aria-label={t("back")}
+      onClick={() => (close ? navigate("/") : navigate(-1))}
+      aria-label={close ? t("close") : t("back")}
     >
-      ←
+      {close ? "✕" : "←"}
     </button>
   );
 }
@@ -31,13 +33,15 @@ function BackButton() {
 export function RouteShell({
   children,
   showBack = true,
+  close = false,
 }: {
   children: ReactNode;
   showBack?: boolean;
+  close?: boolean;
 }) {
   return (
     <div className="route-shell">
-      {showBack && <BackButton />}
+      {showBack && <BackButton close={close} />}
       {children}
     </div>
   );
@@ -67,8 +71,39 @@ export function GameSetupRoute() {
 
 export function ChwatziRoute() {
   const navigate = useNavigate();
+  const [version, setVersion] = useState<1 | 2>(2);
 
-  return <ChwatziScreenV2 onBack={() => navigate(-1)} />;
+  return (
+    <>
+      {version === 2 ? (
+        <>
+          <ChwatziScreenV2 onBack={() => navigate(-1)} />
+          <button
+            type="button"
+            className="chwatzi-version-toggle"
+            onClick={() => setVersion(1)}
+          >
+            Tester V1
+          </button>
+        </>
+      ) : (
+        <>
+          <ChwatziScreen
+            game={createTempGame(2)}
+            onSelect={() => navigate("/")}
+            onBack={() => navigate(-1)}
+          />
+          <button
+            type="button"
+            className="chwatzi-version-toggle"
+            onClick={() => setVersion(2)}
+          >
+            Tester V2
+          </button>
+        </>
+      )}
+    </>
+  );
 }
 
 export function GameRoute() {
