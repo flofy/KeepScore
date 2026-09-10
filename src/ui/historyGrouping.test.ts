@@ -2,11 +2,7 @@ import { describe, expect, it } from "vitest";
 import type { ScoreEntry } from "../domain/game/types";
 import { groupHistory } from "./historyGrouping";
 
-const entry = (
-  id: string,
-  playerId: string,
-  delta: number,
-): ScoreEntry => ({
+const entry = (id: string, playerId: string, delta: number): ScoreEntry => ({
   id,
   playerId,
   delta,
