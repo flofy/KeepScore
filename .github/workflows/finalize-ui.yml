@@ -1,0 +1,50 @@
+name: finalize-ui
+
+on:
+  push:
+    branches:
+      - fix/game-controls-and-pwa-updates
+
+permissions:
+  contents: write
+
+jobs:
+  finalize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Finalize files
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          game = Path("src/features/game/GameScreen.tsx")
+          text = game.read_text()
+          text = text.replace("  onChwatzi,\n  onHome,\n  onHome,", "  onChwatzi,\n  onHome,", 1)
+          text = text.replace(
+              "  onChwatzi: () => void;\n  onHome: () => void;\n  onHome: () => void;",
+              "  onChwatzi: () => void;\n  onHome: () => void;",
+              1,
+          )
+
+          home = re.compile(
+              r'''            <button\n              className="menu-item"\n              type="button"\n              onClick=\{\(\) => \{\n                setMenuOpen\(false\);\n                onHome\(\);\n              \}\}\n            >\n              ⌂ \{t\("home"\)\}\n            </button>\n            <div className="menu-separator" />\n'''
+          )
+          matches = list(home.finditer(text))
+          if len(matches) > 1:
+              start = matches[1].start()
+              end = matches[1].end()
+              text = text[:start] + text[end:]
+          if len(home.findall(text)) != 1:
+              raise SystemExit("expected exactly one home menu item")
+          game.write_text(text)
+          PY
+
+          npx oxfmt src/features/game/GameScreen.tsx src/features/game/PlayerCard.tsx src/styles.css
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          rm -f .github/workflows/finalize-ui.yml .github/workflows/.cleanup-final-trigger
+          git add -A
+          git commit -m "fix(game): finalize player navigation" || exit 0
+          git push
