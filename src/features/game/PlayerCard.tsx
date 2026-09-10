@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { Player } from "../../domain/game/types";
+import "./game-controls.css";
 import { useI18n } from "../../ui/i18n";
 
 function haptic() {
@@ -71,6 +72,7 @@ export function PlayerCard({
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
+
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
       clearTimeout(longPressTimer.current);
@@ -78,6 +80,7 @@ export function PlayerCard({
     }
     longPressOrigin.current = null;
   };
+
   const startLongPress = (
     event: ReactPointerEvent<HTMLElement>,
     sign?: "positive" | "negative",
@@ -91,6 +94,7 @@ export function PlayerCard({
       haptic();
     }, 500);
   };
+
   const moveLongPress = (event: ReactPointerEvent<HTMLElement>) => {
     if (!longPressOrigin.current) return;
     if (
@@ -98,18 +102,22 @@ export function PlayerCard({
         event.clientX - longPressOrigin.current.x,
         event.clientY - longPressOrigin.current.y,
       ) > 10
-    )
+    ) {
       clearLongPress();
+    }
   };
+
   const quick = (delta: number) => {
     onQuickDelta(delta);
     setQuickOpen(false);
     setForcedSign(undefined);
   };
+
   const closeQuick = () => {
     setQuickOpen(false);
     setForcedSign(undefined);
   };
+
   const onStepClick = (delta: number) => {
     if (longPressFired.current) {
       longPressFired.current = false;
@@ -117,19 +125,31 @@ export function PlayerCard({
     }
     onDelta(delta);
   };
+
+  const onQuickStepClick = (delta: number) => {
+    if (longPressFired.current) {
+      longPressFired.current = false;
+      return;
+    }
+    onQuickDelta(delta);
+  };
+
   const openScoreEditor = () => {
     setScoreDraft(String(player.score));
     setScoreEditing(true);
   };
+
   const saveScore = () => {
     const value = Number(scoreDraft);
     if (Number.isFinite(value)) onSetScore(Math.trunc(value));
     setScoreEditing(false);
   };
+
   const cancelScoreEdit = () => {
     setScoreEditing(false);
     setScoreDraft(String(player.score));
   };
+
   const saveCustom = (sign: 1 | -1) => {
     const value = Number(customDraft);
     if (Number.isFinite(value) && value !== 0) {
@@ -139,6 +159,7 @@ export function PlayerCard({
     setCustomOpen(false);
     setCustomDraft("");
   };
+
   const closeCustom = () => {
     setCustomOpen(false);
     setCustomDraft("");
@@ -153,8 +174,9 @@ export function PlayerCard({
         customOpen &&
         (customTooltipRef.current?.contains(target) ||
           customBtnRef.current?.contains(target))
-      )
+      ) {
         return;
+      }
       closeQuick();
       closeCustom();
     };
@@ -167,14 +189,23 @@ export function PlayerCard({
   }, [quickOpen, customOpen]);
 
   useEffect(() => {
+    if (customOpen) {
+      scoreInputRef.current?.focus();
+      scoreInputRef.current?.select();
+    }
+  }, [customOpen]);
+
+  useEffect(() => {
     if (scoreEditing) {
       scoreInputRef.current?.focus();
       scoreInputRef.current?.select();
     }
   }, [scoreEditing]);
+
   const scoreValueRef = useFitText<HTMLDivElement>(
     JSON.stringify(player.score),
   );
+
   const onScoreClick = () => {
     if (longPressFired.current) {
       longPressFired.current = false;
@@ -182,6 +213,7 @@ export function PlayerCard({
     }
     openScoreEditor();
   };
+
   const effectiveSign =
     forcedSign ??
     (lastDelta === undefined
@@ -293,7 +325,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(-2)}
+                onClick={() => onQuickStepClick(-2)}
                 aria-label={`${t("removePoint")} 2 — ${player.name}`}
               >
                 −2
@@ -309,7 +341,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(-3)}
+                onClick={() => onQuickStepClick(-3)}
                 aria-label={`${t("removePoint")} 3 — ${player.name}`}
               >
                 −3
@@ -359,6 +391,7 @@ export function PlayerCard({
                 ref={customBtnRef}
                 type="button"
                 className="custom-delta-btn"
+                onPointerDown={(event) => event.stopPropagation()}
                 onClick={(event) => {
                   event.stopPropagation();
                   setCustomOpen((current) => !current);
@@ -403,7 +436,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(2)}
+                onClick={() => onQuickStepClick(2)}
                 aria-label={`${t("addPoint")} 2 — ${player.name}`}
               >
                 +2
@@ -419,7 +452,7 @@ export function PlayerCard({
                 onPointerUp={clearLongPress}
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
-                onClick={() => onQuickDelta(3)}
+                onClick={() => onQuickStepClick(3)}
                 aria-label={`${t("addPoint")} 3 — ${player.name}`}
               >
                 +3
@@ -492,19 +525,35 @@ export function PlayerCard({
             )}
           </div>
         )}
-        {customOpen && (
+      </div>
+      {customOpen && (
+        <div
+          className="custom-score-backdrop"
+          role="presentation"
+          onClick={closeCustom}
+        >
           <div
-            ref={customTooltipRef}
-            className="score-tooltip"
-            role="tooltip"
-            aria-label={t("customDelta")}
+            className="custom-score-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`custom-score-title-${player.id}`}
+            onClick={(event) => event.stopPropagation()}
+            style={{ "--player-color": player.color ?? "#38bdf8" } as CSSProperties}
           >
+            <h2
+              id={`custom-score-title-${player.id}`}
+              className="custom-score-title"
+            >
+              {t("customDelta")}
+            </h2>
+            <p className="custom-score-subtitle">{player.name}</p>
             <input
+              ref={scoreInputRef}
+              className="custom-score-input"
               type="number"
               inputMode="numeric"
               value={customDraft}
               onChange={(event) => setCustomDraft(event.target.value)}
-              autoFocus
               onKeyDown={(event) => {
                 if (event.key === "Enter") saveCustom(1);
                 if (event.key === "Escape") closeCustom();
@@ -512,25 +561,34 @@ export function PlayerCard({
               aria-label={t("customDelta")}
               placeholder="0"
             />
+            <div className="custom-score-actions">
+              <button
+                type="button"
+                className="delta-neg"
+                onClick={() => saveCustom(-1)}
+                aria-label={`${t("removePoint")} — ${player.name}`}
+              >
+                −
+              </button>
+              <button
+                type="button"
+                className="delta-pos"
+                onClick={() => saveCustom(1)}
+                aria-label={`${t("addPoint")} — ${player.name}`}
+              >
+                +
+              </button>
+            </div>
             <button
               type="button"
-              className="delta-neg"
-              onClick={() => saveCustom(-1)}
-              aria-label={`${t("removePoint")} — ${player.name}`}
+              className="custom-score-cancel"
+              onClick={closeCustom}
             >
-              −
-            </button>
-            <button
-              type="button"
-              className="delta-pos"
-              onClick={() => saveCustom(1)}
-              aria-label={`${t("addPoint")} — ${player.name}`}
-            >
-              +
+              {t("cancel")}
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </article>
   );
 }
