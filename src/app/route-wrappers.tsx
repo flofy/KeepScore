@@ -89,6 +89,7 @@ export function GameRoute() {
       onNewGame={() => navigate("/setup")}
       onSavedGames={() => navigate("/saved")}
       onChwatzi={() => navigate("/chwatzi")}
+      onHome={() => navigate("/")}
     />
   );
 }
