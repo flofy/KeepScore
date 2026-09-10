@@ -268,15 +268,15 @@ h2 {
 .app-shell:has(.players.duo) .quick-actions {
   left: 50%;
   right: auto;
-  top: 50%;
+  top: max(16px, env(safe-area-inset-top));
   bottom: auto;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
 }
 
-@media (max-width: 700px) {
+@media (min-width: 701px) {
   .app-shell:has(.players.duo) .quick-actions {
-    top: max(16px, env(safe-area-inset-top));
-    transform: translateX(-50%);
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 }
 
