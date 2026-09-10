@@ -1,4 +1,4 @@
-const CACHE = "keepscore-v2";
+const CACHE = "keepscore-v3";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -52,6 +52,25 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  const isUpdateSensitive =
+    url.pathname.endsWith("/sw.js") ||
+    url.pathname.endsWith("/manifest.webmanifest");
+
+  if (isUpdateSensitive) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && !url.pathname.endsWith("/sw.js")) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {
