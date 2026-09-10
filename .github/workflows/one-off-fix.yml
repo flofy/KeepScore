@@ -1,0 +1,57 @@
+name: one-off-fix
+on:
+  push:
+    branches: [fix/game-controls-and-pwa-updates]
+permissions:
+  contents: write
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Apply requested UI fixes
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('src/features/game/PlayerCard.tsx')
+          s=p.read_text()
+          s=s.replace('''  const onQuickStepClick = (delta: number) => {\n    if (longPressFired.current) {\n      longPressFired.current = false;\n      return;\n    }\n    onQuickDelta(delta);\n  };\n\n''','')
+          for old, new in [
+            ('onClick={() => onQuickStepClick(-2)}','onClick={() => onQuickDelta(-2)}'),
+            ('onClick={() => onQuickStepClick(-3)}','onClick={() => onQuickDelta(-3)}'),
+            ('onClick={() => onQuickStepClick(2)}','onClick={() => onQuickDelta(2)}'),
+            ('onClick={() => onQuickStepClick(3)}','onClick={() => onQuickDelta(3)}'),
+          ]: s=s.replace(old,new)
+          p.write_text(s)
+
+          p=Path('src/app/app-router.tsx')
+          s=p.read_text().replace('''  game: (\n    <RouteShell>\n      <GameRoute />\n    </RouteShell>\n  ),''','''  game: (\n    <RouteShell showBack={false}>\n      <GameRoute />\n    </RouteShell>\n  ),''')
+          p.write_text(s)
+
+          p=Path('src/ui/i18n.tsx')
+          s=p.read_text()
+          s=s.replace('''  | "back"\n  | "menu"''','''  | "back"\n  | "home"\n  | "menu"''')
+          s=s.replace('''    back: "Back",\n    menu: "Open menu",''','''    back: "Back",\n    home: "Home",\n    menu: "Open menu",''')
+          s=s.replace('''    back: "Retour",\n    menu: "Ouvrir le menu",''','''    back: "Retour",\n    home: "Accueil",\n    menu: "Ouvrir le menu",''')
+          p.write_text(s)
+
+          p=Path('src/features/game/GameScreen.tsx')
+          s=p.read_text()
+          s=s.replace('''  onSavedGames,\n  onChwatzi,''','''  onSavedGames,\n  onChwatzi,\n  onHome,''')
+          s=s.replace('''  onSavedGames: () => void;\n  onChwatzi: () => void;''','''  onSavedGames: () => void;\n  onChwatzi: () => void;\n  onHome: () => void;''')
+          marker='''            <button\n              className="menu-item"\n              type="button"\n              onClick={() => {\n                setHistoryOpen((current) => !current);\n                setMenuOpen(false);\n              }}\n            >\n              🕘 {t("history")}\n            </button>'''
+          replacement='''            <button\n              className="menu-item"\n              type="button"\n              onClick={() => {\n                setMenuOpen(false);\n                onHome();\n              }}\n            >\n              ⌂ {t("home")}\n            </button>\n            <div className="menu-separator" />\n            <button\n              className="menu-item"\n              type="button"\n              onClick={() => {\n                setHistoryOpen((current) => !current);\n                setMenuOpen(false);\n              }}\n            >\n              🕘 {t("history")}\n            </button>'''
+          if marker not in s: raise SystemExit('menu marker not found')
+          s=s.replace(marker,replacement,1)
+          p.write_text(s)
+
+          p=Path('src/features/game/game-controls.css')
+          s=p.read_text()
+          s=s.replace('''  .app-shell:has(.players.duo) .quick-actions {\n    top: max(16px, env(safe-area-inset-top));\n    transform: translateX(-50%);\n  }''','''  .app-shell:has(.players.duo) .quick-actions {\n    top: max(16px, env(safe-area-inset-top));\n    transform: translateX(-50%);\n  }''')
+          p.write_text(s)
+          PY
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add src/features/game/PlayerCard.tsx src/app/app-router.tsx src/ui/i18n.tsx src/features/game/GameScreen.tsx src/features/game/game-controls.css
+          git commit -m "fix(game): finalize player navigation and controls" || exit 0
+          git push
