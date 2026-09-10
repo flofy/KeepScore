@@ -43,18 +43,17 @@ export function GameScreen({
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
   const [draftDelta, setDraftDelta] = useState("");
   const [swapped, setSwapped] = useState(false);
-  const [playerRotations, setPlayerRotations] = useState<Record<string, number>>(
-    {},
-  );
+  const [playerRotations, setPlayerRotations] = useState<
+    Record<string, number>
+  >({});
   const [fullscreen, setFullscreen] = useState(
     () => localStorage.getItem("keepscore-fullscreen") === "1",
   );
   const [menuOpen, setMenuOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
-  const [historyGrouping, setHistoryGrouping] = useState<HistoryGrouping>(
-    "round",
-  );
+  const [historyGrouping, setHistoryGrouping] =
+    useState<HistoryGrouping>("round");
   const isDuo = game.players.length === 2;
   const orderedPlayers =
     isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
