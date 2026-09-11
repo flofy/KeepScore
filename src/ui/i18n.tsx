@@ -19,6 +19,9 @@ export type TranslationKey =
   | "playerNumber"
   | "playerName"
   | "removePlayer"
+  | "removePlayersHint"
+  | "done"
+  | "playersPlural"
   | "colorForPlayer"
   | "setupTagline"
   | "undo"
@@ -112,6 +115,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerNumber: "Player",
     playerName: "name",
     removePlayer: "Remove player",
+    removePlayersHint: "Tap a player card to remove it",
+    done: "Done",
+    playersPlural: "players",
     colorForPlayer: "Color for player",
     setupTagline: "Set up your players, then let the score battle begin.",
     undo: "Undo",
@@ -205,6 +211,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerNumber: "Joueur",
     playerName: "nom",
     removePlayer: "Retirer le joueur",
+    removePlayersHint: "Touchez une carte pour retirer le joueur",
+    done: "Terminer",
+    playersPlural: "joueurs",
     colorForPlayer: "Couleur du joueur",
     setupTagline:
       "Configurez vos joueurs, puis que la bataille des scores commence.",

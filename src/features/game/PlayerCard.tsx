@@ -38,6 +38,10 @@ type PlayerCardProps = {
   deltas: number[];
   rotation?: number;
   lastDelta?: number;
+  removeMode?: boolean;
+  canRemove?: boolean;
+  tilt?: "a" | "b";
+  onRemove?: () => void;
   onRename: (name: string) => void;
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
@@ -50,6 +54,10 @@ export function PlayerCard({
   deltas,
   rotation = 0,
   lastDelta,
+  removeMode = false,
+  canRemove = true,
+  tilt,
+  onRemove,
   onRename,
   onDelta,
   onQuickDelta,
@@ -85,6 +93,7 @@ export function PlayerCard({
     event: ReactPointerEvent<HTMLElement>,
     sign?: "positive" | "negative",
   ) => {
+    if (removeMode) return;
     event.stopPropagation();
     longPressOrigin.current = { x: event.clientX, y: event.clientY };
     longPressTimer.current = window.setTimeout(() => {
@@ -234,7 +243,13 @@ export function PlayerCard({
 
   return (
     <article
-      className={rotation ? `player-card rotated-${rotation}` : "player-card"}
+      className={
+        removeMode
+          ? `player-card remove-mode${tilt ? ` tilt-${tilt}` : ""}`
+          : rotation
+            ? `player-card rotated-${rotation}`
+            : "player-card"
+      }
       style={
         {
           "--player-color": player.color ?? "#38bdf8",
@@ -251,7 +266,21 @@ export function PlayerCard({
         clearLongPress();
       }}
     >
-      {onFlip && (
+      {removeMode && (
+        <button
+          type="button"
+          className="remove-badge"
+          onClick={(event) => {
+            event.stopPropagation();
+            onRemove?.();
+          }}
+          disabled={!canRemove}
+          aria-label={`${t("removePlayer")} — ${player.name}`}
+        >
+          ✕
+        </button>
+      )}
+      {onFlip && !removeMode && (
         <button
           type="button"
           className="card-flip-btn"

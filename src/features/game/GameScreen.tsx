@@ -52,6 +52,7 @@ export function GameScreen({
     () => localStorage.getItem("keepscore-fullscreen") === "1",
   );
   const [menuOpen, setMenuOpen] = useState(false);
+  const [removeMode, setRemoveMode] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
   const [historyGrouping, setHistoryGrouping] =
@@ -276,6 +277,18 @@ export function GameScreen({
   return (
     <>
       <main className={fullscreen ? "app-shell fullscreen" : "app-shell"}>
+        {removeMode && (
+          <div className="remove-mode-banner" role="status">
+            <span className="remove-mode-hint">{t("removePlayersHint")}</span>
+            <button
+              className="remove-mode-done"
+              type="button"
+              onClick={() => setRemoveMode(false)}
+            >
+              {t("done")}
+            </button>
+          </div>
+        )}
         <header className="app-header game-header">
           <div>
             <p className="eyebrow">SCORE KEEPER</p>
@@ -355,11 +368,13 @@ export function GameScreen({
         </div>
         <section
           className={
-            isDuo
-              ? "players duo"
-              : game.players.length >= 4
-                ? "players crowded"
-                : "players"
+            removeMode
+              ? "players remove-mode"
+              : isDuo
+                ? "players duo"
+                : game.players.length >= 4
+                  ? "players crowded"
+                  : "players"
           }
           style={
             (!isDuo &&
@@ -373,7 +388,7 @@ export function GameScreen({
           }
           aria-label={t("players")}
         >
-          {orderedPlayers.map((player) => {
+          {orderedPlayers.map((player, index) => {
             const rotation = playerRotations[player.id] ?? 0;
             return (
               <PlayerCard
@@ -386,6 +401,14 @@ export function GameScreen({
                 deltas={recentDeltasFor(player.id)}
                 rotation={rotation}
                 lastDelta={lastDeltaFor(player.id)}
+                removeMode={removeMode}
+                canRemove={game.players.length > 1}
+                tilt={removeMode ? (index % 2 === 0 ? "a" : "b") : undefined}
+                onRemove={() => {
+                  dispatch({ type: "REMOVE_PLAYER", playerId: player.id });
+                  haptic();
+                  if (game.players.length <= 2) setRemoveMode(false);
+                }}
                 onRename={(name) =>
                   dispatch({ type: "RENAME_PLAYER", playerId: player.id, name })
                 }
@@ -513,36 +536,33 @@ export function GameScreen({
               </button>
             </div>
             <div className="menu-separator" />
-            <div className="menu-row">
+            <div className="menu-row player-count-row">
               <button
-                className="menu-item"
+                className="menu-stepper-btn"
                 type="button"
+                aria-label={t("addPlayerMenuItem")}
                 onClick={() => {
                   dispatch({ type: "ADD_PLAYER" });
                   haptic();
-                  setMenuOpen(false);
                 }}
               >
-                <span className="menu-icon">➕</span>
-                {t("addPlayerMenuItem")}
+                +
               </button>
+              <span className="menu-stepper-count">
+                {game.players.length} {t("playersPlural")}
+              </span>
               <button
-                className="menu-item"
+                className="menu-stepper-btn"
                 type="button"
+                aria-label={t("removePlayer")}
                 disabled={game.players.length <= 1}
                 onClick={() => {
-                  const lastPlayer = game.players[game.players.length - 1];
-                  if (!lastPlayer) return;
-                  dispatch({
-                    type: "REMOVE_PLAYER",
-                    playerId: lastPlayer.id,
-                  });
                   haptic();
                   setMenuOpen(false);
+                  setRemoveMode(true);
                 }}
               >
-                <span className="menu-icon">➖</span>
-                {t("removePlayer")}
+                −
               </button>
             </div>
             <button

@@ -132,73 +132,6 @@
   transform: scale(0.985);
 }
 
-.menu-drawer {
-  width: min(390px, 100%);
-  height: 100%;
-  margin-left: auto;
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 6px;
-  padding: max(72px, calc(env(safe-area-inset-top) + 56px)) 20px
-    max(28px, env(safe-area-inset-bottom));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border-left: 1px solid rgb(255 255 255 / 10%);
-  background: linear-gradient(180deg, rgb(15 23 42 / 98%), rgb(8 12 24 / 99%));
-  box-shadow: -24px 0 60px rgb(0 0 0 / 35%);
-  animation: menu-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.menu-drawer .menu-item,
-.menu-drawer .install-menu-button {
-  max-width: none;
-}
-
-.menu-drawer .menu-item {
-  min-height: 50px;
-  padding: 0 16px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 650;
-}
-
-.menu-drawer .menu-item:hover:not(:disabled) {
-  background: rgb(255 255 255 / 5%);
-}
-
-.menu-drawer .menu-separator {
-  max-width: none;
-  margin: 3px 0;
-  background: rgb(255 255 255 / 7%);
-}
-
-.menu-drawer .menu-row {
-  max-width: none;
-}
-
-.menu-drawer .menu-item.lang {
-  min-height: 46px;
-  text-align: center;
-  font-size: 15px;
-}
-
-.menu-drawer .install-menu-button {
-  min-height: 50px;
-  background: rgb(125 211 252 / 7%);
-}
-
-@keyframes menu-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes install-notice-in {
   from {
     opacity: 0;
@@ -219,9 +152,5 @@
   .install-notice-action span,
   .update-notice-action span {
     white-space: nowrap;
-  }
-
-  .menu-drawer {
-    width: min(360px, 100%);
   }
 }
