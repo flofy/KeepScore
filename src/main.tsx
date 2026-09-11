@@ -12,7 +12,10 @@ import { App } from "./app/App";
 import { AppProviders } from "./app/providers";
 import { UpdateButton } from "./ui/UpdateButton";
 
-if ("serviceWorker" in navigator) {
+// The service worker powers the installed-PWA offline shell in production.
+// It must never register in development: its cache-first fetch handler would
+// serve stale Vite modules and hide every new change until the cache is cleared.
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
