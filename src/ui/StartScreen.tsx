@@ -1,28 +1,14 @@
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { useI18n } from "./i18n";
-import { SavedGamesList } from "./SavedGames";
-import { localGameRepository } from "../infrastructure/persistence/gameRepository";
-import type { Game } from "../domain/game/types";
 
 type Props = {
   onNewGame: () => void;
   onChwatzi: () => void;
   onSavedGames: () => void;
-  onResumeGame: (gameId: string) => void;
 };
 
-export function StartScreen({
-  onNewGame,
-  onChwatzi,
-  onSavedGames,
-  onResumeGame,
-}: Props) {
+export function StartScreen({ onNewGame, onChwatzi, onSavedGames }: Props) {
   const { t } = useI18n();
-  const [games, setGames] = useState<Game[]>(() => localGameRepository.list());
-
-  const refreshGames = useCallback(() => {
-    setGames(localGameRepository.list());
-  }, []);
 
   const handleChwatzi = useCallback(() => {
     onChwatzi();
@@ -68,33 +54,16 @@ export function StartScreen({
             </button>
           </div>
 
-          {games.length === 0 && (
-            <button
-              type="button"
-              className="start-option-btn secondary"
-              onClick={onSavedGames}
-            >
-              <span className="option-icon">💾</span>
-              <span className="option-label">{t("savedGames")}</span>
-              <span className="option-desc">{t("viewSavedGames")}</span>
-            </button>
-          )}
+          <button
+            type="button"
+            className="start-option-btn secondary"
+            onClick={onSavedGames}
+          >
+            <span className="option-icon">💾</span>
+            <span className="option-label">{t("savedGames")}</span>
+            <span className="option-desc">{t("viewSavedGames")}</span>
+          </button>
         </div>
-
-        {games.length > 0 && (
-          <div className="home-saved-games">
-            <h2 className="home-saved-games-title">{t("savedGames")}</h2>
-            <SavedGamesList
-              games={games}
-              onResume={(game) => onResumeGame(game.id)}
-              onDelete={(id) => {
-                localGameRepository.remove(id);
-                refreshGames();
-              }}
-              compact
-            />
-          </div>
-        )}
       </div>
     </main>
   );

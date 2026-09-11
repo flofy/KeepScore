@@ -20,7 +20,7 @@ export const router = createAppRouter({
     </RouteShell>
   ),
   chwatzi: (
-    <RouteShell close>
+    <RouteShell showBack={false}>
       <ChwatziRoute />
     </RouteShell>
   ),
@@ -30,7 +30,7 @@ export const router = createAppRouter({
     </RouteShell>
   ),
   saved: (
-    <RouteShell>
+    <RouteShell showBack={false}>
       <SavedGamesRoute />
     </RouteShell>
   ),

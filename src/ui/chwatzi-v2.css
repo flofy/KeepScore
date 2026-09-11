@@ -177,18 +177,17 @@
   border-radius: 0;
   background: transparent;
   backdrop-filter: none;
-  color: #f8fafc;
-  font-size: 18px;
-  font-weight: 700;
+  color: #94a3b8;
+  font-size: 22px;
+  font-weight: 400;
   cursor: pointer;
   display: grid;
   place-items: center;
-  box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
-  transition: background 0.15s ease;
+  transition: color 0.15s ease;
 }
 
 .chwatzi-v2-close:hover {
-  background: rgb(30 41 59 / 96%);
+  color: #f8fafc;
 }
 
 .chwatzi-v2-close:active {
