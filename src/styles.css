@@ -265,16 +265,6 @@ h2 {
   gap: 10px;
 }
 
-@media (max-width: 700px) {
-  .app-shell:has(.players.duo) .quick-actions {
-    top: 50%;
-    right: auto;
-    bottom: auto;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
-
 .score-row {
   flex: 1 1 auto;
   display: grid;
@@ -503,9 +493,6 @@ h2 {
 .player-card.rotated-180 .card-content {
   transform: rotate(180deg);
 }
-.player-card.rotated-180 .score-tooltip {
-  transform: translate(-50%, -100%) rotate(180deg);
-}
 .player-card.rotated-180 .card-flip-btn {
   top: auto;
   bottom: 10px;
@@ -616,6 +603,19 @@ h2 {
 }
 .app-shell.fullscreen .quick-actions:hover {
   opacity: 1;
+}
+
+/* On mobile fullscreen, keep the controls centered mid-screen for easy reach. */
+@media (max-width: 700px) {
+  .app-shell.fullscreen .quick-actions {
+    top: 50%;
+    right: auto;
+    bottom: auto;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    flex-direction: column;
+    gap: 10px;
+  }
 }
 .burger-button,
 .icon-fab {
@@ -834,6 +834,61 @@ h2 {
 }
 .menu-close:hover {
   color: #f8fafc;
+}
+
+/* Icone uniforme pour tous les items du menu */
+.menu-icon {
+  font-size: 20px;
+  display: inline-block;
+  margin-right: 8px;
+  user-select: none;
+}
+
+/* In fullscreen, expand the menu to fill the screen */
+html:fullscreen .menu-drawer {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  padding: 80px 24px 40px;
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+html:fullscreen .menu-drawer .menu-item {
+  max-width: none;
+  padding: 0 24px;
+}
+
+html:fullscreen .menu-drawer .menu-separator {
+  max-width: none;
+}
+
+html:fullscreen .menu-drawer .menu-row {
+  max-width: none;
+}
+
+@media (display-mode: fullscreen) {
+  .menu-drawer {
+    max-width: none;
+    width: 100%;
+    height: 100%;
+    padding: 80px 24px 40px;
+    justify-content: flex-start;
+    gap: 4px;
+  }
+
+  .menu-drawer .menu-item {
+    max-width: none;
+    padding: 0 24px;
+  }
+
+  .menu-drawer .menu-separator {
+    max-width: none;
+  }
+
+  .menu-drawer .menu-row {
+    max-width: none;
+  }
 }
 
 .history-fullscreen {

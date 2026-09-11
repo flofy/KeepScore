@@ -293,7 +293,7 @@ export function GameScreen({
             <InstallButton variant="header" />
           </div>
         </header>
-        <div className="quick-actions">
+        <div className={isDuo ? "quick-actions duo" : "quick-actions"}>
           {isDuo && (
             <button
               className="icon-fab"
@@ -471,9 +471,9 @@ export function GameScreen({
                 onHome();
               }}
             >
-              ⌂ {t("home")}
+              <span className="menu-icon">🏠</span>
+              {t("home")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -482,7 +482,8 @@ export function GameScreen({
                 setMenuOpen(false);
               }}
             >
-              🕘 {t("history")}
+              <span className="menu-icon">🕘</span>
+              {t("history")}
             </button>
             <div className="menu-separator" />
             <div className="menu-row">
@@ -495,7 +496,8 @@ export function GameScreen({
                 }}
                 disabled={!past.length}
               >
-                ↩ {t("undo")}
+                <span className="menu-icon">↩</span>
+                {t("undo")}
               </button>
               <button
                 className="menu-item"
@@ -506,7 +508,8 @@ export function GameScreen({
                 }}
                 disabled={!future.length}
               >
-                ↪ {t("redo")}
+                <span className="menu-icon">↪</span>
+                {t("redo")}
               </button>
             </div>
             <div className="menu-separator" />
@@ -519,9 +522,9 @@ export function GameScreen({
                 setMenuOpen(false);
               }}
             >
+              <span className="menu-icon">➕</span>
               {t("addPlayerMenuItem")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -530,9 +533,9 @@ export function GameScreen({
                 onSavedGames();
               }}
             >
-              💾 {t("savedGames")}
+              <span className="menu-icon">💾</span>
+              {t("savedGames")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -541,9 +544,9 @@ export function GameScreen({
                 onNewGame();
               }}
             >
+              <span className="menu-icon">🎮</span>
               {t("newGameMenuItem")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -552,11 +555,11 @@ export function GameScreen({
                 onChwatzi();
               }}
             >
-              🎲 {t("whoStarts")}
+              <span className="menu-icon">🎲</span>
+              {t("whoStarts")}
             </button>
             <div className="menu-separator" />
             <InstallButton variant="menu" />
-            <div className="menu-separator" />
             <div className="menu-row lang-row">
               <button
                 type="button"
@@ -565,7 +568,8 @@ export function GameScreen({
                 }
                 onClick={() => setLang("fr")}
               >
-                🇫🇷 Français
+                <span className="menu-icon">🇫🇷</span>
+                Français
               </button>
               <button
                 type="button"
@@ -574,7 +578,8 @@ export function GameScreen({
                 }
                 onClick={() => setLang("en")}
               >
-                🇬🇧 English
+                <span className="menu-icon">🇬🇧</span>
+                English
               </button>
             </div>
           </nav>

@@ -166,23 +166,50 @@
   width: 100%;
 }
 
-/* Temporary A/B toggle to compare Chwatzi V1 and V2 screens */
-.chwatzi-version-toggle {
-  position: fixed;
+.chwatzi-v2-close {
+  position: absolute;
   top: calc(14px + env(safe-area-inset-top));
   right: 14px;
-  z-index: 100;
-  padding: 10px 16px;
-  border: 1px solid rgb(255 255 255 / 25%);
-  border-radius: 12px;
-  background: rgb(15 23 42 / 88%);
-  color: #7dd3fc;
+  z-index: 60;
+  width: 44px;
+  height: 44px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  color: #f8fafc;
+  font-size: 18px;
   font-weight: 700;
-  font-size: 14px;
   cursor: pointer;
+  display: grid;
+  place-items: center;
   box-shadow: 0 8px 24px rgb(0 0 0 / 35%);
+  transition: background 0.15s ease;
 }
 
-.chwatzi-version-toggle:hover {
+.chwatzi-v2-close:hover {
   background: rgb(30 41 59 / 96%);
+}
+
+.chwatzi-v2-close:active {
+  transform: scale(0.95);
+}
+
+/* In fullscreen / installed-PWA fullscreen, recenter the controls around the middle of the screen. */
+html:fullscreen .chwatzi-v2-close {
+  top: auto;
+  right: auto;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@media (display-mode: fullscreen) {
+  .chwatzi-v2-close {
+    top: auto;
+    right: auto;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
 }

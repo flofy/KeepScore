@@ -5,8 +5,6 @@ import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
 import { SavedGames } from "../ui/SavedGames";
-import { ChwatziScreen } from "../ui/ChwatziScreen";
-import { createTempGame } from "../features/chwatzi/createTempGame";
 import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
@@ -53,6 +51,7 @@ export function StartScreenRoute() {
     <StartScreen
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
+      onSavedGames={() => navigate("/saved")}
     />
   );
 }
@@ -71,39 +70,8 @@ export function GameSetupRoute() {
 
 export function ChwatziRoute() {
   const navigate = useNavigate();
-  const [version, setVersion] = useState<1 | 2>(2);
 
-  return (
-    <>
-      {version === 2 ? (
-        <>
-          <ChwatziScreenV2 onBack={() => navigate(-1)} />
-          <button
-            type="button"
-            className="chwatzi-version-toggle"
-            onClick={() => setVersion(1)}
-          >
-            Tester V1
-          </button>
-        </>
-      ) : (
-        <>
-          <ChwatziScreen
-            game={createTempGame(2)}
-            onSelect={() => navigate("/")}
-            onBack={() => navigate(-1)}
-          />
-          <button
-            type="button"
-            className="chwatzi-version-toggle"
-            onClick={() => setVersion(2)}
-          >
-            Tester V2
-          </button>
-        </>
-      )}
-    </>
-  );
+  return <ChwatziScreenV2 onBack={() => navigate(-1)} />;
 }
 
 export function GameRoute() {
@@ -145,6 +113,7 @@ export function SavedGamesRoute() {
         localGameRepository.remove(id);
         refresh();
       }}
+      onClose={() => navigate(-1)}
     />
   );
 }

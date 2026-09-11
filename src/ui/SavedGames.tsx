@@ -5,12 +5,31 @@ interface SavedGamesProps {
   games: Game[];
   onResume: (game: Game) => void;
   onDelete: (id: string) => void;
+  onClose?: () => void;
 }
 
-export function SavedGames({ games, onResume, onDelete }: SavedGamesProps) {
+export function SavedGames({
+  games,
+  onResume,
+  onDelete,
+  onClose,
+}: SavedGamesProps) {
   const { t } = useI18n();
   return (
-    <>
+    <div className="saved-games-container">
+      <header className="saved-games-header">
+        <h2 className="saved-games-title">{t("savedGames")}</h2>
+        {onClose && (
+          <button
+            type="button"
+            className="saved-games-close"
+            onClick={onClose}
+            aria-label={t("close")}
+          >
+            ✕
+          </button>
+        )}
+      </header>
       {games.length === 0 ? (
         <section className="history">
           <p className="empty-state">{t("noSavedGames")}</p>
@@ -47,6 +66,6 @@ export function SavedGames({ games, onResume, onDelete }: SavedGamesProps) {
           ))}
         </section>
       )}
-    </>
+    </div>
   );
 }
