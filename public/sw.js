@@ -1,4 +1,4 @@
-const CACHE = "keepscore-v2";
+const CACHE = "keepscore-__BUILD_ID__";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -12,7 +12,12 @@ self.addEventListener("install", (event) => {
         ]),
       ),
   );
-  self.skipWaiting();
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
@@ -24,8 +29,7 @@ self.addEventListener("activate", (event) => {
           keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)),
         ),
       )
-      .then(() => self.clients.claim())
-      .then(() => self.registration.update()),
+      .then(() => self.clients.claim()),
   );
 });
 
@@ -52,6 +56,25 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return;
+
+  const isUpdateSensitive =
+    url.pathname.endsWith("/sw.js") ||
+    url.pathname.endsWith("/manifest.webmanifest");
+
+  if (isUpdateSensitive) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && !url.pathname.endsWith("/sw.js")) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {

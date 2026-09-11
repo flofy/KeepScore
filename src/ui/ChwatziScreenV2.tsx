@@ -262,6 +262,18 @@ export function ChwatziScreenV2({ onBack }: Props) {
         onPointerUp={handlePointerUp}
         onPointerCancel={handlePointerUp}
       >
+        {onBack && (
+          <button
+            type="button"
+            className="chwatzi-v2-close"
+            onClick={onBack}
+            onPointerDown={(event) => event.stopPropagation()}
+            aria-label={t("close")}
+          >
+            ✕
+          </button>
+        )}
+
         {phase === "counting" && (
           <div className="chwatzi-v2-countdown" aria-live="assertive">
             {countdown}

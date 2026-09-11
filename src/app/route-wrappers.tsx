@@ -10,7 +10,7 @@ import { localGameRepository } from "../infrastructure/persistence/gameRepositor
 import { useI18n } from "../ui/i18n";
 import { GameScreen } from "../features/game/GameScreen";
 
-function BackButton() {
+function BackButton({ close = false }: { close?: boolean }) {
   const { t } = useI18n();
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,12 +18,12 @@ function BackButton() {
 
   return (
     <button
-      className="back-button"
+      className={close ? "back-button close-button" : "back-button"}
       type="button"
-      onClick={() => navigate(-1)}
-      aria-label={t("back")}
+      onClick={() => (close ? navigate("/") : navigate(-1))}
+      aria-label={close ? t("close") : t("back")}
     >
-      ←
+      {close ? "✕" : "←"}
     </button>
   );
 }
@@ -31,13 +31,15 @@ function BackButton() {
 export function RouteShell({
   children,
   showBack = true,
+  close = false,
 }: {
   children: ReactNode;
   showBack?: boolean;
+  close?: boolean;
 }) {
   return (
     <div className="route-shell">
-      {showBack && <BackButton />}
+      {showBack && <BackButton close={close} />}
       {children}
     </div>
   );
@@ -49,6 +51,7 @@ export function StartScreenRoute() {
     <StartScreen
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
+      onSavedGames={() => navigate("/saved")}
     />
   );
 }
@@ -89,6 +92,7 @@ export function GameRoute() {
       onNewGame={() => navigate("/setup")}
       onSavedGames={() => navigate("/saved")}
       onChwatzi={() => navigate("/chwatzi")}
+      onHome={() => navigate("/")}
     />
   );
 }
@@ -109,6 +113,7 @@ export function SavedGamesRoute() {
         localGameRepository.remove(id);
         refresh();
       }}
+      onClose={() => navigate(-1)}
     />
   );
 }

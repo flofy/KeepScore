@@ -106,7 +106,18 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
-/* Chwatzi option with player count selector */
+/* Secondary variant for less prominent actions */
+.start-option-btn.secondary {
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.start-option-btn.secondary:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Chwatzi option */
 .chwatzi-option {
   display: flex;
   flex-direction: column;
@@ -120,85 +131,6 @@
 .chwatzi-btn:hover {
   border-color: rgba(56, 189, 248, 0.6);
   background: rgba(56, 189, 248, 0.15);
-}
-
-/* Player count selector */
-.player-count-selector {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 12px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.count-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.05);
-  color: #f8fafc;
-  font-size: 20px;
-  font-weight: 600;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.count-btn:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-.count-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.count-value {
-  min-width: 30px;
-  font-size: 18px;
-  font-weight: 700;
-  color: #f8fafc;
-  text-align: center;
-}
-
-.count-slider {
-  flex: 1;
-  max-width: 120px;
-  -webkit-appearance: none;
-  appearance: none;
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(255, 255, 255, 0.15);
-  outline: none;
-  cursor: pointer;
-}
-
-.count-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #38bdf8;
-  cursor: pointer;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
-}
-
-.count-slider::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #38bdf8;
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 0 8px rgba(56, 189, 248, 0.5);
 }
 
 /* Responsive */
@@ -221,21 +153,6 @@
   }
 
   .option-label {
-    font-size: 16px;
-  }
-
-  .player-count-selector {
-    padding: 10px 16px;
-    gap: 10px;
-  }
-
-  .count-btn {
-    width: 32px;
-    height: 32px;
-    font-size: 18px;
-  }
-
-  .count-value {
     font-size: 16px;
   }
 }

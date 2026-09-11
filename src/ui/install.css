@@ -7,7 +7,8 @@
   flex: 0 0 auto;
 }
 
-.install-notice {
+.install-notice,
+.update-notice {
   display: flex;
   align-items: center;
   gap: 2px;
@@ -21,7 +22,15 @@
   animation: install-notice-in 0.22s ease;
 }
 
-.install-notice-action {
+.update-notice {
+  position: fixed;
+  top: max(14px, env(safe-area-inset-top));
+  right: 14px;
+  z-index: 500;
+}
+
+.install-notice-action,
+.update-notice-action {
   display: inline-flex;
   align-items: center;
   gap: 7px;
@@ -42,16 +51,24 @@
     transform 0.1s ease;
 }
 
-.install-notice-action:hover {
+.install-notice-action:hover,
+.update-notice-action:hover:not(:disabled) {
   background: rgb(125 211 252 / 18%);
   color: #fff;
 }
 
-.install-notice-action:active {
+.install-notice-action:active,
+.update-notice-action:active:not(:disabled) {
   transform: scale(0.97);
 }
 
-.install-icon {
+.update-notice-action:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.install-icon,
+.update-icon {
   display: block;
   width: 16px;
   height: 16px;
@@ -115,73 +132,6 @@
   transform: scale(0.985);
 }
 
-.menu-drawer {
-  width: min(390px, 100%);
-  height: 100%;
-  margin-left: auto;
-  justify-content: flex-start;
-  align-items: stretch;
-  gap: 6px;
-  padding: max(72px, calc(env(safe-area-inset-top) + 56px)) 20px
-    max(28px, env(safe-area-inset-bottom));
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  border-left: 1px solid rgb(255 255 255 / 10%);
-  background: linear-gradient(180deg, rgb(15 23 42 / 98%), rgb(8 12 24 / 99%));
-  box-shadow: -24px 0 60px rgb(0 0 0 / 35%);
-  animation: menu-slide-in 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-.menu-drawer .menu-item,
-.menu-drawer .install-menu-button {
-  max-width: none;
-}
-
-.menu-drawer .menu-item {
-  min-height: 50px;
-  padding: 0 16px;
-  border-radius: 12px;
-  text-align: left;
-  font-size: 16px;
-  font-weight: 650;
-}
-
-.menu-drawer .menu-item:hover:not(:disabled) {
-  background: rgb(255 255 255 / 5%);
-}
-
-.menu-drawer .menu-separator {
-  max-width: none;
-  margin: 3px 0;
-  background: rgb(255 255 255 / 7%);
-}
-
-.menu-drawer .menu-row {
-  max-width: none;
-}
-
-.menu-drawer .menu-item.lang {
-  min-height: 46px;
-  text-align: center;
-  font-size: 15px;
-}
-
-.menu-drawer .install-menu-button {
-  min-height: 50px;
-  background: rgb(125 211 252 / 7%);
-}
-
-@keyframes menu-slide-in {
-  from {
-    opacity: 0;
-    transform: translateX(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 @keyframes install-notice-in {
   from {
     opacity: 0;
@@ -194,15 +144,13 @@
 }
 
 @media (max-width: 620px) {
-  .install-notice {
+  .install-notice,
+  .update-notice {
     max-width: calc(100vw - 96px);
   }
 
-  .install-notice-action span {
+  .install-notice-action span,
+  .update-notice-action span {
     white-space: nowrap;
-  }
-
-  .menu-drawer {
-    width: min(360px, 100%);
   }
 }

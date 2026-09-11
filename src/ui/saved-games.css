@@ -2,6 +2,49 @@
   display: grid;
   gap: 12px;
 }
+
+.saved-games-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.saved-games-title {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: -0.02em;
+}
+
+.saved-games-close {
+  position: static;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #94a3b8;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.saved-games-close:hover {
+  color: #f8fafc;
+}
+
+.saved-games-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 80px 20px 20px;
+  min-height: 100vh;
+  gap: 16px;
+}
+
 .saved-game {
   display: flex;
   align-items: center;
@@ -14,16 +57,19 @@
   backdrop-filter: blur(14px);
   box-shadow: 0 8px 30px rgb(0 0 0 / 18%);
 }
+
 .saved-game h2 {
   margin: 0 0 6px;
   font-size: 20px;
   color: #f8fafc;
   letter-spacing: -0.01em;
 }
+
 .saved-game p {
   margin: 0;
   color: #94a3b8;
 }
+
 @media (max-width: 560px) {
   .saved-game {
     align-items: stretch;

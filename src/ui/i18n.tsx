@@ -19,6 +19,9 @@ export type TranslationKey =
   | "playerNumber"
   | "playerName"
   | "removePlayer"
+  | "removePlayersHint"
+  | "done"
+  | "playersPlural"
   | "colorForPlayer"
   | "setupTagline"
   | "undo"
@@ -41,9 +44,12 @@ export type TranslationKey =
   | "resume"
   | "untitledGame"
   | "noSavedGames"
+  | "viewSavedGames"
   | "export"
   | "import"
   | "back"
+  | "close"
+  | "home"
   | "menu"
   | "closeMenu"
   | "fullscreen"
@@ -55,6 +61,8 @@ export type TranslationKey =
   | "setScore"
   | "install"
   | "dismissInstall"
+  | "update"
+  | "updating"
   | "importError"
   | "genericImportError"
   | "removeHistoryEntry"
@@ -83,7 +91,11 @@ export type TranslationKey =
   | "tryAgain"
   | "startNewGame"
   | "startChwatzi"
-  | "or";
+  | "or"
+  | "errorTitle"
+  | "errorMessage"
+  | "errorUnknown"
+  | "errorReload";
 
 const translations: Record<Lang, Record<TranslationKey, string>> = {
   en: {
@@ -103,6 +115,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerNumber: "Player",
     playerName: "name",
     removePlayer: "Remove player",
+    removePlayersHint: "Tap a player card to remove it",
+    done: "Done",
+    playersPlural: "players",
     colorForPlayer: "Color for player",
     setupTagline: "Set up your players, then let the score battle begin.",
     undo: "Undo",
@@ -125,9 +140,12 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     resume: "Resume",
     untitledGame: "Untitled game",
     noSavedGames: "No saved games yet.",
+    viewSavedGames: "View saved games",
     export: "Export",
     import: "Import",
     back: "Back",
+    close: "Close",
+    home: "Home",
     menu: "Open menu",
     closeMenu: "Close",
     fullscreen: "Fullscreen",
@@ -136,6 +154,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     newGameMenuItem: "New game",
     install: "Install app",
     dismissInstall: "Dismiss install prompt",
+    update: "Update app",
+    updating: "Updating…",
     importError: "The selected file is not a valid KeepScore export.",
     genericImportError: "Unable to import this file.",
     swapPlayers: "Swap player positions",
@@ -168,6 +188,11 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startNewGame: "Start a new game",
     startChwatzi: "Pick a random starter",
     or: "or",
+    errorTitle: "Something went wrong",
+    errorMessage:
+      "An unexpected error occurred. Your scores are saved — you can safely return home.",
+    errorUnknown: "Unknown error",
+    errorReload: "Reload",
   },
   fr: {
     appName: "KeepScore",
@@ -186,6 +211,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerNumber: "Joueur",
     playerName: "nom",
     removePlayer: "Retirer le joueur",
+    removePlayersHint: "Touchez une carte pour retirer le joueur",
+    done: "Terminer",
+    playersPlural: "joueurs",
     colorForPlayer: "Couleur du joueur",
     setupTagline:
       "Configurez vos joueurs, puis que la bataille des scores commence.",
@@ -209,9 +237,12 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     resume: "Reprendre",
     untitledGame: "Partie sans nom",
     noSavedGames: "Aucune partie sauvegardee.",
+    viewSavedGames: "Voir les parties sauvegardees",
     export: "Exporter",
     import: "Importer",
     back: "Retour",
+    close: "Fermer",
+    home: "Accueil",
     menu: "Ouvrir le menu",
     closeMenu: "Fermer",
     fullscreen: "Plein ecran",
@@ -220,6 +251,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     newGameMenuItem: "Nouvelle partie",
     install: "Installer l app",
     dismissInstall: "Masquer la suggestion d installation",
+    update: "Mettre a jour",
+    updating: "Mise a jour…",
     importError: "Le fichier selectionne n est pas un export KeepScore valide.",
     genericImportError: "Impossible d importer ce fichier.",
     swapPlayers: "Echanger la position des joueurs",
@@ -252,6 +285,11 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startNewGame: "Demarrer une nouvelle partie",
     startChwatzi: "Lancer Chwatzi",
     or: "ou",
+    errorTitle: "Une erreur est survenue",
+    errorMessage:
+      "Une erreur inattendue s est produite. Vos scores sont sauvegardes — vous pouvez revenir a l accueil sans risque.",
+    errorUnknown: "Erreur inconnue",
+    errorReload: "Recharger",
   },
 };
 

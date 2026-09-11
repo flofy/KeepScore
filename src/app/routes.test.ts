@@ -8,8 +8,8 @@ describe("application routes", () => {
     expect(routes.saved()).toBe("/saved");
   });
 
-  it("builds Chwatzi route with player count", () => {
-    expect(routes.chwatzi(4)).toBe("/chwatzi?players=4");
+  it("builds Chwatzi route", () => {
+    expect(routes.chwatzi()).toBe("/chwatzi");
   });
 
   it("encodes game ids safely", () => {

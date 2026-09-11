@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
 import { routes } from "./routes";
+import { RouteErrorBoundary } from "./RouteErrorBoundary";
 
 type RouteComponents = {
   home: ReactElement;
@@ -14,11 +15,31 @@ export function createAppRouteObjects(
   components: RouteComponents,
 ): RouteObject[] {
   return [
-    { path: routes.home(), element: components.home },
-    { path: routes.setup(), element: components.setup },
-    { path: "/chwatzi", element: components.chwatzi },
-    { path: "/game", element: components.game },
-    { path: routes.saved(), element: components.saved },
+    {
+      path: routes.home(),
+      element: components.home,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: routes.setup(),
+      element: components.setup,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: "/chwatzi",
+      element: components.chwatzi,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: "/game",
+      element: components.game,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: routes.saved(),
+      element: components.saved,
+      errorElement: <RouteErrorBoundary />,
+    },
   ];
 }
 

@@ -25,11 +25,13 @@ export function GameScreen({
   onNewGame,
   onSavedGames,
   onChwatzi,
+  onHome,
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
   onChwatzi: () => void;
+  onHome: () => void;
 }) {
   const {
     present: game,
@@ -50,6 +52,7 @@ export function GameScreen({
     () => localStorage.getItem("keepscore-fullscreen") === "1",
   );
   const [menuOpen, setMenuOpen] = useState(false);
+  const [removeMode, setRemoveMode] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
   const [historyGrouping, setHistoryGrouping] =
@@ -274,6 +277,18 @@ export function GameScreen({
   return (
     <>
       <main className={fullscreen ? "app-shell fullscreen" : "app-shell"}>
+        {removeMode && (
+          <div className="remove-mode-banner" role="status">
+            <span className="remove-mode-hint">{t("removePlayersHint")}</span>
+            <button
+              className="remove-mode-done"
+              type="button"
+              onClick={() => setRemoveMode(false)}
+            >
+              {t("done")}
+            </button>
+          </div>
+        )}
         <header className="app-header game-header">
           <div>
             <p className="eyebrow">SCORE KEEPER</p>
@@ -291,7 +306,7 @@ export function GameScreen({
             <InstallButton variant="header" />
           </div>
         </header>
-        <div className="quick-actions">
+        <div className={isDuo ? "quick-actions duo" : "quick-actions"}>
           {isDuo && (
             <button
               className="icon-fab"
@@ -353,11 +368,13 @@ export function GameScreen({
         </div>
         <section
           className={
-            isDuo
-              ? "players duo"
-              : game.players.length >= 4
-                ? "players crowded"
-                : "players"
+            removeMode
+              ? "players remove-mode"
+              : isDuo
+                ? "players duo"
+                : game.players.length >= 4
+                  ? "players crowded"
+                  : "players"
           }
           style={
             (!isDuo &&
@@ -371,7 +388,7 @@ export function GameScreen({
           }
           aria-label={t("players")}
         >
-          {orderedPlayers.map((player) => {
+          {orderedPlayers.map((player, index) => {
             const rotation = playerRotations[player.id] ?? 0;
             return (
               <PlayerCard
@@ -384,6 +401,14 @@ export function GameScreen({
                 deltas={recentDeltasFor(player.id)}
                 rotation={rotation}
                 lastDelta={lastDeltaFor(player.id)}
+                removeMode={removeMode}
+                canRemove={game.players.length > 1}
+                tilt={removeMode ? (index % 2 === 0 ? "a" : "b") : undefined}
+                onRemove={() => {
+                  dispatch({ type: "REMOVE_PLAYER", playerId: player.id });
+                  haptic();
+                  if (game.players.length <= 2) setRemoveMode(false);
+                }}
                 onRename={(name) =>
                   dispatch({ type: "RENAME_PLAYER", playerId: player.id, name })
                 }
@@ -465,11 +490,23 @@ export function GameScreen({
               className="menu-item"
               type="button"
               onClick={() => {
+                setMenuOpen(false);
+                onHome();
+              }}
+            >
+              <span className="menu-icon">🏠</span>
+              {t("home")}
+            </button>
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
                 setHistoryOpen((current) => !current);
                 setMenuOpen(false);
               }}
             >
-              🕘 {t("history")}
+              <span className="menu-icon">🕘</span>
+              {t("history")}
             </button>
             <div className="menu-separator" />
             <div className="menu-row">
@@ -482,7 +519,8 @@ export function GameScreen({
                 }}
                 disabled={!past.length}
               >
-                ↩ {t("undo")}
+                <span className="menu-icon">↩</span>
+                {t("undo")}
               </button>
               <button
                 className="menu-item"
@@ -493,22 +531,40 @@ export function GameScreen({
                 }}
                 disabled={!future.length}
               >
-                ↪ {t("redo")}
+                <span className="menu-icon">↪</span>
+                {t("redo")}
               </button>
             </div>
             <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                dispatch({ type: "ADD_PLAYER" });
-                haptic();
-                setMenuOpen(false);
-              }}
-            >
-              {t("addPlayerMenuItem")}
-            </button>
-            <div className="menu-separator" />
+            <div className="menu-row player-count-row">
+              <button
+                className="menu-stepper-btn"
+                type="button"
+                aria-label={t("addPlayerMenuItem")}
+                onClick={() => {
+                  dispatch({ type: "ADD_PLAYER" });
+                  haptic();
+                }}
+              >
+                +
+              </button>
+              <span className="menu-stepper-count">
+                {game.players.length} {t("playersPlural")}
+              </span>
+              <button
+                className="menu-stepper-btn"
+                type="button"
+                aria-label={t("removePlayer")}
+                disabled={game.players.length <= 1}
+                onClick={() => {
+                  haptic();
+                  setMenuOpen(false);
+                  setRemoveMode(true);
+                }}
+              >
+                −
+              </button>
+            </div>
             <button
               className="menu-item"
               type="button"
@@ -517,9 +573,9 @@ export function GameScreen({
                 onSavedGames();
               }}
             >
-              💾 {t("savedGames")}
+              <span className="menu-icon">💾</span>
+              {t("savedGames")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -528,9 +584,9 @@ export function GameScreen({
                 onNewGame();
               }}
             >
+              <span className="menu-icon">🎮</span>
               {t("newGameMenuItem")}
             </button>
-            <div className="menu-separator" />
             <button
               className="menu-item"
               type="button"
@@ -539,11 +595,11 @@ export function GameScreen({
                 onChwatzi();
               }}
             >
-              🎲 {t("whoStarts")}
+              <span className="menu-icon">🎲</span>
+              {t("whoStarts")}
             </button>
             <div className="menu-separator" />
             <InstallButton variant="menu" />
-            <div className="menu-separator" />
             <div className="menu-row lang-row">
               <button
                 type="button"
@@ -552,7 +608,8 @@ export function GameScreen({
                 }
                 onClick={() => setLang("fr")}
               >
-                🇫🇷 Français
+                <span className="menu-icon">🇫🇷</span>
+                Français
               </button>
               <button
                 type="button"
@@ -561,7 +618,8 @@ export function GameScreen({
                 }
                 onClick={() => setLang("en")}
               >
-                🇬🇧 English
+                <span className="menu-icon">🇬🇧</span>
+                English
               </button>
             </div>
           </nav>
