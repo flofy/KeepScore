@@ -22,24 +22,18 @@
   position: static;
   width: 44px;
   height: 44px;
-  border: none;
-  border-radius: 12px;
-  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
   color: #94a3b8;
-  font-size: 20px;
-  font-weight: 700;
+  background: transparent;
+  border: 0;
   cursor: pointer;
-  display: grid;
-  place-items: center;
-  transition: color 0.15s ease;
 }
 
 .saved-games-close:hover {
   color: #f8fafc;
-}
-
-.saved-games-close:active {
-  transform: scale(0.95);
 }
 
 .saved-games-container {
