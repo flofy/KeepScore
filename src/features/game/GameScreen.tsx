@@ -513,18 +513,38 @@ export function GameScreen({
               </button>
             </div>
             <div className="menu-separator" />
-            <button
-              className="menu-item"
-              type="button"
-              onClick={() => {
-                dispatch({ type: "ADD_PLAYER" });
-                haptic();
-                setMenuOpen(false);
-              }}
-            >
-              <span className="menu-icon">➕</span>
-              {t("addPlayerMenuItem")}
-            </button>
+            <div className="menu-row">
+              <button
+                className="menu-item"
+                type="button"
+                onClick={() => {
+                  dispatch({ type: "ADD_PLAYER" });
+                  haptic();
+                  setMenuOpen(false);
+                }}
+              >
+                <span className="menu-icon">➕</span>
+                {t("addPlayerMenuItem")}
+              </button>
+              <button
+                className="menu-item"
+                type="button"
+                disabled={game.players.length <= 1}
+                onClick={() => {
+                  const lastPlayer = game.players[game.players.length - 1];
+                  if (!lastPlayer) return;
+                  dispatch({
+                    type: "REMOVE_PLAYER",
+                    playerId: lastPlayer.id,
+                  });
+                  haptic();
+                  setMenuOpen(false);
+                }}
+              >
+                <span className="menu-icon">➖</span>
+                {t("removePlayer")}
+              </button>
+            </div>
             <button
               className="menu-item"
               type="button"

@@ -26,6 +26,32 @@ if ("serviceWorker" in navigator && import.meta.env.PROD) {
   });
 }
 
+// In development, wipe any service worker and KeepScore caches left over from
+// a previous production build or dev session, so local changes are always
+// served fresh without manual DevTools cleanup.
+if (import.meta.env.DEV) {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) =>
+        Promise.all(registrations.map((reg) => reg.unregister())),
+      )
+      .catch(() => {});
+  }
+  if ("caches" in window) {
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys
+            .filter((key) => key.startsWith("keepscore-"))
+            .map((key) => caches.delete(key)),
+        ),
+      )
+      .catch(() => {});
+  }
+}
+
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <AppProviders>
