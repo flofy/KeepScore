@@ -41,6 +41,7 @@ export type TranslationKey =
   | "resume"
   | "untitledGame"
   | "noSavedGames"
+  | "viewSavedGames"
   | "export"
   | "import"
   | "back"

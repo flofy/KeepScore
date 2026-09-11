@@ -52,6 +52,7 @@ export function StartScreenRoute() {
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
       onSavedGames={() => navigate("/saved")}
+      onResumeGame={(gameId) => navigate("/game?gameId=" + gameId)}
     />
   );
 }

@@ -156,3 +156,35 @@
     font-size: 16px;
   }
 }
+
+/* Home saved games section */
+.home-saved-games {
+  margin-top: 32px;
+  text-align: left;
+}
+
+.home-saved-games-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f8fafc;
+  margin: 0 0 16px;
+  text-align: center;
+}
+
+.home-saved-games .saved-games {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.home-saved-games .saved-game {
+  padding: 12px;
+}
+
+.home-saved-games .saved-game h2 {
+  font-size: 14px;
+  margin: 0 0 4px;
+}
+
+.home-saved-games .saved-game p {
+  font-size: 12px;
+}
