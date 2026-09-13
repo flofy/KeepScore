@@ -51,7 +51,7 @@ export function GameSetup({
     setStartingScore(String(preset.startingScore));
     if (preset.id !== "default" && !gameName.trim()) setGameName(preset.name);
   }
-  function startGame() {
+  function createConfiguredGame(): Game {
     const parsedStartingScore = Number(startingScore);
     const safeStartingScore = Number.isFinite(parsedStartingScore)
       ? Math.trunc(parsedStartingScore)
@@ -60,26 +60,23 @@ export function GameSetup({
     const playerColors = names
       .map((name, index) => (name.trim() ? colors[index] : undefined))
       .filter((color): color is string => Boolean(color));
-    onCreate(
-      createGame(playerNames, gameName.trim(), safeStartingScore, playerColors),
-    );
-  }
 
-  function determineStartingPlayer() {
-    const parsedStartingScore = Number(startingScore);
-    const safeStartingScore = Number.isFinite(parsedStartingScore)
-      ? Math.trunc(parsedStartingScore)
-      : 0;
-    const playerNames = names.map((name) => name.trim()).filter(Boolean);
-    const playerColors = names
-      .map((name, index) => (name.trim() ? colors[index] : undefined))
-      .filter((color): color is string => Boolean(color));
-    const game = createGame(
+    return createGame(
       playerNames,
       gameName.trim(),
       safeStartingScore,
       playerColors,
+      undefined,
+      presetId || undefined,
     );
+  }
+
+  function startGame() {
+    onCreate(createConfiguredGame());
+  }
+
+  function determineStartingPlayer() {
+    const game = createConfiguredGame();
     if (onDetermineStartingPlayer) {
       onDetermineStartingPlayer(game);
     } else {
