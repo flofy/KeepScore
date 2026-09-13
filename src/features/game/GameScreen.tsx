@@ -8,6 +8,7 @@ import { GameMenuDrawer } from "./GameMenuDrawer";
 import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
 import { useGameHistoryView } from "./useGameHistoryView";
+import { useGamePlayerView } from "./useGamePlayerView";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
@@ -52,15 +53,15 @@ export function GameScreen({
     cancelEdit,
     deleteEntry,
   } = useGameHistoryView({ game, dispatch });
-  const [swapped, setSwapped] = useState(false);
-  const [playerRotations, setPlayerRotations] = useState<
-    Record<string, number>
-  >({});
+  const {
+    swapped,
+    orderedPlayers,
+    playerRotations,
+    toggleSwap,
+    togglePlayerRotation,
+  } = useGamePlayerView(game);
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
-  const isDuo = game.players.length === 2;
-  const orderedPlayers =
-    isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
@@ -117,7 +118,7 @@ export function GameScreen({
           fullscreen={fullscreen}
           onFullscreenToggle={toggleFullscreen}
           swapped={swapped}
-          onSwap={() => setSwapped((current) => !current)}
+          onSwap={toggleSwap}
           onMenuOpen={() => setMenuOpen(true)}
           onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
         />
@@ -133,12 +134,7 @@ export function GameScreen({
           }
           onAddScore={addScore}
           onSetScore={setScore}
-          onFlipPlayer={(playerId) =>
-            setPlayerRotations((prev) => ({
-              ...prev,
-              [playerId]: prev[playerId] ? 0 : 180,
-            }))
-          }
+          onFlipPlayer={togglePlayerRotation}
         />
 
         {historyOpen && (
