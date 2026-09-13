@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Game } from "../../domain/game/types";
 import { findPreset } from "../../domain/game/presets";
 import { useGameHistory } from "../../ui/useGameHistory";
+import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
 import type { HistoryGrouping } from "../../ui/historyGrouping";
 import { GameHistoryOverlay } from "./GameHistoryOverlay";
@@ -35,15 +36,13 @@ export function GameScreen({
     redo,
   } = useGameHistory(initialGame);
   const { t, lang, setLang } = useI18n();
+  const { fullscreen, toggleFullscreen } = useFullscreen();
   const [editingEntry, setEditingEntry] = useState<string | null>(null);
   const [draftDelta, setDraftDelta] = useState("");
   const [swapped, setSwapped] = useState(false);
   const [playerRotations, setPlayerRotations] = useState<
     Record<string, number>
   >({});
-  const [fullscreen, setFullscreen] = useState(
-    () => localStorage.getItem("keepscore-fullscreen") === "1",
-  );
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
@@ -57,38 +56,11 @@ export function GameScreen({
     isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
 
   useEffect(() => {
-    localStorage.setItem("keepscore-fullscreen", fullscreen ? "1" : "0");
-  }, [fullscreen]);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setFullscreen(Boolean(document.fullscreenElement));
-    };
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () =>
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-  }, []);
-
-  useEffect(() => {
     document.body.style.overflow = historyOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [historyOpen]);
-
-  const toggleFullscreen = async () => {
-    try {
-      if (document.fullscreenElement) {
-        await document.exitFullscreen();
-      } else if (document.documentElement.requestFullscreen) {
-        await document.documentElement.requestFullscreen();
-      } else {
-        setFullscreen((current) => !current);
-      }
-    } catch {
-      setFullscreen((current) => !current);
-    }
-  };
 
   const beginEdit = (id: string, delta: number) => {
     setEditingEntry(id);
