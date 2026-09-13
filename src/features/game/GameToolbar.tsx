@@ -9,6 +9,7 @@ type Props = {
   swapped: boolean;
   onSwap: () => void;
   onMenuOpen: () => void;
+  onRename: (name: string) => void;
 };
 
 export function GameToolbar({
@@ -18,6 +19,7 @@ export function GameToolbar({
   swapped,
   onSwap,
   onMenuOpen,
+  onRename,
 }: Props) {
   const { t } = useI18n();
   const isDuo = game.players.length === 2;
@@ -31,9 +33,8 @@ export function GameToolbar({
             className="game-name"
             value={game.name ?? ""}
             placeholder={t("appName")}
-            onChange={() => undefined}
+            onChange={(event) => onRename(event.target.value)}
             aria-label={t("gameName")}
-            readOnly
           />
         </div>
         <div className="toolbar">
