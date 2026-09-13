@@ -7,6 +7,7 @@ export function createGame(
   startingScore = 0,
   colors?: string[],
   startingPlayerId?: string,
+  presetId?: string,
 ): Game {
   const now = Date.now();
   const players: Player[] = playerNames.map((rawName, index) => ({
@@ -32,6 +33,7 @@ export function createGame(
   return {
     id: crypto.randomUUID(),
     name: name?.trim() || undefined,
+    presetId: presetId || undefined,
     players,
     history: [],
     createdAt: now,
