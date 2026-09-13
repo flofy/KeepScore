@@ -1,14 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { Game } from "../../domain/game/types";
-import { findPreset } from "../../domain/game/presets";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
-import type { HistoryGrouping } from "../../ui/historyGrouping";
 import { GameHistoryOverlay } from "./GameHistoryOverlay";
 import { GameMenuDrawer } from "./GameMenuDrawer";
 import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
+import { useGameHistoryView } from "./useGameHistoryView";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
@@ -37,44 +36,31 @@ export function GameScreen({
   } = useGameHistory(initialGame);
   const { t, lang, setLang } = useI18n();
   const { fullscreen, toggleFullscreen } = useFullscreen();
-  const [editingEntry, setEditingEntry] = useState<string | null>(null);
-  const [draftDelta, setDraftDelta] = useState("");
+  const {
+    editingEntry,
+    draftDelta,
+    historyOpen,
+    historyFlipped,
+    historyGrouping,
+    setHistoryGrouping,
+    setHistoryFlipped,
+    setDraftDelta,
+    beginEdit,
+    saveEdit,
+    openHistory: openHistoryView,
+    closeHistory,
+    cancelEdit,
+    deleteEntry,
+  } = useGameHistoryView({ game, dispatch });
   const [swapped, setSwapped] = useState(false);
   const [playerRotations, setPlayerRotations] = useState<
     Record<string, number>
   >({});
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [historyFlipped, setHistoryFlipped] = useState(false);
-  const [historyGrouping, setHistoryGrouping] = useState<HistoryGrouping>(
-    () =>
-      findPreset(game.presetId ?? "default")?.defaultHistoryGrouping ?? "round",
-  );
   const isDuo = game.players.length === 2;
   const orderedPlayers =
     isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
-
-  useEffect(() => {
-    document.body.style.overflow = historyOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [historyOpen]);
-
-  const beginEdit = (id: string, delta: number) => {
-    setEditingEntry(id);
-    setDraftDelta(String(delta));
-  };
-
-  const saveEdit = () => {
-    if (!editingEntry) return;
-    const delta = Number(draftDelta);
-    if (Number.isFinite(delta) && delta !== 0) {
-      dispatch({ type: "EDIT_HISTORY_ENTRY", entryId: editingEntry, delta });
-    }
-    setEditingEntry(null);
-  };
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
@@ -104,7 +90,7 @@ export function GameScreen({
   };
 
   const openHistory = () => {
-    setHistoryOpen(true);
+    openHistoryView();
     setMenuOpen(false);
   };
 
@@ -161,17 +147,15 @@ export function GameScreen({
             historyGrouping={historyGrouping}
             onHistoryGroupingChange={setHistoryGrouping}
             historyFlipped={historyFlipped}
-            onClose={() => setHistoryOpen(false)}
+            onClose={closeHistory}
             onFlip={() => setHistoryFlipped((current) => !current)}
             editingEntry={editingEntry}
             draftDelta={draftDelta}
             onBeginEdit={beginEdit}
             onDraftDeltaChange={setDraftDelta}
             onSaveEdit={saveEdit}
-            onCancelEdit={() => setEditingEntry(null)}
-            onDeleteEntry={(entryId) =>
-              dispatch({ type: "DELETE_HISTORY_ENTRY", entryId })
-            }
+            onCancelEdit={cancelEdit}
+            onDeleteEntry={deleteEntry}
           />
         )}
       </main>
