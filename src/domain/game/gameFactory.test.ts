@@ -15,6 +15,18 @@ describe("createGame", () => {
     expect(game.history).toEqual([]);
   });
 
+  it("preserves the selected preset", () => {
+    const game = createGame(
+      ["Alice", "Bob"],
+      "Munchkin",
+      1,
+      undefined,
+      undefined,
+      "munchkin",
+    );
+    expect(game.presetId).toBe("munchkin");
+  });
+
   it("assigns palette colors when none are provided", () => {
     const game = createGame(["Alice", "Bob"]);
     expect(game.players[0].color).toBe(colorForIndex(0));

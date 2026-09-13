@@ -15,6 +15,7 @@ export type ScoreEntry = {
 export type Game = {
   id: string;
   name?: string;
+  presetId?: string;
   players: Player[];
   history: ScoreEntry[];
   createdAt: number;
