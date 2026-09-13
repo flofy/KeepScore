@@ -49,7 +49,8 @@ export function GameScreen({
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
   const [historyGrouping, setHistoryGrouping] = useState<HistoryGrouping>(
-    () => findPreset(game.presetId ?? "default")?.defaultHistoryGrouping ?? "round",
+    () =>
+      findPreset(game.presetId ?? "default")?.defaultHistoryGrouping ?? "round",
   );
   const isDuo = game.players.length === 2;
   const orderedPlayers =

@@ -3,9 +3,11 @@ import { findPreset, GAME_PRESETS } from "./presets";
 
 describe("game presets", () => {
   it("defines a history grouping default for every preset", () => {
-    expect(GAME_PRESETS.every((preset) =>
-      ["round", "player"].includes(preset.defaultHistoryGrouping),
-    )).toBe(true);
+    expect(
+      GAME_PRESETS.every((preset) =>
+        ["round", "player"].includes(preset.defaultHistoryGrouping),
+      ),
+    ).toBe(true);
   });
 
   it("uses player grouping for Munchkin", () => {
