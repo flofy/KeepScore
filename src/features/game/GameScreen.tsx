@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Game } from "../../domain/game/types";
+import { findPreset } from "../../domain/game/presets";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useI18n } from "../../ui/i18n";
 import type { HistoryGrouping } from "../../ui/historyGrouping";
@@ -47,8 +48,9 @@ export function GameScreen({
   const [removeMode, setRemoveMode] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [historyFlipped, setHistoryFlipped] = useState(false);
-  const [historyGrouping, setHistoryGrouping] =
-    useState<HistoryGrouping>("round");
+  const [historyGrouping, setHistoryGrouping] = useState<HistoryGrouping>(
+    () => findPreset(game.presetId ?? "default")?.defaultHistoryGrouping ?? "round",
+  );
   const isDuo = game.players.length === 2;
   const orderedPlayers =
     isDuo && swapped ? [game.players[1], game.players[0]] : game.players;
