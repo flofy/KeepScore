@@ -4,7 +4,7 @@ import { findPreset } from "../../domain/game/presets";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useI18n } from "../../ui/i18n";
 import type { HistoryGrouping } from "../../ui/historyGrouping";
-import { GameHistoryPanel } from "./GameHistoryPanel";
+import { GameHistoryOverlay } from "./GameHistoryOverlay";
 import { GameMenuDrawer } from "./GameMenuDrawer";
 import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
@@ -184,49 +184,23 @@ export function GameScreen({
         />
 
         {historyOpen && (
-          <div
-            className={
-              historyFlipped
-                ? "history-fullscreen flipped"
-                : "history-fullscreen"
+          <GameHistoryOverlay
+            game={game}
+            historyGrouping={historyGrouping}
+            onHistoryGroupingChange={setHistoryGrouping}
+            historyFlipped={historyFlipped}
+            onClose={() => setHistoryOpen(false)}
+            onFlip={() => setHistoryFlipped((current) => !current)}
+            editingEntry={editingEntry}
+            draftDelta={draftDelta}
+            onBeginEdit={beginEdit}
+            onDraftDeltaChange={setDraftDelta}
+            onSaveEdit={saveEdit}
+            onCancelEdit={() => setEditingEntry(null)}
+            onDeleteEntry={(entryId) =>
+              dispatch({ type: "DELETE_HISTORY_ENTRY", entryId })
             }
-            role="dialog"
-            aria-label={t("history")}
-          >
-            <button
-              className="history-close"
-              type="button"
-              onClick={() => setHistoryOpen(false)}
-              aria-label={t("closeHistory")}
-              title={t("closeHistory")}
-            >
-              ✕
-            </button>
-            <button
-              className="history-flip-btn"
-              type="button"
-              onClick={() => setHistoryFlipped((current) => !current)}
-              aria-pressed={historyFlipped}
-              aria-label={t("flipHistory")}
-              title={t("flipHistory")}
-            >
-              ↻
-            </button>
-            <GameHistoryPanel
-              game={game}
-              historyGrouping={historyGrouping}
-              onHistoryGroupingChange={setHistoryGrouping}
-              editingEntry={editingEntry}
-              draftDelta={draftDelta}
-              onBeginEdit={beginEdit}
-              onDraftDeltaChange={setDraftDelta}
-              onSaveEdit={saveEdit}
-              onCancelEdit={() => setEditingEntry(null)}
-              onDeleteEntry={(entryId) =>
-                dispatch({ type: "DELETE_HISTORY_ENTRY", entryId })
-              }
-            />
-          </div>
+          />
         )}
       </main>
 
