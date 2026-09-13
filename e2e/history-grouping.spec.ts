@@ -46,14 +46,14 @@ test.describe("history grouping", () => {
     await expect(roundButton).toHaveAttribute("aria-pressed", "false");
     await expect(playerButton).toHaveAttribute("aria-pressed", "true");
     await expect(dialog.locator(".history-group")).toHaveCount(2);
-    await expect(
-      dialog.getByRole("heading", { name: "Alice" }),
-    ).toBeVisible();
+    await expect(dialog.getByRole("heading", { name: "Alice" })).toBeVisible();
     await expect(dialog.getByRole("heading", { name: "Bob" })).toBeVisible();
     await expect(dialog.getByText("+1")).toHaveCount(2);
   });
 
-  test("edits and deletes entries while grouped by player", async ({ page }) => {
+  test("edits and deletes entries while grouped by player", async ({
+    page,
+  }) => {
     await startGame(page);
 
     const playerCards = page.locator(".player-card");
@@ -84,9 +84,7 @@ test.describe("history grouping", () => {
     await expect(aliceGroup.getByText("+3")).toBeVisible();
     await expect(dialog.locator(".history-group")).toHaveCount(2);
 
-    await aliceGroup
-      .getByRole("button", { name: "Remove this entry" })
-      .click();
+    await aliceGroup.getByRole("button", { name: "Remove this entry" }).click();
 
     await expect(dialog.locator(".history-group")).toHaveCount(1);
     await expect(dialog.getByRole("heading", { name: "Bob" })).toBeVisible();
