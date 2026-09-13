@@ -39,9 +39,7 @@ export function GameHistoryOverlay({
   return (
     <div
       className={
-        historyFlipped
-          ? "history-fullscreen flipped"
-          : "history-fullscreen"
+        historyFlipped ? "history-fullscreen flipped" : "history-fullscreen"
       }
       role="dialog"
       aria-label={t("history")}
