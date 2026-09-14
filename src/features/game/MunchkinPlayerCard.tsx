@@ -8,6 +8,9 @@ type Props = {
   player: Player;
   stats: MunchkinStats;
   rotation?: number;
+  removeMode?: boolean;
+  canRemove?: boolean;
+  onRemove?: () => void;
   onRename: (name: string) => void;
   onChangeStats: (stats: MunchkinStats) => void;
   onFlip?: () => void;
@@ -25,6 +28,9 @@ export function MunchkinPlayerCard({
   player,
   stats,
   rotation = 0,
+  removeMode = false,
+  canRemove = true,
+  onRemove,
   onRename,
   onChangeStats,
   onFlip,
@@ -43,7 +49,11 @@ export function MunchkinPlayerCard({
 
   return (
     <article
-      className={rotation ? "munchkin-player-card rotated" : "munchkin-player-card"}
+      className={
+        removeMode
+          ? "munchkin-player-card remove-mode"
+          : "munchkin-player-card"
+      }
       style={
         {
           "--player-color": player.color ?? "#38bdf8",
@@ -51,7 +61,18 @@ export function MunchkinPlayerCard({
         } as CSSProperties
       }
     >
-      {onFlip && (
+      {removeMode && onRemove && (
+        <button
+          type="button"
+          className="munchkin-remove-btn"
+          onClick={onRemove}
+          disabled={!canRemove}
+          aria-label={`Supprimer ${player.name}`}
+        >
+          ✕
+        </button>
+      )}
+      {onFlip && !removeMode && (
         <button
           type="button"
           className="munchkin-card-flip-btn"
