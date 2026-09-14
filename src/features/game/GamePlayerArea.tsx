@@ -61,17 +61,21 @@ export function GamePlayerArea({
     return undefined;
   };
 
+  const playerAreaClass = removeMode
+    ? isMunchkin
+      ? "players munchkin-players remove-mode"
+      : "players remove-mode"
+    : isMunchkin
+      ? "players munchkin-players"
+      : isDuo
+        ? "players duo"
+        : game.players.length >= 4
+          ? "players crowded"
+          : "players";
+
   return (
     <section
-      className={
-        removeMode
-          ? "players remove-mode"
-          : isDuo
-            ? "players duo"
-            : game.players.length >= 4
-              ? "players crowded"
-              : "players"
-      }
+      className={playerAreaClass}
       style={
         (!isDuo &&
           game.players.length > 2 &&
