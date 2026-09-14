@@ -24,8 +24,12 @@ describe("munchkin-style workflow", () => {
     });
   });
 
-  it("calculates power from level and strength", () => {
-    expect(playerPower({ level: 7, strength: 4 })).toBe(11);
+  it("calculates power from level and equipment bonus", () => {
+    expect(playerPower({ level: 7, equipmentBonus: 4 })).toBe(11);
+  });
+
+  it("includes negative equipment bonuses in combat strength", () => {
+    expect(playerPower({ level: 6, equipmentBonus: -2 })).toBe(4);
   });
 
   it("opens combat and allows one helper", () => {
@@ -50,7 +54,7 @@ describe("munchkin-style workflow", () => {
     const players: CompanionPlayer[] = game.players.map((player, index) => ({
       ...player,
       level: index === 0 ? 7 : 4,
-      strength: index === 0 ? 3 : 2,
+      equipmentBonus: index === 0 ? 3 : 2,
     }));
     const started = reduceWorkflow(createMunchkinWorkflow(), {
       type: "START",
