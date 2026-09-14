@@ -1,0 +1,108 @@
+.munchkin-player-card {
+  --player-color: #38bdf8;
+  position: relative;
+  display: flex;
+  min-height: 220px;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+  border: 2px solid color-mix(in srgb, var(--player-color) 55%, transparent);
+  border-radius: 24px;
+  background: var(--surface, #fff);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 10%);
+}
+
+.munchkin-card-flip-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  border: 0;
+  background: transparent;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.munchkin-player-name {
+  width: calc(100% - 36px);
+  border: 0;
+  border-bottom: 2px solid color-mix(in srgb, var(--player-color) 35%, transparent);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.2rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.munchkin-counters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  flex: 1;
+}
+
+.munchkin-counter {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--player-color) 10%, transparent);
+  text-align: center;
+}
+
+.munchkin-counter-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.munchkin-counter-controls {
+  display: grid;
+  grid-template-columns: 44px minmax(48px, 1fr) 44px;
+  align-items: center;
+  gap: 8px;
+}
+
+.munchkin-counter-controls button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--player-color);
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.munchkin-counter-controls button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.munchkin-counter-controls strong {
+  font-size: clamp(2rem, 7vw, 3.5rem);
+  line-height: 1;
+}
+
+@media (max-width: 520px) {
+  .munchkin-player-card {
+    min-height: 190px;
+    padding: 18px;
+  }
+
+  .munchkin-counters {
+    gap: 10px;
+  }
+
+  .munchkin-counter {
+    padding: 10px;
+  }
+
+  .munchkin-counter-controls {
+    grid-template-columns: 36px minmax(36px, 1fr) 36px;
+    gap: 4px;
+  }
+}
