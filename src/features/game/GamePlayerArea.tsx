@@ -96,6 +96,12 @@ export function GamePlayerArea({
               player={{ ...player, color }}
               stats={player.munchkin ?? defaultMunchkinStats(player.score)}
               rotation={rotation}
+              removeMode={removeMode}
+              canRemove={game.players.length > 1}
+              onRemove={() => {
+                onRemovePlayer(player.id);
+                haptic();
+              }}
               onRename={(name) => onRenamePlayer(player.id, name)}
               onChangeStats={(stats) =>
                 onUpdateMunchkinStats(player.id, stats)
