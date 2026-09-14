@@ -20,8 +20,8 @@ function clampLevel(level: number): number {
   return Math.max(0, Math.min(MAX_LEVEL, Math.trunc(level)));
 }
 
-function clampStrength(strength: number): number {
-  return Math.trunc(strength);
+function clampEquipmentBonus(bonus: number): number {
+  return Math.trunc(bonus);
 }
 
 export function MunchkinPlayerCard({
@@ -41,10 +41,12 @@ export function MunchkinPlayerCard({
       level: clampLevel(stats.level + delta),
     });
 
-  const updateStrength = (delta: number) =>
+  const force = stats.level + stats.equipmentBonus;
+
+  const updateForce = (delta: number) =>
     onChangeStats({
       ...stats,
-      strength: clampStrength(stats.strength + delta),
+      equipmentBonus: clampEquipmentBonus(stats.equipmentBonus + delta),
     });
 
   return (
@@ -130,17 +132,15 @@ export function MunchkinPlayerCard({
           <div className="munchkin-counter-controls">
             <button
               type="button"
-              onClick={() => updateStrength(-1)}
+              onClick={() => updateForce(-1)}
               aria-label={`Retirer un point de force à ${player.name}`}
             >
               −
             </button>
-            <strong aria-label={`Force ${stats.strength}`}>
-              {stats.strength}
-            </strong>
+            <strong aria-label={`Force ${force}`}>{force}</strong>
             <button
               type="button"
-              onClick={() => updateStrength(1)}
+              onClick={() => updateForce(1)}
               aria-label={`Ajouter un point de force à ${player.name}`}
             >
               +
