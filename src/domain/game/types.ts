@@ -1,6 +1,6 @@
 export type MunchkinStats = {
   level: number;
-  strength: number;
+  equipmentBonus: number;
 };
 
 export type Player = {
