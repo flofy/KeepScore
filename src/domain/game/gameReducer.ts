@@ -91,7 +91,7 @@ export function gameReducer(game: Game, action: GameAction): Game {
         score: 0,
         color: colorForIndex(game.players.length),
         ...(game.presetId === "munchkin"
-          ? { munchkin: { level: 1, strength: 0 } }
+          ? { munchkin: { level: 1, equipmentBonus: 0 } }
           : {}),
       };
       return { ...game, players: [...game.players, player], updatedAt };
