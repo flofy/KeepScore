@@ -56,11 +56,27 @@ export function MunchkinPlayerCard({
       }
       style={
         {
-          "--player-color": player.color ?? "#38bdf8",
+          "--player-color": player.color ?? "#d88a24",
           transform: rotation ? `rotate(${rotation}deg)` : undefined,
         } as CSSProperties
       }
     >
+      <div className="munchkin-card-frame" aria-hidden="true" />
+      <div className="munchkin-card-header">
+        <span className="munchkin-card-emblem" aria-hidden="true">
+          ⚔
+        </span>
+        <input
+          className="munchkin-player-name"
+          value={player.name}
+          onChange={(event) => onRename(event.target.value)}
+          aria-label={`Nom du joueur — ${player.name}`}
+        />
+        <span className="munchkin-card-emblem" aria-hidden="true">
+          🛡
+        </span>
+      </div>
+
       {removeMode && onRemove && (
         <button
           type="button"
@@ -83,12 +99,9 @@ export function MunchkinPlayerCard({
           ↻
         </button>
       )}
-      <input
-        className="munchkin-player-name"
-        value={player.name}
-        onChange={(event) => onRename(event.target.value)}
-        aria-label={`Nom du joueur — ${player.name}`}
-      />
+
+      <div className="munchkin-card-divider" aria-hidden="true" />
+
       <div className="munchkin-counters">
         <div className="munchkin-counter">
           <span className="munchkin-counter-label">Niveau</span>
