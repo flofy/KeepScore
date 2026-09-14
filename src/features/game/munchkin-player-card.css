@@ -12,18 +12,28 @@
   box-shadow: 0 12px 30px rgb(0 0 0 / 10%);
 }
 
-.munchkin-card-flip-btn {
+.munchkin-card-flip-btn,
+.munchkin-remove-btn {
   position: absolute;
   top: 12px;
-  right: 12px;
   border: 0;
   background: transparent;
   font-size: 1.4rem;
   cursor: pointer;
 }
 
+.munchkin-card-flip-btn {
+  right: 12px;
+}
+
+.munchkin-remove-btn {
+  left: 12px;
+  color: #ef4444;
+}
+
 .munchkin-player-name {
   width: calc(100% - 36px);
+  margin: 0 auto;
   border: 0;
   border-bottom: 2px solid color-mix(in srgb, var(--player-color) 35%, transparent);
   background: transparent;
