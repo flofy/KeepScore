@@ -1,7 +1,8 @@
 import type { CSSProperties } from "react";
-import type { Game } from "../../domain/game/types";
+import type { Game, MunchkinStats } from "../../domain/game/types";
 import { colorForIndex } from "../../domain/game/colors";
 import { useI18n } from "../../ui/i18n";
+import { MunchkinPlayerCard } from "./MunchkinPlayerCard";
 import { PlayerCard } from "./PlayerCard";
 
 type Props = {
@@ -13,6 +14,7 @@ type Props = {
   onRenamePlayer: (playerId: string, name: string) => void;
   onAddScore: (playerId: string, delta: number) => void;
   onSetScore: (playerId: string, value: number) => void;
+  onUpdateMunchkinStats: (playerId: string, stats: MunchkinStats) => void;
   onFlipPlayer: (playerId: string) => void;
 };
 
@@ -20,6 +22,13 @@ const RECENT_DELTAS = 6;
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
+}
+
+function defaultMunchkinStats(score: number): MunchkinStats {
+  return {
+    level: Math.max(0, Math.min(10, Math.trunc(score))),
+    strength: 0,
+  };
 }
 
 export function GamePlayerArea({
@@ -31,10 +40,12 @@ export function GamePlayerArea({
   onRenamePlayer,
   onAddScore,
   onSetScore,
+  onUpdateMunchkinStats,
   onFlipPlayer,
 }: Props) {
   const { t } = useI18n();
   const isDuo = game.players.length === 2;
+  const isMunchkin = game.presetId === "munchkin";
 
   const recentDeltasFor = (playerId: string): number[] =>
     game.history
@@ -75,14 +86,29 @@ export function GamePlayerArea({
     >
       {orderedPlayers.map((player, index) => {
         const rotation = playerRotations[player.id] ?? 0;
+        const color =
+          player.color ?? colorForIndex(game.players.indexOf(player));
+
+        if (isMunchkin) {
+          return (
+            <MunchkinPlayerCard
+              key={player.id}
+              player={{ ...player, color }}
+              stats={player.munchkin ?? defaultMunchkinStats(player.score)}
+              rotation={rotation}
+              onRename={(name) => onRenamePlayer(player.id, name)}
+              onChangeStats={(stats) =>
+                onUpdateMunchkinStats(player.id, stats)
+              }
+              onFlip={() => onFlipPlayer(player.id)}
+            />
+          );
+        }
+
         return (
           <PlayerCard
             key={player.id}
-            player={{
-              ...player,
-              color:
-                player.color ?? colorForIndex(game.players.indexOf(player)),
-            }}
+            player={{ ...player, color }}
             deltas={recentDeltasFor(player.id)}
             rotation={rotation}
             lastDelta={lastDeltaFor(player.id)}
