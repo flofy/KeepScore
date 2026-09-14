@@ -16,7 +16,12 @@ export function createGame(
     score: startingScore,
     color: colors?.[index] ?? colorForIndex(index),
     ...(presetId === "munchkin"
-      ? { munchkin: { level: Math.max(0, Math.min(10, startingScore)), strength: 0 } }
+      ? {
+          munchkin: {
+            level: Math.max(0, Math.min(10, startingScore)),
+            strength: 0,
+          },
+        }
       : {}),
   }));
 
