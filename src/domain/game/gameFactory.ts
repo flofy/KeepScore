@@ -19,7 +19,7 @@ export function createGame(
       ? {
           munchkin: {
             level: Math.max(0, Math.min(10, startingScore)),
-            strength: 0,
+            equipmentBonus: 0,
           },
         }
       : {}),
