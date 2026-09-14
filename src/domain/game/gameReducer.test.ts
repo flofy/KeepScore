@@ -12,7 +12,14 @@ describe("gameReducer", () => {
   });
 
   it("creates Munchkin players with level 1 and zero strength", () => {
-    const game = createGame(["Alice", "Bob"], undefined, 1, undefined, undefined, "munchkin");
+    const game = createGame(
+      ["Alice", "Bob"],
+      undefined,
+      1,
+      undefined,
+      undefined,
+      "munchkin",
+    );
     expect(game.players.map(({ munchkin }) => munchkin)).toEqual([
       { level: 1, strength: 0 },
       { level: 1, strength: 0 },
@@ -32,7 +39,14 @@ describe("gameReducer", () => {
   });
 
   it("updates Munchkin player counters without changing score history", () => {
-    const game = createGame(["Alice", "Bob"], undefined, 1, undefined, undefined, "munchkin");
+    const game = createGame(
+      ["Alice", "Bob"],
+      undefined,
+      1,
+      undefined,
+      undefined,
+      "munchkin",
+    );
     const next = gameReducer(game, {
       type: "UPDATE_MUNCHKIN_STATS",
       playerId: game.players[0].id,
