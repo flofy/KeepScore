@@ -24,8 +24,8 @@ describe("munchkin-style workflow", () => {
     });
   });
 
-  it("calculates power from level and gear", () => {
-    expect(playerPower({ level: 7, gear: 4 })).toBe(11);
+  it("calculates power from level and strength", () => {
+    expect(playerPower({ level: 7, strength: 4 })).toBe(11);
   });
 
   it("opens combat and allows one helper", () => {
@@ -50,7 +50,7 @@ describe("munchkin-style workflow", () => {
     const players: CompanionPlayer[] = game.players.map((player, index) => ({
       ...player,
       level: index === 0 ? 7 : 4,
-      gear: index === 0 ? 3 : 2,
+      strength: index === 0 ? 3 : 2,
     }));
     const started = reduceWorkflow(createMunchkinWorkflow(), {
       type: "START",
