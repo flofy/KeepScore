@@ -128,26 +128,36 @@
   text-transform: uppercase;
 }
 
-.munchkin-level-label,
 .munchkin-equipment-label {
   display: flex;
   min-height: 1.4em;
   align-items: center;
   justify-content: center;
+  font-size: 1.8rem;
+  line-height: 1;
+}
+
+.munchkin-gender-toggle {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 0;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--player-color);
+  cursor: pointer;
 }
 
 .munchkin-player-icon {
-  display: inline-flex;
-  width: 1.5em;
-  height: 1.5em;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  background: var(--player-icon-color);
-  color: #fff8e1;
-  font-size: 1.1rem;
-  line-height: 1;
-  box-shadow: 0 2px 0 rgb(91 50 24 / 55%);
+  display: block;
+  width: 2.3rem;
+  height: 2.3rem;
+  fill: currentColor;
+  filter: drop-shadow(0 2px 0 rgb(91 50 24 / 55%));
 }
 
 .munchkin-counter-controls {
@@ -198,6 +208,7 @@
   line-height: 1;
 }
 
+.munchkin-level-counter,
 .munchkin-equipment-counter {
   position: relative;
 }
@@ -344,6 +355,39 @@
   .munchkin-counter-controls {
     grid-template-columns: 34px minmax(32px, 1fr) 34px;
     gap: 4px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls {
+    display: block;
+    position: relative;
+    min-height: 68px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls strong {
+    display: block;
+    padding-top: 10px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls button {
+    position: absolute;
+    bottom: -2px;
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+    border-radius: 0;
+    box-shadow:
+      inset 0 2px 0 rgb(255 224 154 / 65%),
+      inset 0 -2px 0 rgb(107 59 22 / 70%);
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls button:first-child {
+    left: -2px;
+    border-top-right-radius: 12px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls button:last-child {
+    right: -2px;
+    border-top-left-radius: 12px;
   }
 
   .munchkin-counter-controls button,
