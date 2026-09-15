@@ -296,8 +296,8 @@
 }
 
 @media (max-width: 700px) {
-  .munchkin-players {
-    grid-template-columns: 1fr;
+  .players.munchkin-players {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
     padding: 14px;
     gap: 12px;
   }
