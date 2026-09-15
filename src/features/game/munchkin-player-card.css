@@ -18,7 +18,11 @@
   border: 3px solid #211109;
   border-radius: 18px;
   background: linear-gradient(145deg, #f5d895, #d5a85f 55%, #b77b3d);
-  box-shadow: inset 0 0 0 2px #ffe09a, inset 0 0 0 6px rgb(87 45 19 / 16%), 0 10px 0 #1c0d07, 0 16px 28px rgb(0 0 0 / 30%);
+  box-shadow:
+    inset 0 0 0 2px #ffe09a,
+    inset 0 0 0 6px rgb(87 45 19 / 16%),
+    0 10px 0 #1c0d07,
+    0 16px 28px rgb(0 0 0 / 30%);
   color: #24140b;
 }
 
@@ -118,7 +122,9 @@
   border: 2px solid #80501f;
   border-radius: 14px;
   background: rgb(255 230 170 / 48%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 35%), 0 3px 0 rgb(79 40 16 / 22%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 35%),
+    0 3px 0 rgb(79 40 16 / 22%);
   text-align: center;
 }
 

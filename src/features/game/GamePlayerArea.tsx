@@ -107,9 +107,7 @@ export function GamePlayerArea({
                 haptic();
               }}
               onRename={(name) => onRenamePlayer(player.id, name)}
-              onChangeStats={(stats) =>
-                onUpdateMunchkinStats(player.id, stats)
-              }
+              onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
               onFlip={() => onFlipPlayer(player.id)}
             />
           );

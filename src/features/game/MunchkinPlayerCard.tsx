@@ -56,9 +56,7 @@ export function MunchkinPlayerCard({
   return (
     <article
       className={
-        removeMode
-          ? "munchkin-player-card remove-mode"
-          : "munchkin-player-card"
+        removeMode ? "munchkin-player-card remove-mode" : "munchkin-player-card"
       }
       style={
         {
@@ -155,7 +153,10 @@ export function MunchkinPlayerCard({
           <span className="munchkin-counter-label">
             <span aria-hidden="true">⚔</span> Force
           </span>
-          <strong className="munchkin-force-value" aria-label={`Force ${force}`}>
+          <strong
+            className="munchkin-force-value"
+            aria-label={`Force ${force}`}
+          >
             {force}
           </strong>
         </div>
