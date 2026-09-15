@@ -157,21 +157,20 @@ export function MunchkinPlayerCard({
           >
             {force}
           </strong>
+          {onCombat && (
+            <button
+              type="button"
+              className="munchkin-combat-action"
+              onClick={onCombat}
+              aria-label={`Lancer un combat avec ${player.name}`}
+              title="Lancer un combat"
+            >
+              <span aria-hidden="true">⚔</span>
+              <span>Combat</span>
+            </button>
+          )}
         </div>
       </div>
-
-      {onCombat && (
-        <button
-          type="button"
-          className="munchkin-combat-action"
-          onClick={onCombat}
-          aria-label={`Lancer un combat avec ${player.name}`}
-          title="Lancer un combat"
-        >
-          <span aria-hidden="true">⚔</span>
-          <span>Combat</span>
-        </button>
-      )}
     </article>
   );
 }
