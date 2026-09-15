@@ -27,7 +27,7 @@ function haptic() {
 function defaultMunchkinStats(score: number): MunchkinStats {
   return {
     level: Math.max(0, Math.min(10, Math.trunc(score))),
-    strength: 0,
+    equipmentBonus: 0,
   };
 }
 
