@@ -35,19 +35,19 @@ export function MunchkinPlayerCard({
   onChangeStats,
   onFlip,
 }: Props) {
-  const updateLevel = (delta: number) =>
-    onChangeStats({
-      ...stats,
-      level: clampLevel(stats.level + delta),
-    });
-
   const level = Number.isFinite(stats.level) ? stats.level : 0;
   const equipmentBonus = Number.isFinite(stats.equipmentBonus)
     ? stats.equipmentBonus
     : 0;
   const force = level + equipmentBonus;
 
-  const updateForce = (delta: number) =>
+  const updateLevel = (delta: number) =>
+    onChangeStats({
+      ...stats,
+      level: clampLevel(level + delta),
+    });
+
+  const updateEquipment = (delta: number) =>
     onChangeStats({
       ...stats,
       equipmentBonus: clampEquipmentBonus(equipmentBonus + delta),
@@ -125,27 +125,39 @@ export function MunchkinPlayerCard({
             </button>
           </div>
         </div>
+
         <div className="munchkin-counter">
           <span className="munchkin-counter-label">
-            <span aria-hidden="true">🛡</span> Force
+            <span aria-hidden="true">🛡</span> Équipement
           </span>
           <div className="munchkin-counter-controls">
             <button
               type="button"
-              onClick={() => updateForce(-1)}
+              onClick={() => updateEquipment(-1)}
               aria-label={`Retirer un bonus d'équipement à ${player.name}`}
             >
               −
             </button>
-            <strong aria-label={`Force ${force}`}>{force}</strong>
+            <strong aria-label={`Bonus d'équipement ${equipmentBonus}`}>
+              {equipmentBonus > 0 ? `+${equipmentBonus}` : equipmentBonus}
+            </strong>
             <button
               type="button"
-              onClick={() => updateForce(1)}
+              onClick={() => updateEquipment(1)}
               aria-label={`Ajouter un bonus d'équipement à ${player.name}`}
             >
               +
             </button>
           </div>
+        </div>
+
+        <div className="munchkin-counter">
+          <span className="munchkin-counter-label">
+            <span aria-hidden="true">⚔</span> Force
+          </span>
+          <strong className="munchkin-force-value" aria-label={`Force ${force}`}>
+            {force}
+          </strong>
         </div>
       </div>
     </article>
