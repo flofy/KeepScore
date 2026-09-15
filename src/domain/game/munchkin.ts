@@ -1,7 +1,10 @@
 import type { Player } from "./types";
 import { createWorkflowState, type WorkflowState } from "./workflow";
 
-export type CompanionPlayer = Player & { level: number; gear: number };
+export type CompanionPlayer = Player & {
+  level: number;
+  equipmentBonus: number;
+};
 
 export type CombatState = {
   monsterLevel: number;
@@ -17,7 +20,7 @@ export const MUNCHKIN_TEMPLATE = {
   id: "munchkin",
   name: "Munchkin-style",
   description:
-    "Levels, gear, turns and optional combat resolution for dungeon-style card games.",
+    "Levels, equipment, turns and optional combat resolution for dungeon-style card games.",
   victoryLevel: 10,
 } as const;
 
@@ -26,9 +29,9 @@ export function createMunchkinWorkflow(): MunchkinWorkflow {
 }
 
 export function playerPower(
-  player: Pick<CompanionPlayer, "level" | "gear">,
+  player: Pick<CompanionPlayer, "level" | "equipmentBonus">,
 ): number {
-  return player.level + player.gear;
+  return player.level + player.equipmentBonus;
 }
 
 export function startCombat(

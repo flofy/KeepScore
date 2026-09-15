@@ -15,13 +15,20 @@ export function createGame(
     name: rawName.trim() || "Player " + (index + 1),
     score: startingScore,
     color: colors?.[index] ?? colorForIndex(index),
+    ...(presetId === "munchkin"
+      ? {
+          munchkin: {
+            level: Math.max(0, Math.min(10, startingScore)),
+            equipmentBonus: 0,
+          },
+        }
+      : {}),
   }));
 
   if (players.length < 1) {
     throw new Error("A game requires at least one player");
   }
 
-  // If startingPlayerId is provided, verify it exists in players
   let validatedStartingPlayerId: string | undefined = startingPlayerId;
   if (startingPlayerId) {
     const playerIds = players.map((p) => p.id);
