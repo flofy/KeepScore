@@ -101,8 +101,23 @@ export function MunchkinPlayerCard({
       )}
 
       <div className="munchkin-counters">
-        <div className="munchkin-counter">
-          <span className="munchkin-counter-label">Niveau</span>
+        <div className="munchkin-counter munchkin-level-counter">
+          <span
+            className="munchkin-counter-label munchkin-level-label"
+            aria-label="Niveau"
+          >
+            <span
+              className="munchkin-player-icon"
+              style={
+                {
+                  "--player-icon-color": player.color ?? "#d88a24",
+                } as CSSProperties
+              }
+              aria-hidden="true"
+            >
+              ♟
+            </span>
+          </span>
           <div className="munchkin-counter-controls">
             <button
               type="button"
@@ -125,8 +140,11 @@ export function MunchkinPlayerCard({
         </div>
 
         <div className="munchkin-counter munchkin-equipment-counter">
-          <span className="munchkin-counter-label">
-            <span aria-hidden="true">🛡</span> Équipement
+          <span
+            className="munchkin-counter-label munchkin-equipment-label"
+            aria-label="Équipement"
+          >
+            <span aria-hidden="true">🛡</span>
           </span>
           <div className="munchkin-equipment-value">
             <strong aria-label={`Bonus d'équipement ${equipmentBonus}`}>
