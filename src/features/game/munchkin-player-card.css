@@ -180,7 +180,6 @@
 }
 
 .munchkin-equipment-value {
-  position: relative;
   display: flex;
   min-height: 78px;
   align-items: center;
@@ -200,12 +199,12 @@
 }
 
 .munchkin-equipment-value button:first-of-type {
-  left: -12px;
+  left: -2px;
   border-top-right-radius: 12px;
 }
 
 .munchkin-equipment-value button:last-of-type {
-  right: -12px;
+  right: -2px;
   border-top-left-radius: 12px;
 }
 
