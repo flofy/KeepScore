@@ -128,7 +128,8 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
         </div>
         {activePlayer && (
           <strong>
-            {activePlayer.name} · {labels.level} {activePlayer.munchkin?.level ?? 0}
+            {activePlayer.name} · {labels.level}{" "}
+            {activePlayer.munchkin?.level ?? 0}
           </strong>
         )}
       </div>
