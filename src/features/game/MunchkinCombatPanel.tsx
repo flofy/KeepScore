@@ -17,7 +17,31 @@ type Props = {
 };
 
 export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
-  const { t } = useI18n();
+  const { lang } = useI18n();
+  const labels =
+    lang === "fr"
+      ? {
+          combat: "Combat",
+          level: "Niveau",
+          monsterLevel: "Niveau du monstre",
+          combatForce: "Force totale",
+          combatHelpers: "Allies",
+          startCombat: "Lancer le combat",
+          resolveCombat: "Resoudre le combat",
+          combatWon: "Victoire ! +1 niveau",
+          combatLost: "Defaite",
+        }
+      : {
+          combat: "Combat",
+          level: "Level",
+          monsterLevel: "Monster level",
+          combatForce: "Total power",
+          combatHelpers: "Helpers",
+          startCombat: "Start combat",
+          resolveCombat: "Resolve combat",
+          combatWon: "Victory! +1 level",
+          combatLost: "Defeat",
+        };
   const [workflow, setWorkflow] = useState<MunchkinWorkflow>(() => {
     const initial = createMunchkinWorkflow();
     const activePlayerId = game.startingPlayerId ?? game.players[0]?.id;
@@ -96,15 +120,15 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   };
 
   return (
-    <section className="munchkin-combat" aria-label={t("combat")}>
+    <section className="munchkin-combat" aria-label={labels.combat}>
       <div className="munchkin-combat-header">
         <div>
           <span className="eyebrow">MUNCHKIN</span>
-          <h2>{t("combat")}</h2>
+          <h2>{labels.combat}</h2>
         </div>
         {activePlayer && (
           <strong>
-            {activePlayer.name} · {t("level")} {activePlayer.munchkin?.level ?? 0}
+            {activePlayer.name} · {labels.level} {activePlayer.munchkin?.level ?? 0}
           </strong>
         )}
       </div>
@@ -112,7 +136,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
       {workflow.phase !== "event" ? (
         <div className="munchkin-combat-start">
           <label>
-            {t("monsterLevel")}
+            {labels.monsterLevel}
             <input
               type="number"
               min="0"
@@ -123,11 +147,11 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
             />
           </label>
           <button type="button" onClick={beginCombat}>
-            {t("startCombat")}
+            {labels.startCombat}
           </button>
           {result && (
             <p role="status" className="munchkin-combat-result">
-              {result === "won" ? t("combatWon") : t("combatLost")}
+              {result === "won" ? labels.combatWon : labels.combatLost}
             </p>
           )}
         </div>
@@ -135,14 +159,14 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
         <div className="munchkin-combat-body">
           <div className="munchkin-combat-summary">
             <span>
-              {t("monsterLevel")}: <strong>{combat?.monsterLevel}</strong>
+              {labels.monsterLevel}: <strong>{combat?.monsterLevel}</strong>
             </span>
             <span>
-              {t("combatForce")}: <strong>{totalPower}</strong>
+              {labels.combatForce}: <strong>{totalPower}</strong>
             </span>
           </div>
           <fieldset>
-            <legend>{t("combatHelpers")}</legend>
+            <legend>{labels.combatHelpers}</legend>
             {game.players
               .filter((player) => player.id !== activePlayer?.id)
               .map((player) => (
@@ -160,7 +184,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
               ))}
           </fieldset>
           <button type="button" onClick={finishCombat}>
-            {t("resolveCombat")}
+            {labels.resolveCombat}
           </button>
         </div>
       )}
