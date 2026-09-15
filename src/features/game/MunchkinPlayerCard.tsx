@@ -14,6 +14,7 @@ type Props = {
   onRename: (name: string) => void;
   onChangeStats: (stats: MunchkinStats) => void;
   onFlip?: () => void;
+  onCombat?: () => void;
 };
 
 function clampLevel(level: number): number {
@@ -34,6 +35,7 @@ export function MunchkinPlayerCard({
   onRename,
   onChangeStats,
   onFlip,
+  onCombat,
 }: Props) {
   const level = Number.isFinite(stats.level) ? stats.level : 0;
   const equipmentBonus = Number.isFinite(stats.equipmentBonus)
@@ -149,9 +151,9 @@ export function MunchkinPlayerCard({
           </div>
         </div>
 
-        <div className="munchkin-counter">
+        <div className="munchkin-counter munchkin-force-counter">
           <span className="munchkin-counter-label">
-            <span aria-hidden="true">⚔</span> Force
+            Force
           </span>
           <strong
             className="munchkin-force-value"
@@ -159,6 +161,17 @@ export function MunchkinPlayerCard({
           >
             {force}
           </strong>
+          {onCombat && (
+            <button
+              type="button"
+              className="munchkin-combat-trigger"
+              onClick={onCombat}
+              aria-label={`Lancer un combat avec ${player.name}`}
+              title="Lancer un combat"
+            >
+              ⚔
+            </button>
+          )}
         </div>
       </div>
     </article>
