@@ -124,11 +124,14 @@ export function MunchkinPlayerCard({
           </div>
         </div>
 
-        <div className="munchkin-counter">
+        <div className="munchkin-counter munchkin-equipment-counter">
           <span className="munchkin-counter-label">
             <span aria-hidden="true">🛡</span> Équipement
           </span>
           <div className="munchkin-equipment-value">
+            <strong aria-label={`Bonus d'équipement ${equipmentBonus}`}>
+              {equipmentBonus > 0 ? `+${equipmentBonus}` : equipmentBonus}
+            </strong>
             <button
               type="button"
               onClick={() => updateEquipment(-1)}
@@ -136,9 +139,6 @@ export function MunchkinPlayerCard({
             >
               −
             </button>
-            <strong aria-label={`Bonus d'équipement ${equipmentBonus}`}>
-              {equipmentBonus > 0 ? `+${equipmentBonus}` : equipmentBonus}
-            </strong>
             <button
               type="button"
               onClick={() => updateEquipment(1)}
@@ -149,14 +149,16 @@ export function MunchkinPlayerCard({
           </div>
         </div>
 
-        <div className="munchkin-counter munchkin-force-counter">
-          <span className="munchkin-counter-label">Force</span>
-          <strong
-            className="munchkin-force-value"
-            aria-label={`Force ${force}`}
-          >
-            {force}
-          </strong>
+        <div className="munchkin-force-column">
+          <div className="munchkin-counter munchkin-force-counter">
+            <span className="munchkin-counter-label">Force</span>
+            <strong
+              className="munchkin-force-value"
+              aria-label={`Force ${force}`}
+            >
+              {force}
+            </strong>
+          </div>
           {onCombat && (
             <button
               type="button"
