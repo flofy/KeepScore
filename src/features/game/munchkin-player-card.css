@@ -67,22 +67,10 @@
 
 .munchkin-card-header {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 34px;
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
   gap: 8px;
   padding-inline: 18px;
-}
-
-.munchkin-card-emblem {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  border: 2px solid #6c3b16;
-  border-radius: 50%;
-  background: #f6ca55;
-  box-shadow: 0 2px 0 #6c3b16;
-  font-size: 0.95rem;
 }
 
 .munchkin-player-name {
@@ -115,7 +103,7 @@
 
 .munchkin-counters {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   flex: 1;
 }
@@ -184,6 +172,13 @@
   line-height: 1;
 }
 
+.munchkin-force-value {
+  color: #211209;
+  font-size: clamp(2.3rem, 7vw, 3.8rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
 .munchkin-card-flip-btn,
 .munchkin-remove-btn {
   position: absolute;
@@ -209,8 +204,12 @@
 }
 
 @keyframes munchkin-card-wiggle {
-  from { transform: rotate(-0.4deg); }
-  to { transform: rotate(0.4deg); }
+  from {
+    transform: rotate(-0.4deg);
+  }
+  to {
+    transform: rotate(0.4deg);
+  }
 }
 
 @media (max-width: 520px) {
@@ -225,13 +224,7 @@
   }
 
   .munchkin-card-header {
-    grid-template-columns: 28px minmax(0, 1fr) 28px;
-  }
-
-  .munchkin-card-emblem {
-    width: 26px;
-    height: 26px;
-    font-size: 0.8rem;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .munchkin-counters {
