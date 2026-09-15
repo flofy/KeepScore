@@ -41,12 +41,16 @@ export function MunchkinPlayerCard({
       level: clampLevel(stats.level + delta),
     });
 
-  const force = stats.level + stats.equipmentBonus;
+  const level = Number.isFinite(stats.level) ? stats.level : 0;
+  const equipmentBonus = Number.isFinite(stats.equipmentBonus)
+    ? stats.equipmentBonus
+    : 0;
+  const force = level + equipmentBonus;
 
   const updateForce = (delta: number) =>
     onChangeStats({
       ...stats,
-      equipmentBonus: clampEquipmentBonus(stats.equipmentBonus + delta),
+      equipmentBonus: clampEquipmentBonus(equipmentBonus + delta),
     });
 
   return (
@@ -65,18 +69,12 @@ export function MunchkinPlayerCard({
     >
       <div className="munchkin-card-frame" aria-hidden="true" />
       <div className="munchkin-card-header">
-        <span className="munchkin-card-emblem" aria-hidden="true">
-          ⚔
-        </span>
         <input
           className="munchkin-player-name"
           value={player.name}
           onChange={(event) => onRename(event.target.value)}
           aria-label={`Nom du joueur — ${player.name}`}
         />
-        <span className="munchkin-card-emblem" aria-hidden="true">
-          🛡
-        </span>
       </div>
 
       {removeMode && onRemove && (
@@ -111,16 +109,16 @@ export function MunchkinPlayerCard({
             <button
               type="button"
               onClick={() => updateLevel(-1)}
-              disabled={stats.level <= 0}
+              disabled={level <= 0}
               aria-label={`Retirer un niveau à ${player.name}`}
             >
               −
             </button>
-            <strong aria-label={`Niveau ${stats.level}`}>{stats.level}</strong>
+            <strong aria-label={`Niveau ${level}`}>{level}</strong>
             <button
               type="button"
               onClick={() => updateLevel(1)}
-              disabled={stats.level >= MAX_LEVEL}
+              disabled={level >= MAX_LEVEL}
               aria-label={`Ajouter un niveau à ${player.name}`}
             >
               +
@@ -128,12 +126,14 @@ export function MunchkinPlayerCard({
           </div>
         </div>
         <div className="munchkin-counter">
-          <span className="munchkin-counter-label">Force</span>
+          <span className="munchkin-counter-label">
+            <span aria-hidden="true">🛡</span> Force
+          </span>
           <div className="munchkin-counter-controls">
             <button
               type="button"
               onClick={() => updateForce(-1)}
-              aria-label={`Retirer un point de force à ${player.name}`}
+              aria-label={`Retirer un bonus d'équipement à ${player.name}`}
             >
               −
             </button>
@@ -141,7 +141,7 @@ export function MunchkinPlayerCard({
             <button
               type="button"
               onClick={() => updateForce(1)}
-              aria-label={`Ajouter un point de force à ${player.name}`}
+              aria-label={`Ajouter un bonus d'équipement à ${player.name}`}
             >
               +
             </button>
