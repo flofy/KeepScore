@@ -168,7 +168,6 @@ export function MunchkinPlayerCard({
               title="Lancer un combat"
             >
               <span aria-hidden="true">⚔</span>
-              <span>Combat</span>
             </button>
           )}
         </div>
