@@ -128,6 +128,28 @@
   text-transform: uppercase;
 }
 
+.munchkin-level-label,
+.munchkin-equipment-label {
+  display: flex;
+  min-height: 1.4em;
+  align-items: center;
+  justify-content: center;
+}
+
+.munchkin-player-icon {
+  display: inline-flex;
+  width: 1.5em;
+  height: 1.5em;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--player-icon-color);
+  color: #fff8e1;
+  font-size: 1.1rem;
+  line-height: 1;
+  box-shadow: 0 2px 0 rgb(91 50 24 / 55%);
+}
+
 .munchkin-counter-controls {
   display: grid;
   grid-template-columns: 40px minmax(42px, 1fr) 40px;
