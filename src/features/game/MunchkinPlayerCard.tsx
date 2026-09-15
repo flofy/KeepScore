@@ -100,8 +100,6 @@ export function MunchkinPlayerCard({
         </button>
       )}
 
-      <div className="munchkin-card-divider" aria-hidden="true" />
-
       <div className="munchkin-counters">
         <div className="munchkin-counter">
           <span className="munchkin-counter-label">Niveau</span>
@@ -130,7 +128,7 @@ export function MunchkinPlayerCard({
           <span className="munchkin-counter-label">
             <span aria-hidden="true">🛡</span> Équipement
           </span>
-          <div className="munchkin-counter-controls">
+          <div className="munchkin-equipment-value">
             <button
               type="button"
               onClick={() => updateEquipment(-1)}
@@ -152,28 +150,28 @@ export function MunchkinPlayerCard({
         </div>
 
         <div className="munchkin-counter munchkin-force-counter">
-          <span className="munchkin-counter-label">
-            Force
-          </span>
+          <span className="munchkin-counter-label">Force</span>
           <strong
             className="munchkin-force-value"
             aria-label={`Force ${force}`}
           >
             {force}
           </strong>
-          {onCombat && (
-            <button
-              type="button"
-              className="munchkin-combat-trigger"
-              onClick={onCombat}
-              aria-label={`Lancer un combat avec ${player.name}`}
-              title="Lancer un combat"
-            >
-              ⚔
-            </button>
-          )}
         </div>
       </div>
+
+      {onCombat && (
+        <button
+          type="button"
+          className="munchkin-combat-action"
+          onClick={onCombat}
+          aria-label={`Lancer un combat avec ${player.name}`}
+          title="Lancer un combat"
+        >
+          <span aria-hidden="true">⚔</span>
+          <span>Combat</span>
+        </button>
+      )}
     </article>
   );
 }
