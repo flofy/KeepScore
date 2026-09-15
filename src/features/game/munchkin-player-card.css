@@ -63,8 +63,7 @@
 .munchkin-card-header,
 .munchkin-counters,
 .munchkin-card-flip-btn,
-.munchkin-remove-btn,
-.munchkin-combat-action {
+.munchkin-remove-btn {
   position: relative;
   z-index: 1;
 }
@@ -187,7 +186,7 @@
 
 .munchkin-equipment-value button {
   position: absolute;
-  top: 0;
+  bottom: 0;
   width: 38px;
   height: 38px;
 }
@@ -200,6 +199,10 @@
   right: 0;
 }
 
+.munchkin-force-counter {
+  justify-content: flex-start;
+}
+
 .munchkin-force-value {
   color: #211209;
   font-size: clamp(2.3rem, 7vw, 3.8rem);
@@ -209,15 +212,16 @@
 
 .munchkin-combat-action {
   display: inline-flex;
-  min-width: 120px;
-  min-height: 52px;
+  min-width: 96px;
+  min-height: 46px;
   align-items: center;
   align-self: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
+  margin-top: auto;
   border-radius: 999px;
-  padding: 6px 18px;
-  font-size: 0.85rem;
+  padding: 5px 14px;
+  font-size: 0.78rem;
   font-weight: 900;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -227,7 +231,7 @@
 }
 
 .munchkin-combat-action span:first-child {
-  font-size: 1.9rem;
+  font-size: 1.65rem;
   line-height: 1;
 }
 
@@ -313,10 +317,10 @@
   }
 
   .munchkin-combat-action {
-    min-height: 48px;
+    min-height: 44px;
   }
 
   .munchkin-combat-action span:first-child {
-    font-size: 1.7rem;
+    font-size: 1.55rem;
   }
 }
