@@ -5,6 +5,7 @@ import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
 import { GameHistoryOverlay } from "./GameHistoryOverlay";
 import { GameMenuDrawer } from "./GameMenuDrawer";
+import { MunchkinCombatPanel } from "./MunchkinCombatPanel";
 import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
 import { useGameHistoryView } from "./useGameHistoryView";
@@ -90,6 +91,15 @@ export function GameScreen({
     haptic();
   };
 
+  const updateMunchkinLevel = (playerId: string, level: number) => {
+    const player = game.players.find((candidate) => candidate.id === playerId);
+    if (!player?.munchkin) return;
+    updateMunchkinStats(playerId, {
+      ...player.munchkin,
+      level: Math.max(0, Math.min(10, Math.trunc(level))),
+    });
+  };
+
   const addPlayer = () => {
     dispatch({ type: "ADD_PLAYER" });
     haptic();
@@ -127,6 +137,13 @@ export function GameScreen({
           onMenuOpen={() => setMenuOpen(true)}
           onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
         />
+
+        {game.presetId === "munchkin" && (
+          <MunchkinCombatPanel
+            game={game}
+            onUpdateLevel={updateMunchkinLevel}
+          />
+        )}
 
         <GamePlayerArea
           game={game}
