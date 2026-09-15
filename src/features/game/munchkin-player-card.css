@@ -145,7 +145,8 @@
 
 .munchkin-counter-controls button,
 .munchkin-card-flip-btn,
-.munchkin-remove-btn {
+.munchkin-remove-btn,
+.munchkin-combat-trigger {
   border: 2px solid #5b3218;
   background: #f5c64f;
   box-shadow: 0 3px 0 #6b3b16;
@@ -161,7 +162,8 @@
   line-height: 1;
 }
 
-.munchkin-counter-controls button:active {
+.munchkin-counter-controls button:active,
+.munchkin-combat-trigger:active {
   transform: translateY(2px);
   box-shadow: 0 1px 0 #6b3b16;
 }
@@ -178,11 +180,31 @@
   line-height: 1;
 }
 
+.munchkin-force-counter {
+  position: relative;
+}
+
 .munchkin-force-value {
   color: #211209;
   font-size: clamp(2.3rem, 7vw, 3.8rem);
   font-weight: 950;
   line-height: 1;
+}
+
+.munchkin-combat-trigger {
+  width: 58px;
+  height: 58px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-size: 2rem;
+  line-height: 1;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.munchkin-combat-trigger:hover {
+  transform: scale(1.08);
 }
 
 .munchkin-card-flip-btn,
@@ -249,5 +271,11 @@
   .munchkin-counter-controls button {
     min-height: 34px;
     font-size: 1.2rem;
+  }
+
+  .munchkin-combat-trigger {
+    width: 48px;
+    height: 48px;
+    font-size: 1.7rem;
   }
 }
