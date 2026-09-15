@@ -5,10 +5,12 @@ import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
 import { GameHistoryOverlay } from "./GameHistoryOverlay";
 import { GameMenuDrawer } from "./GameMenuDrawer";
+import { MunchkinCombatPanel } from "./MunchkinCombatPanel";
 import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
 import { useGameHistoryView } from "./useGameHistoryView";
 import { useGamePlayerView } from "./useGamePlayerView";
+import "./munchkin-combat.css";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
@@ -62,6 +64,7 @@ export function GameScreen({
   } = useGamePlayerView(game);
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
+  const [combatPlayerId, setCombatPlayerId] = useState<string | null>(null);
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
@@ -90,6 +93,15 @@ export function GameScreen({
     haptic();
   };
 
+  const updateMunchkinLevel = (playerId: string, level: number) => {
+    const player = game.players.find((candidate) => candidate.id === playerId);
+    if (!player?.munchkin) return;
+    updateMunchkinStats(playerId, {
+      ...player.munchkin,
+      level: Math.max(0, Math.min(10, Math.trunc(level))),
+    });
+  };
+
   const addPlayer = () => {
     dispatch({ type: "ADD_PLAYER" });
     haptic();
@@ -101,6 +113,9 @@ export function GameScreen({
   };
 
   const closeMenu = () => setMenuOpen(false);
+  const combatPlayer = game.players.find(
+    (player) => player.id === combatPlayerId,
+  );
 
   return (
     <>
@@ -141,7 +156,28 @@ export function GameScreen({
           onSetScore={setScore}
           onUpdateMunchkinStats={updateMunchkinStats}
           onFlipPlayer={togglePlayerRotation}
+          onCombat={setCombatPlayerId}
         />
+
+        {combatPlayer && (
+          <div className="munchkin-combat-backdrop">
+            <div className="munchkin-combat-modal">
+              <button
+                className="munchkin-combat-close"
+                type="button"
+                onClick={() => setCombatPlayerId(null)}
+                aria-label={lang === "fr" ? "Fermer" : "Close"}
+              >
+                ×
+              </button>
+              <MunchkinCombatPanel
+                key={combatPlayer.id}
+                game={{ ...game, startingPlayerId: combatPlayer.id }}
+                onUpdateLevel={updateMunchkinLevel}
+              />
+            </div>
+          </div>
+        )}
 
         {historyOpen && (
           <GameHistoryOverlay
