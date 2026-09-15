@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Game } from "../../domain/game/types";
+import type { Game, MunchkinStats } from "../../domain/game/types";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
@@ -85,6 +85,11 @@ export function GameScreen({
     haptic();
   };
 
+  const updateMunchkinStats = (playerId: string, stats: MunchkinStats) => {
+    dispatch({ type: "UPDATE_MUNCHKIN_STATS", playerId, stats });
+    haptic();
+  };
+
   const addPlayer = () => {
     dispatch({ type: "ADD_PLAYER" });
     haptic();
@@ -134,6 +139,7 @@ export function GameScreen({
           }
           onAddScore={addScore}
           onSetScore={setScore}
+          onUpdateMunchkinStats={updateMunchkinStats}
           onFlipPlayer={togglePlayerRotation}
         />
 

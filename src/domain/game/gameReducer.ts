@@ -1,9 +1,10 @@
-import type { Game } from "./types";
+import type { Game, MunchkinStats } from "./types";
 import { removeHistoryEntry, updateHistoryEntry } from "./historyActions";
 import { colorForIndex } from "./colors";
 
 export type GameAction =
   | { type: "ADD_SCORE"; playerId: string; delta: number }
+  | { type: "UPDATE_MUNCHKIN_STATS"; playerId: string; stats: MunchkinStats }
   | { type: "RENAME_PLAYER"; playerId: string; name: string }
   | { type: "RENAME_GAME"; name: string }
   | { type: "RESET_SCORE"; playerId: string }
@@ -37,6 +38,21 @@ export function gameReducer(game: Game, action: GameAction): Game {
             timestamp: updatedAt,
           },
         ],
+        updatedAt,
+      };
+    }
+    case "UPDATE_MUNCHKIN_STATS": {
+      const player = game.players.find(
+        (candidate) => candidate.id === action.playerId,
+      );
+      if (!player) return game;
+      return {
+        ...game,
+        players: game.players.map((candidate) =>
+          candidate.id === action.playerId
+            ? { ...candidate, munchkin: action.stats }
+            : candidate,
+        ),
         updatedAt,
       };
     }
@@ -74,6 +90,9 @@ export function gameReducer(game: Game, action: GameAction): Game {
         name,
         score: 0,
         color: colorForIndex(game.players.length),
+        ...(game.presetId === "munchkin"
+          ? { munchkin: { level: 1, equipmentBonus: 0 } }
+          : {}),
       };
       return { ...game, players: [...game.players, player], updatedAt };
     }

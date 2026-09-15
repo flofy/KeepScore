@@ -11,6 +11,21 @@ describe("gameReducer", () => {
     ]);
   });
 
+  it("creates Munchkin players with level 1 and zero equipment bonus", () => {
+    const game = createGame(
+      ["Alice", "Bob"],
+      undefined,
+      1,
+      undefined,
+      undefined,
+      "munchkin",
+    );
+    expect(game.players.map(({ munchkin }) => munchkin)).toEqual([
+      { level: 1, equipmentBonus: 0 },
+      { level: 1, equipmentBonus: 0 },
+    ]);
+  });
+
   it("adds score and records history", () => {
     const game = createGame(["Alice", "Bob"]);
     const next = gameReducer(game, {
@@ -21,6 +36,28 @@ describe("gameReducer", () => {
     expect(next.players[0].score).toBe(5);
     expect(next.history).toHaveLength(1);
     expect(next.history[0].delta).toBe(5);
+  });
+
+  it("updates Munchkin player counters without changing score history", () => {
+    const game = createGame(
+      ["Alice", "Bob"],
+      undefined,
+      1,
+      undefined,
+      undefined,
+      "munchkin",
+    );
+    const next = gameReducer(game, {
+      type: "UPDATE_MUNCHKIN_STATS",
+      playerId: game.players[0].id,
+      stats: { level: 3, equipmentBonus: -2 },
+    });
+    expect(next.players[0].munchkin).toEqual({
+      level: 3,
+      equipmentBonus: -2,
+    });
+    expect(next.players[0].score).toBe(1);
+    expect(next.history).toEqual([]);
   });
 
   it("renames a player", () => {

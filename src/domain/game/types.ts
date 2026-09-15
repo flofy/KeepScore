@@ -1,8 +1,14 @@
+export type MunchkinStats = {
+  level: number;
+  equipmentBonus: number;
+};
+
 export type Player = {
   id: string;
   name: string;
   score: number;
   color?: string;
+  munchkin?: MunchkinStats;
 };
 
 export type ScoreEntry = {
