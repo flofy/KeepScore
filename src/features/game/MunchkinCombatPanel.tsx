@@ -42,11 +42,15 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
       game.players.filter((player) => combat?.helperIds.includes(player.id)),
     [combat?.helperIds, game.players],
   );
-  const participants = [activePlayer, ...helpers].filter(
-    (player): player is NonNullable<typeof player> => Boolean(player),
-  ) as CompanionPlayer[];
+  const participants: CompanionPlayer[] = [activePlayer, ...helpers]
+    .filter((player): player is NonNullable<typeof player> => Boolean(player))
+    .map((player) => ({
+      ...player,
+      level: player.munchkin?.level ?? 0,
+      equipmentBonus: player.munchkin?.equipmentBonus ?? 0,
+    }));
   const totalPower = participants.reduce(
-    (total, player) => total + playerPower(player.munchkin ?? { level: 0, equipmentBonus: 0 }),
+    (total, player) => total + playerPower(player),
     0,
   );
 
@@ -61,15 +65,16 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   const toggleHelper = (playerId: string) => {
     if (!combat) return;
     setWorkflow((current) => {
-      const isSelected = current.context.combat?.helperIds.includes(playerId);
-      if (isSelected) {
+      const currentCombat = current.context.combat;
+      if (!currentCombat) return current;
+      if (currentCombat.helperIds.includes(playerId)) {
         return {
           ...current,
           context: {
             ...current.context,
             combat: {
-              ...current.context.combat!,
-              helperIds: current.context.combat!.helperIds.filter(
+              ...currentCombat,
+              helperIds: currentCombat.helperIds.filter(
                 (id) => id !== playerId,
               ),
             },
@@ -81,10 +86,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   };
 
   const finishCombat = () => {
-    const resolved = resolveCombat(workflow, game.players.map((player) => ({
-      ...player,
-      ...(player.munchkin ?? { level: 0, equipmentBonus: 0 }),
-    })));
+    const resolved = resolveCombat(workflow, participants);
     setWorkflow(resolved.workflow);
     setResult(resolved.winner ? "won" : "lost");
     if (resolved.winner && activePlayer) {
@@ -94,7 +96,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   };
 
   return (
-    <section className="munchkin-combat" aria-label={t("combat") }>
+    <section className="munchkin-combat" aria-label={t("combat")}>
       <div className="munchkin-combat-header">
         <div>
           <span className="eyebrow">MUNCHKIN</span>
