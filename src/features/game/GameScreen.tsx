@@ -10,6 +10,7 @@ import { GamePlayerArea } from "./GamePlayerArea";
 import { GameToolbar } from "./GameToolbar";
 import { useGameHistoryView } from "./useGameHistoryView";
 import { useGamePlayerView } from "./useGamePlayerView";
+import "./munchkin-combat.css";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
@@ -63,6 +64,7 @@ export function GameScreen({
   } = useGamePlayerView(game);
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
+  const [combatPlayerId, setCombatPlayerId] = useState<string | null>(null);
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
@@ -111,6 +113,9 @@ export function GameScreen({
   };
 
   const closeMenu = () => setMenuOpen(false);
+  const combatPlayer = game.players.find(
+    (player) => player.id === combatPlayerId,
+  );
 
   return (
     <>
@@ -138,13 +143,6 @@ export function GameScreen({
           onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
         />
 
-        {game.presetId === "munchkin" && (
-          <MunchkinCombatPanel
-            game={game}
-            onUpdateLevel={updateMunchkinLevel}
-          />
-        )}
-
         <GamePlayerArea
           game={game}
           orderedPlayers={orderedPlayers}
@@ -158,7 +156,28 @@ export function GameScreen({
           onSetScore={setScore}
           onUpdateMunchkinStats={updateMunchkinStats}
           onFlipPlayer={togglePlayerRotation}
+          onCombat={setCombatPlayerId}
         />
+
+        {combatPlayer && (
+          <div className="munchkin-combat-backdrop">
+            <div className="munchkin-combat-modal">
+              <button
+                className="munchkin-combat-close"
+                type="button"
+                onClick={() => setCombatPlayerId(null)}
+                aria-label={lang === "fr" ? "Fermer" : "Close"}
+              >
+                ×
+              </button>
+              <MunchkinCombatPanel
+                key={combatPlayer.id}
+                game={{ ...game, startingPlayerId: combatPlayer.id }}
+                onUpdateLevel={updateMunchkinLevel}
+              />
+            </div>
+          </div>
+        )}
 
         {historyOpen && (
           <GameHistoryOverlay
