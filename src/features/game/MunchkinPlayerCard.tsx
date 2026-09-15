@@ -1,5 +1,9 @@
 import type { CSSProperties } from "react";
-import type { MunchkinStats, Player } from "../../domain/game/types";
+import type {
+  MunchkinGender,
+  MunchkinStats,
+  Player,
+} from "../../domain/game/types";
 import "./munchkin-player-card.css";
 
 const MAX_LEVEL = 10;
@@ -25,6 +29,10 @@ function clampEquipmentBonus(bonus: number): number {
   return Math.trunc(bonus);
 }
 
+function nextGender(gender: MunchkinGender): MunchkinGender {
+  return gender === "female" ? "male" : "female";
+}
+
 export function MunchkinPlayerCard({
   player,
   stats,
@@ -41,6 +49,7 @@ export function MunchkinPlayerCard({
   const equipmentBonus = Number.isFinite(stats.equipmentBonus)
     ? stats.equipmentBonus
     : 0;
+  const gender = stats.gender ?? "male";
   const force = level + equipmentBonus;
 
   const updateLevel = (delta: number) =>
@@ -53,6 +62,12 @@ export function MunchkinPlayerCard({
     onChangeStats({
       ...stats,
       equipmentBonus: clampEquipmentBonus(equipmentBonus + delta),
+    });
+
+  const toggleGender = () =>
+    onChangeStats({
+      ...stats,
+      gender: nextGender(gender),
     });
 
   return (
@@ -102,22 +117,27 @@ export function MunchkinPlayerCard({
 
       <div className="munchkin-counters">
         <div className="munchkin-counter munchkin-level-counter">
-          <span
-            className="munchkin-counter-label munchkin-level-label"
-            aria-label="Niveau"
+          <button
+            type="button"
+            className="munchkin-gender-toggle"
+            onClick={toggleGender}
+            aria-pressed={gender === "female"}
+            aria-label={`Personnage ${gender === "female" ? "femme" : "homme"}. Changer de personnage`}
+            title="Changer de personnage"
           >
-            <span
+            <svg
               className="munchkin-player-icon"
-              style={
-                {
-                  "--player-icon-color": player.color ?? "#d88a24",
-                } as CSSProperties
-              }
+              viewBox="0 0 24 24"
+              role="img"
               aria-hidden="true"
             >
-              ♟
-            </span>
-          </span>
+              {gender === "female" ? (
+                <path d="M12 2.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5M7.5 11.75h9l1.5 8.25h-3.25v2.5h-2v-2.5h-1.5V22h-2v-2h-3.25z" />
+              ) : (
+                <path d="M12 2.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5M7.25 11.75h9.5l1.25 8.25h-3.25l-.75-4.5-.75 6.5h-2.5l-.75-6.5-.75 4.5H6z" />
+              )}
+            </svg>
+          </button>
           <div className="munchkin-counter-controls">
             <button
               type="button"
