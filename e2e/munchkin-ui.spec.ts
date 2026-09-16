@@ -14,7 +14,9 @@ async function startMunchkinGame(page: Page) {
 }
 
 test.describe("Munchkin player card", () => {
-  test("toggles the character and confirms player removal", async ({ page }) => {
+  test("toggles the character and confirms player removal", async ({
+    page,
+  }) => {
     await startMunchkinGame(page);
 
     const firstCard = page.locator(".munchkin-player-card").first();
