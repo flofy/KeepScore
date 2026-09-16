@@ -126,6 +126,7 @@ export function GameSetup({
             type="number"
             inputMode="numeric"
             value={startingScore}
+            onFocus={(event) => event.currentTarget.select()}
             onChange={(event) => {
               setStartingScore(event.target.value);
               setPresetId("");
