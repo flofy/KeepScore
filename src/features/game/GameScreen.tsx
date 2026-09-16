@@ -116,10 +116,17 @@ export function GameScreen({
   const combatPlayer = game.players.find(
     (player) => player.id === combatPlayerId,
   );
+  const shellClassName = [
+    "app-shell",
+    fullscreen ? "fullscreen" : "",
+    game.presetId === "munchkin" ? "munchkin-theme" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
     <>
-      <main className={fullscreen ? "app-shell fullscreen" : "app-shell"}>
+      <main className={shellClassName}>
         {removeMode && (
           <div className="remove-mode-banner" role="status">
             <span className="remove-mode-hint">{t("removePlayersHint")}</span>
