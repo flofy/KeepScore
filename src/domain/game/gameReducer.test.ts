@@ -11,7 +11,7 @@ describe("gameReducer", () => {
     ]);
   });
 
-  it("creates Munchkin players with level 1 and zero equipment bonus", () => {
+  it("creates Munchkin players with level 1, zero equipment bonus and male gender", () => {
     const game = createGame(
       ["Alice", "Bob"],
       undefined,
@@ -21,8 +21,8 @@ describe("gameReducer", () => {
       "munchkin",
     );
     expect(game.players.map(({ munchkin }) => munchkin)).toEqual([
-      { level: 1, equipmentBonus: 0 },
-      { level: 1, equipmentBonus: 0 },
+      { level: 1, equipmentBonus: 0, gender: "male" },
+      { level: 1, equipmentBonus: 0, gender: "male" },
     ]);
   });
 
@@ -50,11 +50,12 @@ describe("gameReducer", () => {
     const next = gameReducer(game, {
       type: "UPDATE_MUNCHKIN_STATS",
       playerId: game.players[0].id,
-      stats: { level: 3, equipmentBonus: -2 },
+      stats: { level: 3, equipmentBonus: -2, gender: "female" },
     });
     expect(next.players[0].munchkin).toEqual({
       level: 3,
       equipmentBonus: -2,
+      gender: "female",
     });
     expect(next.players[0].score).toBe(1);
     expect(next.history).toEqual([]);
