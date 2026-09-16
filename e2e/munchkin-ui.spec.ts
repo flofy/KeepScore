@@ -1,5 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 
+async function startGame(page: Page) {
+  await page.goto("setup", { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Start game" }).click();
+  await expect(page.locator(".players")).toBeVisible();
+}
+
 async function startMunchkinGame(page: Page) {
   await page.goto("setup", { waitUntil: "networkidle" });
   await page.getByRole("radio", { name: /Munchkin/ }).click();
@@ -32,22 +38,26 @@ test.describe("Munchkin player card", () => {
     await expect(page.getByDisplayValue("Alice")).toHaveCount(0);
   });
 
-  test("selects a number when editing a score or combat value", async ({
-    page,
-  }) => {
-    await startMunchkinGame(page);
+  test("selects number inputs when starting an edit", async ({ page }) => {
+    await startGame(page);
 
-    const firstCard = page.locator(".munchkin-player-card").first();
-    await firstCard.getByText("1", { exact: true }).click();
+    const firstCard = page.locator(".player-card").first();
+    await firstCard.getByRole("button", { name: /Set score/ }).click();
 
     const scoreInput = firstCard.locator("input[type=number]");
     await expect(scoreInput).toBeFocused();
-    await expect(scoreInput).toHaveValue("1");
+    await expect(scoreInput).toHaveJSProperty("selectionStart", 1);
+    await expect(scoreInput).toHaveJSProperty("selectionEnd", 1);
 
-    await firstCard.getByRole("button", { name: /Lancer un combat/ }).click();
+    await startMunchkinGame(page);
+    const munchkinCard = page.locator(".munchkin-player-card").first();
+    await munchkinCard.getByRole("button", { name: /Lancer un combat/ }).click();
+
     const monsterInput = page.locator(".munchkin-combat input[type=number]");
     await expect(monsterInput).toBeVisible();
     await monsterInput.click();
-    await expect(monsterInput).toHaveValue("1");
+    await expect(monsterInput).toBeFocused();
+    await expect(monsterInput).toHaveJSProperty("selectionStart", 1);
+    await expect(monsterInput).toHaveJSProperty("selectionEnd", 1);
   });
 });
