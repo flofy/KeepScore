@@ -61,6 +61,19 @@ body::after {
   padding-top: max(8px, env(safe-area-inset-top));
 }
 
+.app-shell.munchkin-theme {
+  background:
+    linear-gradient(rgb(55 28 12 / 18%), rgb(55 28 12 / 18%)),
+    repeating-linear-gradient(
+      90deg,
+      #6f421f 0,
+      #6f421f 18px,
+      #784925 19px,
+      #613617 36px
+    );
+  box-shadow: inset 0 0 80px rgb(35 16 7 / 45%);
+}
+
 .players {
   min-height: 0;
 }
