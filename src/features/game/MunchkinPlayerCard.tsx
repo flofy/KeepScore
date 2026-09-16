@@ -17,7 +17,6 @@ type Props = {
   onRemove?: () => void;
   onRename: (name: string) => void;
   onChangeStats: (stats: MunchkinStats) => void;
-  onFlip?: () => void;
   onCombat?: () => void;
 };
 
@@ -42,7 +41,6 @@ export function MunchkinPlayerCard({
   onRemove,
   onRename,
   onChangeStats,
-  onFlip,
   onCombat,
 }: Props) {
   const level = Number.isFinite(stats.level) ? stats.level : 0;
@@ -92,26 +90,16 @@ export function MunchkinPlayerCard({
         />
       </div>
 
-      {removeMode && onRemove && (
+      {onRemove && (
         <button
           type="button"
           className="munchkin-remove-btn"
           onClick={onRemove}
           disabled={!canRemove}
           aria-label={`Supprimer ${player.name}`}
+          title="Supprimer le joueur"
         >
           ✕
-        </button>
-      )}
-      {onFlip && !removeMode && (
-        <button
-          type="button"
-          className="munchkin-card-flip-btn"
-          onClick={onFlip}
-          aria-pressed={rotation > 0}
-          aria-label={`Retourner ${player.name}`}
-        >
-          ↻
         </button>
       )}
 
