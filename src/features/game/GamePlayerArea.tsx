@@ -110,7 +110,6 @@ export function GamePlayerArea({
               }}
               onRename={(name) => onRenamePlayer(player.id, name)}
               onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
-              onFlip={() => onFlipPlayer(player.id)}
               onCombat={() => onCombat(player.id)}
             />
           );
