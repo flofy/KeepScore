@@ -8,6 +8,7 @@ import "./ui/saved-games.css";
 import "./ui/chwatzi.css";
 import "./ui/intro.css";
 import "./ui/install.css";
+import "./features/game/munchkin-combat.css";
 import { App } from "./app/App";
 import { AppProviders } from "./app/providers";
 import { UpdateButton } from "./ui/UpdateButton";
