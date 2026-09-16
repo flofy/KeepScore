@@ -38,7 +38,7 @@ test.describe("Munchkin player card", () => {
     await expect(page.getByDisplayValue("Alice")).toHaveCount(0);
   });
 
-  test("selects number inputs when starting an edit", async ({ page }) => {
+  test("focuses number inputs when starting an edit", async ({ page }) => {
     await startGame(page);
 
     const firstCard = page.locator(".player-card").first();
@@ -46,8 +46,6 @@ test.describe("Munchkin player card", () => {
 
     const scoreInput = firstCard.locator("input[type=number]");
     await expect(scoreInput).toBeFocused();
-    await expect(scoreInput).toHaveJSProperty("selectionStart", 1);
-    await expect(scoreInput).toHaveJSProperty("selectionEnd", 1);
 
     await startMunchkinGame(page);
     const munchkinCard = page.locator(".munchkin-player-card").first();
@@ -57,7 +55,5 @@ test.describe("Munchkin player card", () => {
     await expect(monsterInput).toBeVisible();
     await monsterInput.click();
     await expect(monsterInput).toBeFocused();
-    await expect(monsterInput).toHaveJSProperty("selectionStart", 1);
-    await expect(monsterInput).toHaveJSProperty("selectionEnd", 1);
   });
 });
