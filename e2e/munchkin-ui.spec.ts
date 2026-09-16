@@ -14,9 +14,7 @@ async function startMunchkinGame(page: Page) {
 }
 
 test.describe("Munchkin player card", () => {
-  test("toggles the character and removes a player from the card", async ({
-    page,
-  }) => {
+  test("toggles the character and confirms player removal", async ({ page }) => {
     await startMunchkinGame(page);
 
     const firstCard = page.locator(".munchkin-player-card").first();
@@ -30,6 +28,18 @@ test.describe("Munchkin player card", () => {
       firstCard.getByRole("button", { name: /Personnage femme/ }),
     ).toHaveAttribute("aria-pressed", "true");
 
+    page.once("dialog", async (dialog) => {
+      expect(dialog.type()).toBe("confirm");
+      expect(dialog.message()).toContain("Alice");
+      await dialog.dismiss();
+    });
+    await firstCard.getByRole("button", { name: /Supprimer Alice/ }).click();
+
+    await expect(page.locator(".munchkin-player-card")).toHaveCount(2);
+
+    page.once("dialog", async (dialog) => {
+      await dialog.accept();
+    });
     await firstCard.getByRole("button", { name: /Supprimer Alice/ }).click();
 
     await expect(page.locator(".munchkin-player-card")).toHaveCount(1);
