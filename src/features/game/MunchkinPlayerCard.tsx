@@ -125,18 +125,9 @@ export function MunchkinPlayerCard({
             aria-label={`Personnage ${gender === "female" ? "femme" : "homme"}. Changer de personnage`}
             title="Changer de personnage"
           >
-            <svg
-              className="munchkin-player-icon"
-              viewBox="0 0 24 24"
-              role="img"
-              aria-hidden="true"
-            >
-              {gender === "female" ? (
-                <path d="M12 2.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5M7.5 11.75h9l1.5 8.25h-3.25v2.5h-2v-2.5h-1.5V22h-2v-2h-3.25z" />
-              ) : (
-                <path d="M12 2.75a3.75 3.75 0 1 0 0 7.5 3.75 3.75 0 0 0 0-7.5M7.25 11.75h9.5l1.25 8.25h-3.25l-.75-4.5-.75 6.5h-2.5l-.75-6.5-.75 4.5H6z" />
-              )}
-            </svg>
+            <span className="munchkin-player-icon" aria-hidden="true">
+              {gender === "female" ? "♀" : "♂"}
+            </span>
           </button>
           <div className="munchkin-counter-controls">
             <button
