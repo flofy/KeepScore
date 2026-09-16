@@ -30,9 +30,7 @@ test.describe("Munchkin player card", () => {
       firstCard.getByRole("button", { name: /Personnage femme/ }),
     ).toHaveAttribute("aria-pressed", "true");
 
-    await firstCard
-      .getByRole("button", { name: /Supprimer Alice/ })
-      .click();
+    await firstCard.getByRole("button", { name: /Supprimer Alice/ }).click();
 
     await expect(page.locator(".munchkin-player-card")).toHaveCount(1);
     await expect(page.getByDisplayValue("Alice")).toHaveCount(0);
@@ -49,7 +47,9 @@ test.describe("Munchkin player card", () => {
 
     await startMunchkinGame(page);
     const munchkinCard = page.locator(".munchkin-player-card").first();
-    await munchkinCard.getByRole("button", { name: /Lancer un combat/ }).click();
+    await munchkinCard
+      .getByRole("button", { name: /Lancer un combat/ })
+      .click();
 
     const monsterInput = page.locator(".munchkin-combat input[type=number]");
     await expect(monsterInput).toBeVisible();
