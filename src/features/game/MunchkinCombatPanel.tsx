@@ -54,7 +54,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
         }
       : initial;
   });
-  const [monsterLevel, setMonsterLevel] = useState(1);
+  const [monsterLevel, setMonsterLevel] = useState("1");
   const [result, setResult] = useState<"won" | "lost" | null>(null);
 
   const activePlayer = game.players.find(
@@ -81,7 +81,9 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   if (game.presetId !== "munchkin" || game.players.length === 0) return null;
 
   const beginCombat = () => {
-    const next = startCombat(workflow, monsterLevel);
+    const level = Math.max(0, Number(monsterLevel) || 0);
+    const next = startCombat(workflow, level);
+    setMonsterLevel(String(level));
     setWorkflow(next);
     setResult(null);
   };
@@ -143,9 +145,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
               min="0"
               value={monsterLevel}
               onFocus={(event) => event.currentTarget.select()}
-              onChange={(event) =>
-                setMonsterLevel(Math.max(0, Number(event.target.value) || 0))
-              }
+              onChange={(event) => setMonsterLevel(event.target.value)}
             />
           </label>
           <button type="button" onClick={beginCombat}>
