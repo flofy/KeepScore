@@ -16,6 +16,7 @@ type Props = {
   onSetScore: (playerId: string, value: number) => void;
   onUpdateMunchkinStats: (playerId: string, stats: MunchkinStats) => void;
   onFlipPlayer: (playerId: string) => void;
+  onCombat: (playerId: string) => void;
 };
 
 const RECENT_DELTAS = 6;
@@ -42,6 +43,7 @@ export function GamePlayerArea({
   onSetScore,
   onUpdateMunchkinStats,
   onFlipPlayer,
+  onCombat,
 }: Props) {
   const { t } = useI18n();
   const isDuo = game.players.length === 2;
@@ -109,6 +111,7 @@ export function GamePlayerArea({
               onRename={(name) => onRenamePlayer(player.id, name)}
               onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
               onFlip={() => onFlipPlayer(player.id)}
+              onCombat={() => onCombat(player.id)}
             />
           );
         }

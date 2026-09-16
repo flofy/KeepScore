@@ -1,6 +1,9 @@
+export type MunchkinGender = "male" | "female";
+
 export type MunchkinStats = {
   level: number;
   equipmentBonus: number;
+  gender?: MunchkinGender;
 };
 
 export type Player = {
