@@ -63,7 +63,8 @@ test.describe("Munchkin player card", () => {
 
     const monsterInput = page.locator(".munchkin-combat input[type=number]");
     await expect(monsterInput).toBeVisible();
-    await monsterInput.click();
     await expect(monsterInput).toBeFocused();
+    await monsterInput.fill("7");
+    await expect(monsterInput).toHaveValue("7");
   });
 });
