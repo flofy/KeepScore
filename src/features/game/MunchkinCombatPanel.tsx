@@ -142,6 +142,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
               type="number"
               min="0"
               value={monsterLevel}
+              onFocus={(event) => event.currentTarget.select()}
               onChange={(event) =>
                 setMonsterLevel(Math.max(0, Number(event.target.value) || 0))
               }
