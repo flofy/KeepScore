@@ -17,7 +17,6 @@ type Props = {
   onRemove?: () => void;
   onRename: (name: string) => void;
   onChangeStats: (stats: MunchkinStats) => void;
-  onFlip?: () => void;
   onCombat?: () => void;
 };
 
@@ -42,7 +41,6 @@ export function MunchkinPlayerCard({
   onRemove,
   onRename,
   onChangeStats,
-  onFlip,
   onCombat,
 }: Props) {
   const level = Number.isFinite(stats.level) ? stats.level : 0;
