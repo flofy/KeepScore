@@ -75,6 +75,13 @@ export function GamePlayerArea({
           ? "players crowded"
           : "players";
 
+  const removeMunchkinPlayer = (playerId: string, playerName: string) => {
+    if (game.players.length <= 1) return;
+    if (!window.confirm(`${t("delete")} ${playerName} ?`)) return;
+    onRemovePlayer(playerId);
+    haptic();
+  };
+
   return (
     <section
       className={playerAreaClass}
@@ -104,13 +111,9 @@ export function GamePlayerArea({
               rotation={rotation}
               removeMode={removeMode}
               canRemove={game.players.length > 1}
-              onRemove={() => {
-                onRemovePlayer(player.id);
-                haptic();
-              }}
+              onRemove={() => removeMunchkinPlayer(player.id, player.name)}
               onRename={(name) => onRenamePlayer(player.id, name)}
               onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
-              onFlip={() => onFlipPlayer(player.id)}
               onCombat={() => onCombat(player.id)}
             />
           );

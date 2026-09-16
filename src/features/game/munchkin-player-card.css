@@ -12,6 +12,7 @@
   position: relative;
   display: flex;
   min-height: 230px;
+  max-height: 20em;
   flex-direction: column;
   overflow: hidden;
   gap: 16px;
@@ -63,7 +64,6 @@
 
 .munchkin-card-header,
 .munchkin-counters,
-.munchkin-card-flip-btn,
 .munchkin-remove-btn {
   position: relative;
   z-index: 1;
@@ -154,9 +154,10 @@
 
 .munchkin-player-icon {
   display: block;
-  width: 2.5rem;
-  height: 2.5rem;
-  fill: currentColor;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 3.5rem;
+  line-height: 1;
   filter: drop-shadow(0 2px 0 rgb(91 50 24 / 55%));
 }
 
@@ -176,7 +177,6 @@
 
 .munchkin-counter-controls button,
 .munchkin-equipment-value button,
-.munchkin-card-flip-btn,
 .munchkin-remove-btn,
 .munchkin-combat-action {
   border: 2px solid #5b3218;
@@ -324,24 +324,16 @@
     0 1px 0 #6b3b16;
 }
 
-.munchkin-card-flip-btn,
 .munchkin-remove-btn {
   position: absolute;
   top: 10px;
+  right: 10px;
   width: 34px;
   height: 34px;
   border-radius: 50%;
+  color: #7d1f13;
   font-size: 1rem;
   font-weight: 900;
-}
-
-.munchkin-card-flip-btn {
-  right: 10px;
-}
-
-.munchkin-remove-btn {
-  left: 10px;
-  color: #7d1f13;
 }
 
 .munchkin-player-card.remove-mode {
@@ -404,6 +396,12 @@
   .munchkin-equipment-value button {
     width: 34px;
     height: 34px;
+  }
+
+  .munchkin-player-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 3rem;
   }
 
   .munchkin-combat-action {
