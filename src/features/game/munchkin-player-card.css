@@ -85,7 +85,7 @@
   background: transparent;
   color: #211209;
   font: inherit;
-  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  font-size: clamp(1.3rem, 3.4vw, 1.7rem);
   font-weight: 900;
   letter-spacing: 0.04em;
   text-align: center;
