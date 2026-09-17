@@ -1,0 +1,412 @@
+.munchkin-players {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 100%;
+  padding: 24px;
+  gap: 20px;
+  background: transparent;
+}
+
+.munchkin-player-card {
+  --player-color: #d88a24;
+  position: relative;
+  display: flex;
+  min-height: 230px;
+  max-height: 20em;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 16px;
+  padding: 22px;
+  border: 3px solid #211109;
+  border-radius: 18px;
+  background: linear-gradient(145deg, #f5d895, #d5a85f 55%, #b77b3d);
+  box-shadow:
+    inset 0 0 0 2px #ffe09a,
+    inset 0 0 0 6px rgb(87 45 19 / 16%),
+    0 10px 0 #1c0d07,
+    0 16px 28px rgb(0 0 0 / 30%);
+  color: #24140b;
+}
+
+.munchkin-player-card::before,
+.munchkin-player-card::after {
+  position: absolute;
+  z-index: 0;
+  width: 26px;
+  height: 26px;
+  border: 3px solid #5b3218;
+  content: "";
+  opacity: 0.8;
+}
+
+.munchkin-player-card::before {
+  top: 10px;
+  left: 10px;
+  border-right: 0;
+  border-bottom: 0;
+}
+
+.munchkin-player-card::after {
+  right: 10px;
+  bottom: 10px;
+  border-top: 0;
+  border-left: 0;
+}
+
+.munchkin-card-frame {
+  position: absolute;
+  inset: 6px;
+  z-index: 0;
+  border: 1px solid rgb(78 39 14 / 40%);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+.munchkin-card-header,
+.munchkin-counters,
+.munchkin-remove-btn {
+  position: relative;
+  z-index: 1;
+}
+
+.munchkin-card-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  padding-inline: 18px;
+}
+
+.munchkin-player-name {
+  width: 100%;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 0;
+  background: transparent;
+  color: #211209;
+  font: inherit;
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.munchkin-player-name:focus {
+  outline: 2px solid #8b551e;
+  outline-offset: 3px;
+}
+
+.munchkin-counters {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  flex: 1;
+}
+
+.munchkin-counter {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 10px;
+  border: 2px solid #80501f;
+  border-radius: 14px;
+  background: rgb(255 230 170 / 48%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 35%),
+    0 3px 0 rgb(79 40 16 / 22%);
+  text-align: center;
+}
+
+.munchkin-counter-label {
+  color: #543016;
+  font-size: 0.82rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.munchkin-equipment-label {
+  display: flex;
+  min-height: 1.4em;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.munchkin-gender-toggle {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 0;
+  align-self: center;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--player-color);
+  cursor: pointer;
+}
+
+.munchkin-player-icon {
+  display: block;
+  width: 3.5rem;
+  height: 3.5rem;
+  font-size: 3.5rem;
+  line-height: 1;
+  filter: drop-shadow(0 2px 0 rgb(91 50 24 / 55%));
+}
+
+.munchkin-gender-toggle:focus-visible {
+  outline: 2px solid var(--player-color);
+  outline-offset: 3px;
+  border-radius: 50%;
+}
+
+.munchkin-counter-controls {
+  display: flex;
+  min-height: 78px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.munchkin-counter-controls button,
+.munchkin-equipment-value button,
+.munchkin-remove-btn,
+.munchkin-combat-action {
+  border: 2px solid #5b3218;
+  background: #f5c64f;
+  box-shadow: 0 3px 0 #6b3b16;
+  color: #2b160a;
+  cursor: pointer;
+}
+
+.munchkin-counter-controls button,
+.munchkin-equipment-value button {
+  min-height: 40px;
+  border-radius: 50%;
+  font-size: 1.45rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.munchkin-counter-controls button:active,
+.munchkin-equipment-value button:active,
+.munchkin-combat-action:active {
+  transform: translateY(2px);
+  box-shadow: 0 1px 0 #6b3b16;
+}
+
+.munchkin-counter-controls button:disabled {
+  cursor: default;
+  opacity: 0.35;
+}
+
+.munchkin-counter-controls strong,
+.munchkin-equipment-value strong {
+  color: #211209;
+  font-size: clamp(2.3rem, 7vw, 3.8rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.munchkin-level-counter,
+.munchkin-equipment-counter {
+  position: relative;
+}
+
+.munchkin-equipment-value {
+  display: flex;
+  min-height: 78px;
+  align-items: center;
+  justify-content: center;
+}
+
+.munchkin-equipment-value button {
+  position: absolute;
+  bottom: -2px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: 0;
+  box-shadow:
+    inset 0 2px 0 rgb(255 224 154 / 65%),
+    inset 0 -2px 0 rgb(107 59 22 / 70%);
+}
+
+.munchkin-equipment-value button:first-of-type {
+  left: -2px;
+  border-top-right-radius: 12px;
+}
+
+.munchkin-equipment-value button:last-of-type {
+  right: -2px;
+  border-top-left-radius: 12px;
+}
+
+.munchkin-level-counter .munchkin-counter-controls button {
+  position: absolute;
+  bottom: -2px;
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  border-radius: 0;
+  box-shadow:
+    inset 0 2px 0 rgb(255 224 154 / 65%),
+    inset 0 -2px 0 rgb(107 59 22 / 70%);
+}
+
+.munchkin-level-counter .munchkin-counter-controls button:first-child {
+  left: -2px;
+  border-top-right-radius: 12px;
+}
+
+.munchkin-level-counter .munchkin-counter-controls button:last-child {
+  right: -2px;
+  border-top-left-radius: 12px;
+}
+
+.munchkin-force-column {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.munchkin-force-counter {
+  flex: 1;
+  justify-content: center;
+}
+
+.munchkin-force-value {
+  color: #211209;
+  font-size: clamp(2.3rem, 7vw, 3.8rem);
+  font-weight: 950;
+  line-height: 1;
+}
+
+.munchkin-combat-action {
+  display: inline-flex;
+  width: 46px;
+  min-width: 46px;
+  min-height: 46px;
+  aspect-ratio: 1;
+  align-items: center;
+  align-self: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  box-shadow:
+    inset 0 2px 0 rgb(255 224 154 / 65%),
+    inset 0 -2px 0 rgb(107 59 22 / 70%),
+    0 3px 0 #6b3b16;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.munchkin-combat-action:hover {
+  transform: translateY(-2px) scale(1.04);
+}
+
+.munchkin-combat-action:active {
+  transform: translateY(2px) scale(0.98);
+  box-shadow:
+    inset 0 2px 0 rgb(255 224 154 / 65%),
+    inset 0 -2px 0 rgb(107 59 22 / 70%),
+    0 1px 0 #6b3b16;
+}
+
+.munchkin-remove-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  color: #7d1f13;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.munchkin-player-card.remove-mode {
+  animation: munchkin-card-wiggle 0.35s ease-in-out infinite alternate;
+}
+
+@keyframes munchkin-card-wiggle {
+  from {
+    transform: rotate(-0.4deg);
+  }
+  to {
+    transform: rotate(0.4deg);
+  }
+}
+
+@media (max-width: 700px) {
+  .players.munchkin-players {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .munchkin-player-card {
+    min-height: 190px;
+    padding: 18px;
+  }
+
+  .munchkin-card-header {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .munchkin-counters {
+    gap: 8px;
+  }
+
+  .munchkin-counter {
+    padding: 10px 6px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls {
+    min-height: 68px;
+  }
+
+  .munchkin-level-counter .munchkin-counter-controls button {
+    width: 34px;
+    height: 34px;
+    min-height: 34px;
+  }
+
+  .munchkin-counter-controls button,
+  .munchkin-equipment-value button {
+    min-height: 34px;
+    font-size: 1.2rem;
+  }
+
+  .munchkin-equipment-value {
+    min-height: 68px;
+  }
+
+  .munchkin-equipment-value button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .munchkin-player-icon {
+    width: 3rem;
+    height: 3rem;
+    font-size: 3rem;
+  }
+
+  .munchkin-combat-action {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

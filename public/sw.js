@@ -1,56 +1,91 @@
-const CACHE = 'keepscore-v2'
+const CACHE = "keepscore-__BUILD_ID__";
 
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((cache) =>
-      cache.addAll([
-        new URL('./', self.registration.scope).href,
-        new URL('./manifest.webmanifest', self.registration.scope).href,
-        new URL('./icon.svg', self.registration.scope).href,
-      ]),
-    ),
-  )
-  self.skipWaiting()
-})
+    caches
+      .open(CACHE)
+      .then((cache) =>
+        cache.addAll([
+          new URL("./", self.registration.scope).href,
+          new URL("./manifest.webmanifest", self.registration.scope).href,
+          new URL("./icon.svg", self.registration.scope).href,
+        ]),
+      ),
+  );
+});
 
-self.addEventListener('activate', (event) => {
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
+});
+
+self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) =>
-      Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))),
-    ).then(() => self.clients.claim()).then(() => self.registration.update()),
-  )
-})
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)),
+        ),
+      )
+      .then(() => self.clients.claim()),
+  );
+});
 
-self.addEventListener('fetch', (event) => {
-  const request = event.request
-  if (request.method !== 'GET') return
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  if (request.mode === 'navigate') {
+  if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)
         .then((response) => {
-          const copy = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(new URL('./', self.registration.scope).href, copy))
-          return response
+          const copy = response.clone();
+          caches
+            .open(CACHE)
+            .then((cache) =>
+              cache.put(new URL("./", self.registration.scope).href, copy),
+            );
+          return response;
         })
-        .catch(() => caches.match(new URL('./', self.registration.scope).href)),
-    )
-    return
+        .catch(() => caches.match(new URL("./", self.registration.scope).href)),
+    );
+    return;
   }
 
-  const url = new URL(request.url)
-  if (url.origin !== self.location.origin) return
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const isUpdateSensitive =
+    url.pathname.endsWith("/sw.js") ||
+    url.pathname.endsWith("/manifest.webmanifest");
+
+  if (isUpdateSensitive) {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok && !url.pathname.endsWith("/sw.js")) {
+            const copy = response.clone();
+            caches.open(CACHE).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request)),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(request).then((cached) => {
-      if (cached) return cached
+      if (cached) return cached;
       return fetch(request).then((response) => {
         if (response.ok) {
-          const copy = response.clone()
-          caches.open(CACHE).then((cache) => cache.put(request, copy))
+          const copy = response.clone();
+          caches.open(CACHE).then((cache) => cache.put(request, copy));
         }
-        return response
-      })
+        return response;
+      });
     }),
-  )
-})
+  );
+});

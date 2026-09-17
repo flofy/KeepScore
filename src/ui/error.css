@@ -1,0 +1,85 @@
+/* Route error screen */
+.error-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(145deg, rgb(30 41 72 / 96%), rgb(15 23 42 / 96%));
+}
+
+.error-card {
+  width: min(420px, 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 24px;
+  background: rgb(15 23 42 / 97%);
+  box-shadow: 0 24px 70px rgb(0 0 0 / 45%);
+  text-align: center;
+}
+
+.error-icon {
+  font-size: 40px;
+}
+
+.error-card h1 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.error-card .muted {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.error-detail {
+  width: 100%;
+  max-height: 120px;
+  overflow: auto;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  background: rgb(2 6 23 / 60%);
+  color: #f87171;
+  font-size: 12px;
+  text-align: left;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.error-card .primary-button,
+.error-card .secondary-button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.error-card .primary-button {
+  background: linear-gradient(135deg, #2563eb, #7c3aed);
+  color: #fff;
+}
+
+.error-card .secondary-button {
+  border: 1px solid rgb(148 163 184 / 25%);
+  background: transparent;
+  color: #cbd5e1;
+}
+
+.error-card .secondary-button:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.error-card .primary-button:hover {
+  filter: brightness(1.15);
+}

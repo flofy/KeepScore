@@ -339,9 +339,18 @@
 }
 
 @keyframes countdownPulse {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.9; }
-  100% { transform: scale(1); opacity: 1; }
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 
 /* Blink Ring Animation - starts from touch point */
@@ -542,30 +551,30 @@
     margin: 0 12px;
     padding: 20px;
   }
-  
+
   .chwatzi-header h1 {
     font-size: 24px;
   }
-  
+
   .roulette-wheel {
     max-width: 260px;
   }
-  
+
   .roulette-item {
     padding: 14px 16px;
   }
-  
+
   .countdown-number {
     font-size: 120px;
   }
-  
+
   .multitouch-count {
     bottom: 16px;
     right: 16px;
     font-size: 14px;
     padding: 4px 12px;
   }
-  
+
   .multitouch-back-btn {
     top: 16px;
     left: 16px;
@@ -573,13 +582,13 @@
     height: 44px;
     font-size: 20px;
   }
-  
+
   .finger-dot {
     width: 64px;
     height: 64px;
     font-size: 20px;
   }
-  
+
   .finger-number {
     font-size: 20px;
   }

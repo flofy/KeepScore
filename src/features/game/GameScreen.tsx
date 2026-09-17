@@ -1,0 +1,250 @@
+import { useState } from "react";
+import type { Game, MunchkinStats } from "../../domain/game/types";
+import { useGameHistory } from "../../ui/useGameHistory";
+import { useFullscreen } from "../../ui/useFullscreen";
+import { useI18n } from "../../ui/i18n";
+import { GameHistoryOverlay } from "./GameHistoryOverlay";
+import { GameMenuDrawer } from "./GameMenuDrawer";
+import { MunchkinCombatPanel } from "./MunchkinCombatPanel";
+import { GamePlayerArea } from "./GamePlayerArea";
+import { GameToolbar } from "./GameToolbar";
+import { useGameHistoryView } from "./useGameHistoryView";
+import { useGamePlayerView } from "./useGamePlayerView";
+import "./munchkin-combat.css";
+
+function haptic() {
+  if ("vibrate" in navigator) navigator.vibrate(8);
+}
+
+export function GameScreen({
+  initialGame,
+  onNewGame,
+  onSavedGames,
+  onChwatzi,
+  onHome,
+}: {
+  initialGame: Game;
+  onNewGame: () => void;
+  onSavedGames: () => void;
+  onChwatzi: () => void;
+  onHome: () => void;
+}) {
+  const {
+    present: game,
+    past,
+    future,
+    dispatch,
+    undo,
+    redo,
+  } = useGameHistory(initialGame);
+  const { t, lang, setLang } = useI18n();
+  const { fullscreen, toggleFullscreen } = useFullscreen();
+  const {
+    editingEntry,
+    draftDelta,
+    historyOpen,
+    historyFlipped,
+    historyGrouping,
+    setHistoryGrouping,
+    setHistoryFlipped,
+    setDraftDelta,
+    beginEdit,
+    saveEdit,
+    openHistory: openHistoryView,
+    closeHistory,
+    cancelEdit,
+    deleteEntry,
+  } = useGameHistoryView({ game, dispatch });
+  const {
+    swapped,
+    orderedPlayers,
+    playerRotations,
+    toggleSwap,
+    togglePlayerRotation,
+  } = useGamePlayerView(game);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [removeMode, setRemoveMode] = useState(false);
+  const [combatPlayerId, setCombatPlayerId] = useState<string | null>(null);
+
+  const removePlayer = (playerId: string) => {
+    dispatch({ type: "REMOVE_PLAYER", playerId });
+    haptic();
+    if (game.players.length <= 2) setRemoveMode(false);
+  };
+
+  const addScore = (playerId: string, delta: number) => {
+    dispatch({ type: "ADD_SCORE", playerId, delta });
+    haptic();
+  };
+
+  const setScore = (playerId: string, value: number) => {
+    const player = game.players.find((candidate) => candidate.id === playerId);
+    if (!player) return;
+    dispatch({
+      type: "ADD_SCORE",
+      playerId,
+      delta: value - player.score,
+    });
+    haptic();
+  };
+
+  const updateMunchkinStats = (playerId: string, stats: MunchkinStats) => {
+    dispatch({ type: "UPDATE_MUNCHKIN_STATS", playerId, stats });
+    haptic();
+  };
+
+  const updateMunchkinLevel = (playerId: string, level: number) => {
+    const player = game.players.find((candidate) => candidate.id === playerId);
+    if (!player?.munchkin) return;
+    updateMunchkinStats(playerId, {
+      ...player.munchkin,
+      level: Math.max(0, Math.min(10, Math.trunc(level))),
+    });
+  };
+
+  const addPlayer = () => {
+    dispatch({ type: "ADD_PLAYER" });
+    haptic();
+  };
+
+  const openHistory = () => {
+    openHistoryView();
+    setMenuOpen(false);
+  };
+
+  const closeMenu = () => setMenuOpen(false);
+  const combatPlayer = game.players.find(
+    (player) => player.id === combatPlayerId,
+  );
+  const shellClassName = [
+    "app-shell",
+    fullscreen ? "fullscreen" : "",
+    game.presetId === "munchkin" ? "munchkin-theme" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
+  return (
+    <>
+      <main className={shellClassName}>
+        {removeMode && (
+          <div className="remove-mode-banner" role="status">
+            <span className="remove-mode-hint">{t("removePlayersHint")}</span>
+            <button
+              className="remove-mode-done"
+              type="button"
+              onClick={() => setRemoveMode(false)}
+            >
+              {t("done")}
+            </button>
+          </div>
+        )}
+
+        <GameToolbar
+          game={game}
+          fullscreen={fullscreen}
+          onFullscreenToggle={toggleFullscreen}
+          swapped={swapped}
+          onSwap={toggleSwap}
+          onMenuOpen={() => setMenuOpen(true)}
+          onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
+        />
+
+        <GamePlayerArea
+          game={game}
+          orderedPlayers={orderedPlayers}
+          removeMode={removeMode}
+          playerRotations={playerRotations}
+          onRemovePlayer={removePlayer}
+          onRenamePlayer={(playerId, name) =>
+            dispatch({ type: "RENAME_PLAYER", playerId, name })
+          }
+          onAddScore={addScore}
+          onSetScore={setScore}
+          onUpdateMunchkinStats={updateMunchkinStats}
+          onFlipPlayer={togglePlayerRotation}
+          onCombat={setCombatPlayerId}
+        />
+
+        {combatPlayer && (
+          <div className="munchkin-combat-backdrop">
+            <div className="munchkin-combat-modal">
+              <button
+                className="munchkin-combat-close"
+                type="button"
+                onClick={() => setCombatPlayerId(null)}
+                aria-label={lang === "fr" ? "Fermer" : "Close"}
+              >
+                ×
+              </button>
+              <MunchkinCombatPanel
+                key={combatPlayer.id}
+                game={{ ...game, startingPlayerId: combatPlayer.id }}
+                onUpdateLevel={updateMunchkinLevel}
+              />
+            </div>
+          </div>
+        )}
+
+        {historyOpen && (
+          <GameHistoryOverlay
+            game={game}
+            historyGrouping={historyGrouping}
+            onHistoryGroupingChange={setHistoryGrouping}
+            historyFlipped={historyFlipped}
+            onClose={closeHistory}
+            onFlip={() => setHistoryFlipped((current) => !current)}
+            editingEntry={editingEntry}
+            draftDelta={draftDelta}
+            onBeginEdit={beginEdit}
+            onDraftDeltaChange={setDraftDelta}
+            onSaveEdit={saveEdit}
+            onCancelEdit={cancelEdit}
+            onDeleteEntry={deleteEntry}
+          />
+        )}
+      </main>
+
+      <GameMenuDrawer
+        open={menuOpen}
+        onClose={closeMenu}
+        onHome={() => {
+          closeMenu();
+          onHome();
+        }}
+        onHistory={openHistory}
+        onUndo={() => {
+          undo();
+          closeMenu();
+        }}
+        onRedo={() => {
+          redo();
+          closeMenu();
+        }}
+        canUndo={Boolean(past.length)}
+        canRedo={Boolean(future.length)}
+        playerCount={game.players.length}
+        onAddPlayer={addPlayer}
+        onRemovePlayerMode={() => {
+          haptic();
+          closeMenu();
+          setRemoveMode(true);
+        }}
+        onSavedGames={() => {
+          closeMenu();
+          onSavedGames();
+        }}
+        onNewGame={() => {
+          closeMenu();
+          onNewGame();
+        }}
+        onChwatzi={() => {
+          closeMenu();
+          onChwatzi();
+        }}
+        lang={lang}
+        onLanguageChange={setLang}
+      />
+    </>
+  );
+}

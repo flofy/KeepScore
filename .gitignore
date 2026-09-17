@@ -9,3 +9,6 @@ vite.config.d.ts
 .env
 .env.*
 !.env.example
+pnpm-lock.yaml
+test-results/
+playwright-report/
