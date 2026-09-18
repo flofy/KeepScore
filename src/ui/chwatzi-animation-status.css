@@ -1,0 +1,24 @@
+.chwatzi-v2-animation-status {
+  position: absolute;
+  left: 50%;
+  bottom: calc(20px + env(safe-area-inset-bottom));
+  z-index: 70;
+  width: min(90vw, 560px);
+  padding: 10px 14px;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 12px;
+  background: rgb(15 23 42 / 0.9);
+  color: rgb(255 255 255 / 0.9);
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: 0 8px 32px rgb(0 0 0 / 0.3);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chwatzi-v2-water {
+    animation-duration: 1ms;
+  }
+}
