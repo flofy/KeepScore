@@ -1,10 +1,18 @@
 import { useMemo, useState } from "react";
 import type { Game } from "../../domain/game/types";
 
+export const PLAYER_ROTATIONS = [0, 90, 180, 270] as const;
+export type PlayerRotation = (typeof PLAYER_ROTATIONS)[number];
+
+export function nextPlayerRotation(rotation: number): PlayerRotation {
+  const index = PLAYER_ROTATIONS.indexOf(rotation as PlayerRotation);
+  return PLAYER_ROTATIONS[(index + 1) % PLAYER_ROTATIONS.length];
+}
+
 export function useGamePlayerView(game: Game) {
   const [swapped, setSwapped] = useState(false);
   const [playerRotations, setPlayerRotations] = useState<
-    Record<string, number>
+    Record<string, PlayerRotation>
   >({});
 
   const isDuo = game.players.length === 2;
@@ -19,7 +27,7 @@ export function useGamePlayerView(game: Game) {
   const togglePlayerRotation = (playerId: string) => {
     setPlayerRotations((previous) => ({
       ...previous,
-      [playerId]: previous[playerId] ? 0 : 180,
+      [playerId]: nextPlayerRotation(previous[playerId] ?? 0),
     }));
   };
 
