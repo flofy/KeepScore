@@ -3,6 +3,7 @@ import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import { PLAYER_COLORS } from "../domain/game/colors";
 import { useI18n } from "./i18n";
 import "./chwatzi-v2.css";
+import "./chwatzi-animation-status.css";
 
 type Props = {
   onBack?: () => void;
@@ -15,19 +16,30 @@ const FINGER_SETTLE_MS = 3000;
 const WATER_FILL_MS = 5000;
 
 export function ChwatziScreenV2({ onBack }: Props) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [fingers, setFingers] = useState<Finger[]>([]);
   const [phase, setPhase] = useState<Phase>("idle");
   const [countdown, setCountdown] = useState(3);
   const [selectedFingerId, setSelectedFingerId] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const fingersRef = useRef<Finger[]>([]);
   const fingerColorsRef = useRef(new Map<number, string>());
   const selectedFingerRef = useRef<Finger | null>(null);
   const settleTimerRef = useRef<number | null>(null);
   const countdownTimerRef = useRef<number | null>(null);
   const wipeTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setReducedMotion(mediaQuery.matches);
+
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+    return () =>
+      mediaQuery.removeEventListener("change", updateMotionPreference);
+  }, []);
 
   const updateFingers = useCallback(
     (updater: (current: Finger[]) => Finger[]) => {
@@ -272,6 +284,18 @@ export function ChwatziScreenV2({ onBack }: Props) {
           >
             ✕
           </button>
+        )}
+
+        {reducedMotion && (
+          <div
+            className="chwatzi-v2-animation-status"
+            role="status"
+            aria-live="polite"
+          >
+            {lang === "fr"
+              ? "Animations réduites par les réglages de votre appareil."
+              : "Animations are reduced by your device settings."}
+          </div>
         )}
 
         {phase === "counting" && (
