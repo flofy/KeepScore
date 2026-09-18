@@ -287,7 +287,11 @@ export function ChwatziScreenV2({ onBack }: Props) {
         )}
 
         {reducedMotion && (
-          <div className="chwatzi-v2-animation-status" role="status" aria-live="polite">
+          <div
+            className="chwatzi-v2-animation-status"
+            role="status"
+            aria-live="polite"
+          >
             {lang === "fr"
               ? "Animations réduites par les réglages de votre appareil."
               : "Animations are reduced by your device settings."}
