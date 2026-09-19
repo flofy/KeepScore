@@ -4,8 +4,8 @@ import type { Game } from "../../domain/game/types";
 export const PLAYER_ROTATIONS = [0, 90, 180, 270] as const;
 export type PlayerRotation = (typeof PLAYER_ROTATIONS)[number];
 
-export function nextPlayerRotation(rotation: PlayerRotation): PlayerRotation {
-  const index = PLAYER_ROTATIONS.indexOf(rotation);
+export function nextPlayerRotation(rotation: number): PlayerRotation {
+  const index = PLAYER_ROTATIONS.indexOf(rotation as PlayerRotation);
   return PLAYER_ROTATIONS[(index + 1) % PLAYER_ROTATIONS.length];
 }
 
