@@ -10,6 +10,6 @@ describe("nextPlayerRotation", () => {
   });
 
   it("falls back to the first rotation for an unknown value", () => {
-    expect(nextPlayerRotation(45)).toBe(90);
+    expect(nextPlayerRotation(45)).toBe(0);
   });
 });
