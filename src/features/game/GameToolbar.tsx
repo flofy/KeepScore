@@ -39,9 +39,7 @@ export function GameToolbar({
         </div>
         <div className="toolbar">
           <InstallButton variant="header" />
-        </div>
-      </header>
-      <div className={isDuo ? "quick-actions duo" : "quick-actions"}>
+          <div className={isDuo ? "quick-actions duo" : "quick-actions"}>
         {isDuo && (
           <button
             className="icon-fab"
@@ -100,7 +98,9 @@ export function GameToolbar({
             />
           </svg>
         </button>
-      </div>
+          </div>
+        </div>
+      </header>
     </>
   );
 }
