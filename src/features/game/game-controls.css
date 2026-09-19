@@ -123,3 +123,57 @@
     border-radius: 20px;
   }
 }
+
+/* Player cards rotate as a complete visual surface. The content already
+   follows the rotation value; these rules keep the controls and history
+   indicators on the corresponding physical corners and rotate them too. */
+.player-card.rotated-90 .card-flip-btn {
+  top: 10px;
+  right: 10px;
+  bottom: auto;
+  left: auto;
+  transform: rotate(90deg);
+}
+
+.player-card.rotated-90 .player-deltas {
+  top: auto;
+  right: 12px;
+  bottom: 14px;
+  left: auto;
+  align-items: flex-end;
+  transform: rotate(90deg);
+}
+
+.player-card.rotated-180 .card-flip-btn {
+  top: auto;
+  right: 10px;
+  bottom: 10px;
+  left: auto;
+  transform: rotate(180deg);
+}
+
+.player-card.rotated-180 .player-deltas {
+  top: auto;
+  right: auto;
+  bottom: 14px;
+  left: 12px;
+  align-items: flex-end;
+  transform: rotate(180deg);
+}
+
+.player-card.rotated-270 .card-flip-btn {
+  top: auto;
+  right: auto;
+  bottom: 10px;
+  left: 10px;
+  transform: rotate(270deg);
+}
+
+.player-card.rotated-270 .player-deltas {
+  top: 14px;
+  right: auto;
+  bottom: auto;
+  left: 12px;
+  align-items: flex-start;
+  transform: rotate(270deg);
+}
