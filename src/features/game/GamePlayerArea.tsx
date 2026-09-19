@@ -4,12 +4,14 @@ import { colorForIndex } from "../../domain/game/colors";
 import { useI18n } from "../../ui/i18n";
 import { MunchkinPlayerCard } from "./MunchkinPlayerCard";
 import { PlayerCard } from "./PlayerCard";
+import "./player-grid.css";
 
 type Props = {
   game: Game;
   orderedPlayers: Game["players"];
   removeMode: boolean;
   playerRotations: Record<string, number>;
+  playerGridColumns: number;
   onRemovePlayer: (playerId: string) => void;
   onRenamePlayer: (playerId: string, name: string) => void;
   onAddScore: (playerId: string, delta: number) => void;
@@ -37,6 +39,7 @@ export function GamePlayerArea({
   orderedPlayers,
   removeMode,
   playerRotations,
+  playerGridColumns,
   onRemovePlayer,
   onRenamePlayer,
   onAddScore,
@@ -63,17 +66,16 @@ export function GamePlayerArea({
     return undefined;
   };
 
-  const playerAreaClass = removeMode
-    ? isMunchkin
-      ? "players munchkin-players remove-mode"
-      : "players remove-mode"
-    : isMunchkin
-      ? "players munchkin-players"
-      : isDuo
-        ? "players duo"
-        : game.players.length >= 4
-          ? "players crowded"
-          : "players";
+  const playerAreaClass = [
+    "players",
+    "player-grid",
+    isDuo ? "duo" : "",
+    isMunchkin ? "munchkin-players" : "",
+    removeMode ? "remove-mode" : "",
+    !isDuo && game.players.length >= 4 ? "crowded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   const removeMunchkinPlayer = (playerId: string, playerName: string) => {
     if (game.players.length <= 1) return;
@@ -85,16 +87,7 @@ export function GamePlayerArea({
   return (
     <section
       className={playerAreaClass}
-      style={
-        (!isDuo &&
-          game.players.length > 2 &&
-          ({
-            "--cols": String(
-              Math.max(2, Math.min(4, Math.ceil(game.players.length / 2))),
-            ),
-          } as CSSProperties)) ||
-        undefined
-      }
+      style={{ "--player-grid-cols": playerGridColumns } as CSSProperties}
       aria-label={t("players")}
     >
       {orderedPlayers.map((player, index) => {

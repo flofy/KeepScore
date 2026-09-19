@@ -1,5 +1,6 @@
 import { InstallButton } from "../../ui/InstallButton";
 import { useI18n, type Lang } from "../../ui/i18n";
+import type { PlayerGridLayout } from "./usePlayerGrid";
 
 type Props = {
   open: boolean;
@@ -11,6 +12,8 @@ type Props = {
   canUndo: boolean;
   canRedo: boolean;
   playerCount: number;
+  playerGridLayout: PlayerGridLayout;
+  onPlayerGridLayoutChange: (layout: PlayerGridLayout) => void;
   onAddPlayer: () => void;
   onRemovePlayerMode: () => void;
   onSavedGames: () => void;
@@ -30,6 +33,8 @@ export function GameMenuDrawer({
   canUndo,
   canRedo,
   playerCount,
+  playerGridLayout,
+  onPlayerGridLayoutChange,
   onAddPlayer,
   onRemovePlayerMode,
   onSavedGames,
@@ -41,6 +46,26 @@ export function GameMenuDrawer({
   const { t } = useI18n();
 
   if (!open) return null;
+
+  const gridOptions: Array<{
+    value: PlayerGridLayout;
+    label: string;
+  }> =
+    lang === "fr"
+      ? [
+          { value: "auto", label: "Auto" },
+          { value: "1", label: "1 par ligne" },
+          { value: "2", label: "2 par ligne" },
+          { value: "3", label: "3 par ligne" },
+          { value: "4", label: "4 par ligne" },
+        ]
+      : [
+          { value: "auto", label: "Auto" },
+          { value: "1", label: "1 per row" },
+          { value: "2", label: "2 per row" },
+          { value: "3", label: "3 per row" },
+          { value: "4", label: "4 per row" },
+        ];
 
   return (
     <div className="drawer-backdrop" onClick={onClose}>
@@ -116,6 +141,29 @@ export function GameMenuDrawer({
             −
           </button>
         </div>
+        <details className="player-grid-accordion">
+          <summary>
+            <span className="menu-icon">▦</span>
+            {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
+          </summary>
+          <div className="player-grid-options">
+            {gridOptions.map((option) => (
+              <button
+                key={option.value}
+                className={
+                  option.value === playerGridLayout
+                    ? "player-grid-option active"
+                    : "player-grid-option"
+                }
+                type="button"
+                aria-pressed={option.value === playerGridLayout}
+                onClick={() => onPlayerGridLayoutChange(option.value)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </details>
         <button className="menu-item" type="button" onClick={onSavedGames}>
           <span className="menu-icon">💾</span>
           {t("savedGames")}
