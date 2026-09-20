@@ -141,19 +141,19 @@ export function GameMenuDrawer({
             −
           </button>
         </div>
-        <details className="player-grid-accordion">
+        <details className="menu-item menu-item-accordion">
           <summary>
             <span className="menu-icon">▦</span>
             {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
           </summary>
-          <div className="player-grid-options">
+          <div className="menu-accordion-options">
             {gridOptions.map((option) => (
               <button
                 key={option.value}
                 className={
                   option.value === playerGridLayout
-                    ? "player-grid-option active"
-                    : "player-grid-option"
+                    ? "menu-option active"
+                    : "menu-option"
                 }
                 type="button"
                 aria-pressed={option.value === playerGridLayout}
