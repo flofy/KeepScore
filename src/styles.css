@@ -771,6 +771,59 @@ h2 {
   opacity: 0.35;
   cursor: default;
 }
+.menu-item-accordion {
+  display: block;
+  padding: 0;
+  text-align: center;
+  list-style: none;
+}
+.menu-item-accordion summary {
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  cursor: pointer;
+  list-style: none;
+}
+.menu-item-accordion summary::-webkit-details-marker {
+  display: none;
+}
+.menu-item-accordion summary::after {
+  content: "›";
+  margin-left: 10px;
+  color: #94a3b8;
+  font-size: 22px;
+  transition: transform 0.15s ease;
+}
+.menu-item-accordion[open] summary::after {
+  transform: rotate(90deg);
+}
+.menu-accordion-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  padding: 0 20px 10px;
+}
+.menu-option {
+  min-height: 44px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 4%);
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.menu-option:hover {
+  border-color: rgb(125 211 252 / 40%);
+  background: rgb(255 255 255 / 7%);
+}
+.menu-option.active {
+  border-color: rgb(125 211 252 / 60%);
+  background: rgb(125 211 252 / 10%);
+  color: #7dd3fc;
+}
 .menu-separator {
   width: 100%;
   max-width: 360px;
