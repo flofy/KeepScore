@@ -5,4 +5,3 @@
 .players.player-grid.duo {
   grid-template-columns: repeat(var(--player-grid-cols, 1), minmax(0, 1fr));
 }
-
