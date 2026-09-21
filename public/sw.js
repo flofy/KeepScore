@@ -15,6 +15,13 @@ self.addEventListener("install", (event) => {
 });
 
 self.addEventListener("message", (event) => {
+  /*
+   * Seul un onglet de notre propre origine a le droit d'ordonner la mise a
+   * jour : tout message venu d'ailleurs est ignore (validation d'origine
+   * insuffisante sur postMessage, CWE-20).
+   */
+  if (event.origin !== self.location.origin) return;
+
   if (event.data?.type === "SKIP_WAITING") {
     self.skipWaiting();
   }

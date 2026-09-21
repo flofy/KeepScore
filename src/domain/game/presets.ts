@@ -1,6 +1,6 @@
-export type HistoryGrouping = "round" | "player";
+import type { HistoryGrouping } from "./types";
 
-export type GamePreset = {
+type GamePreset = {
   id: string;
   name: string;
   emoji: string;

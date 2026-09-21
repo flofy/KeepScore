@@ -1,14 +1,43 @@
+# Dependencies
 node_modules/
+
+# Build output
 dist/
-.vite/
-coverage/
-*.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+
+# Test coverage
+coverage/
+
+# Knip
+.knip/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
 .DS_Store
+Thumbs.db
+
+# Environment
 .env
-.env.*
-!.env.example
-pnpm-lock.yaml
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cache
+.cache/
+
+#tsbuild
+*.tsbuildinfo
+
+# Playwright (artefacts de run : .last-run.json, traces, captures d'ecran)
 test-results/
 playwright-report/
+blob-report/

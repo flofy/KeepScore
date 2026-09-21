@@ -1,3 +1,14 @@
+export type HistoryGrouping = "round" | "player";
+
+export type WorkflowPhase = "setup" | "turn" | "event" | "finished";
+
+export type WorkflowAction =
+  | { type: "START"; playerId: string }
+  | { type: "NEXT_PLAYER"; playerId: string }
+  | { type: "OPEN_EVENT" }
+  | { type: "CLOSE_EVENT" }
+  | { type: "FINISH" };
+
 export type MunchkinGender = "male" | "female";
 
 export type MunchkinStats = {
@@ -5,6 +16,15 @@ export type MunchkinStats = {
   equipmentBonus: number;
   gender?: MunchkinGender;
 };
+
+type CombatState = {
+  monsterLevel: number;
+  helperIds: string[];
+  rewardLevels: number;
+  rewardTreasures: number;
+};
+
+export type MunchkinContext = { combat: CombatState | null };
 
 export type Player = {
   id: string;

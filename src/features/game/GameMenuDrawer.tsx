@@ -1,5 +1,5 @@
 import { InstallButton } from "../../ui/InstallButton";
-import { useI18n } from "../../ui/i18n";
+import { useI18n, type Lang } from "../../ui/i18n";
 
 type Props = {
   open: boolean;
@@ -16,8 +16,8 @@ type Props = {
   onSavedGames: () => void;
   onNewGame: () => void;
   onChwatzi: () => void;
-  lang: "fr" | "en";
-  onLanguageChange: (lang: "fr" | "en") => void;
+  lang: Lang;
+  onLanguageChange: (lang: Lang) => void;
 };
 
 export function GameMenuDrawer({

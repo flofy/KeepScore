@@ -26,7 +26,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --strictPort --port 5173",
+    // Le `--` est a proscrire ici : pnpm le transmet a Vite qui ignore alors
+    // silencieusement --strictPort et --port.
+    command: "pnpm run dev --strictPort --port 5173",
     url: "http://localhost:5173/KeepScore/",
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,

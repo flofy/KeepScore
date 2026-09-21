@@ -1,4 +1,4 @@
-import type { HistoryGrouping } from "./historyGrouping";
+import type { HistoryGrouping } from "../domain/game/types";
 import { useI18n } from "./i18n";
 
 type HistoryGroupingToggleProps = {

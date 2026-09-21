@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 
 export type Lang = "en" | "fr";
-export type TranslationKey =
+type TranslationKey =
   | "appName"
   | "newGame"
   | "gameName"
@@ -28,6 +28,7 @@ export type TranslationKey =
   | "redo"
   | "savedGames"
   | "history"
+  | "round"
   | "moves"
   | "noMoves"
   | "movesPlaceholder"
@@ -124,6 +125,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     redo: "Redo",
     savedGames: "Saved games",
     history: "History",
+    round: "Round",
     moves: "moves",
     noMoves: "No moves yet.",
     movesPlaceholder: "Score changes will appear here.",
@@ -221,6 +223,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     redo: "Retablir",
     savedGames: "Parties sauvegardees",
     history: "Historique",
+    round: "Tour",
     moves: "coups",
     noMoves: "Aucun mouvement pour le moment.",
     movesPlaceholder: "Les changements de score apparaitront ici.",
@@ -295,7 +298,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
 
 const STORAGE_KEY = "keepscore-lang";
 
-export function getInitialLang(): Lang {
+function getInitialLang(): Lang {
   const stored = localStorage.getItem(STORAGE_KEY);
   if (stored === "fr" || stored === "en") return stored;
   return navigator.language?.toLowerCase().startsWith("fr") ? "fr" : "en";
@@ -326,16 +329,18 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     }),
     [lang],
   );
+
+  /*
+   * index.html declare lang="en" en dur : on le resynchronise sur la langue
+   * active pour que les lecteurs d'ecran annoncent le bon contenu.
+   */
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
+
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
 
 export function useI18n(): I18n {
   return useContext(I18nContext);
-}
-
-export function useDocumentLang(): void {
-  const { lang } = useI18n();
-  useEffect(() => {
-    document.documentElement.lang = lang;
-  }, [lang]);
 }

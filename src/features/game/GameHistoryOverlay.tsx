@@ -1,5 +1,5 @@
 import type { Game } from "../../domain/game/types";
-import type { HistoryGrouping } from "../../ui/historyGrouping";
+import type { HistoryGrouping } from "../../domain/game/types";
 import { useI18n } from "../../ui/i18n";
 import { GameHistoryPanel } from "./GameHistoryPanel";
 

@@ -1,13 +1,5 @@
 import { defineConfig } from "vitest/config";
 
-/**
- * Vitest configuration.
- *
- * Excludes the Playwright E2E directory (e2e/) and build output (dist/)
- * from the unit-test run so that `npm test` only runs the fast unit tests.
- * Playwright E2E tests live in e2e/ and are executed separately via
- * `npx playwright test`.
- */
 export default defineConfig({
   test: {
     include: ["src/**/*.test.{ts,tsx}"],
@@ -18,5 +10,24 @@ export default defineConfig({
       "test-results",
       "playwright-report",
     ],
+    coverage: {
+      provider: "v8",
+      // La couverture unitaire mesure la logique pure (domaine + infrastructure).
+      // Les composants UI (src/ui, src/features, src/app) sont couverts par les
+      // tests e2e Playwright (`pnpm run test:e2e`).
+      include: ["src/domain/**", "src/infrastructure/**"],
+      reporter: ["text", "json", "html"],
+      // Seuils alignés sur la couverture actuelle (81,7 % lignes, 67,5 % branches
+      // avec le remapping v8 de Vitest 4, plus strict qu'en Vitest 1).
+      // À re-relever au fur et à mesure des nouveaux tests.
+      thresholds: {
+        lines: 80,
+        functions: 90,
+        branches: 65,
+        statements: 72,
+      },
+    },
+    environment: "jsdom",
+    globals: true,
   },
 });

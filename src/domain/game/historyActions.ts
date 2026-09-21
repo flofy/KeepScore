@@ -1,9 +1,6 @@
 import type { Game, ScoreEntry } from "./types";
 
-export function getHistoryEntry(
-  game: Game,
-  entryId: string,
-): ScoreEntry | undefined {
+function getHistoryEntry(game: Game, entryId: string): ScoreEntry | undefined {
   return game.history.find((entry) => entry.id === entryId);
 }
 

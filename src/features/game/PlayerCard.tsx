@@ -355,7 +355,7 @@ export function PlayerCard({
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickStepClick(-2)}
-                aria-label={`${t("removePoint")} 2 — ${player.name}`}
+                aria-label={`${t("quickScoreChange")} ${player.name} −2`}
               >
                 −2
               </button>
@@ -371,7 +371,7 @@ export function PlayerCard({
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickStepClick(-3)}
-                aria-label={`${t("removePoint")} 3 — ${player.name}`}
+                aria-label={`${t("quickScoreChange")} ${player.name} −3`}
               >
                 −3
               </button>
@@ -466,7 +466,7 @@ export function PlayerCard({
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickStepClick(2)}
-                aria-label={`${t("addPoint")} 2 — ${player.name}`}
+                aria-label={`${t("quickScoreChange")} ${player.name} +2`}
               >
                 +2
               </button>
@@ -482,7 +482,7 @@ export function PlayerCard({
                 onPointerLeave={clearLongPress}
                 onPointerCancel={clearLongPress}
                 onClick={() => onQuickStepClick(3)}
-                aria-label={`${t("addPoint")} 3 — ${player.name}`}
+                aria-label={`${t("quickScoreChange")} ${player.name} +3`}
               >
                 +3
               </button>

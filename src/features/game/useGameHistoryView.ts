@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { findPreset } from "../../domain/game/presets";
 import type { Game } from "../../domain/game/types";
 import type { GameAction } from "../../domain/game/gameReducer";
-import type { HistoryGrouping } from "../../ui/historyGrouping";
+import type { HistoryGrouping } from "../../domain/game/types";
 
 export function useGameHistoryView({
   game,

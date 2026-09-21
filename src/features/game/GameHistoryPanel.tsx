@@ -1,5 +1,5 @@
 import { HistoryGroupingToggle } from "../../ui/HistoryGroupingToggle";
-import type { HistoryGrouping } from "../../ui/historyGrouping";
+import type { HistoryGrouping } from "../../domain/game/types";
 import { groupHistory } from "../../ui/historyGrouping";
 import { useI18n } from "../../ui/i18n";
 import type { Game } from "../../domain/game/types";
@@ -74,7 +74,7 @@ export function GameHistoryPanel({
                 <h3>
                   {historyGrouping === "player"
                     ? player?.name
-                    : `Tour ${group.round}`}
+                    : `${t("round")} ${group.round}`}
                 </h3>
                 <ol>
                   {entries.map((entry) => {
