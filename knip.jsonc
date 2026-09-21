@@ -1,5 +1,17 @@
 {
-  "$schema": "./node_modules/knip/schema.json",
+  "$schema": "./node_modules/knip/schema-jsonc.json",
+
+  // Enregistre dynamiquement depuis main.tsx : knip ne peut pas suivre la
+  // reference, le service worker est donc exclu de l'analyse.
   "ignore": ["public/sw.js"],
-  "ignoreDependencies": []
+
+  // Les dependances circulaires ne sont pas activees par defaut, et une fois
+  // activees elles ne sont qu'un avertissement : sans "error" la CI resterait
+  // verte. Le second passage `knip --cycles` du script `knip` s'en charge.
+  // Ne pas mettre "include": ["cycles"] ici : `include` REMPLACE la liste par
+  // defaut (fichiers, exports, dependances...) au lieu de l'etendre, ce qui
+  // desactiverait silencieusement les autres verifications.
+  "rules": { "cycles": "error" },
+
+  "ignoreDependencies": [],
 }

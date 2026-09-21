@@ -20,11 +20,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run Knip
+      - name: Run Knip (unused code and circular dependencies)
         run: pnpm run knip
-
-      - name: Run Madge
-        run: pnpm run madge
 
       - name: Run tests with coverage
         run: pnpm run test:coverage

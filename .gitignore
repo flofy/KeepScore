@@ -36,3 +36,8 @@ npm-debug.log*
 
 #tsbuild
 *.tsbuildinfo
+
+# Playwright (artefacts de run : .last-run.json, traces, captures d'ecran)
+test-results/
+playwright-report/
+blob-report/

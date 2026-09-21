@@ -14,9 +14,7 @@
     "test:e2e:ui": "playwright test --ui",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "knip": "knip",
-    "madge": "madge --circular src/",
-    "snyk": "snyk test",
+    "knip": "knip && knip --cycles",
     "inspect": "vite build --mode inspect"
   },
   "dependencies": {
@@ -33,9 +31,7 @@
     "@vitest/coverage-v8": "^4.1.11",
     "jsdom": "^30.1.0",
     "knip": "^6.37.0",
-    "madge": "^6.0.0",
     "oxfmt": "^0.66.0",
-    "snyk": "^1.1235.0",
     "typescript": "7.0.2",
     "vite": "8.2.2",
     "vite-plugin-inspect": "^12.0.2",

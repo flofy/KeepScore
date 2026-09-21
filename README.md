@@ -36,10 +36,13 @@ Built with **React + TypeScript + Vite**. Styling is hand-written CSS (no framew
 
 ```bash
 pnpm install
-pnpm run dev           # development server
-pnpm run build         # production build (tsc + vite)
-pnpm run test          # run tests
-pnpm run format        # format with oxfmt
+pnpm run dev            # development server
+pnpm run build          # production build (tsc + vite)
+pnpm run test           # unit tests (vitest)
+pnpm run test:coverage  # unit tests + coverage thresholds
+pnpm run test:e2e       # end-to-end tests (Playwright)
+pnpm run knip           # unused files/exports/deps + circular dependencies
+pnpm run format         # format with oxfmt
 ```
 
 ## Architecture
