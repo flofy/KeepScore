@@ -14,7 +14,7 @@ function isPlayerGridLayout(value: string | null): value is PlayerGridLayout {
   );
 }
 
-export function getInitialPlayerGridLayout(): PlayerGridLayout {
+function getInitialPlayerGridLayout(): PlayerGridLayout {
   const stored = localStorage.getItem(STORAGE_KEY);
   return isPlayerGridLayout(stored) ? stored : "auto";
 }
