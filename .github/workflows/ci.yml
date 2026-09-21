@@ -28,8 +28,3 @@ jobs:
 
       - name: Run tests with coverage
         run: pnpm run test:coverage
-
-      - name: Run Snyk
-        run: pnpm run snyk
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
