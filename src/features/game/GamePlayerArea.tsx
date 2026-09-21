@@ -66,8 +66,6 @@ export function GamePlayerArea({
     return undefined;
   };
 
-
-
   const removeMunchkinPlayer = (playerId: string, playerName: string) => {
     if (game.players.length <= 1) return;
     if (!window.confirm(`${t("delete")} ${playerName} ?`)) return;

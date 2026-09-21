@@ -147,7 +147,11 @@ export function GameMenuDrawer({
             {gridOptions.map((option) => (
               <button
                 key={option.value}
-                className={option.value === playerGridLayout ? "menu-option active" : "menu-option"}
+                className={
+                  option.value === playerGridLayout
+                    ? "menu-option active"
+                    : "menu-option"
+                }
                 type="button"
                 aria-pressed={option.value === playerGridLayout}
                 onClick={() => onPlayerGridLayoutChange(option.value)}

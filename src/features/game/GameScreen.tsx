@@ -63,7 +63,8 @@ export function GameScreen({
     toggleSwap,
     togglePlayerRotation,
   } = useGamePlayerView(game);
-  const { layout: playerGridLayout, setLayout: setPlayerGridLayout } = usePlayerGrid();
+  const { layout: playerGridLayout, setLayout: setPlayerGridLayout } =
+    usePlayerGrid();
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [combatPlayerId, setCombatPlayerId] = useState<string | null>(null);
@@ -157,7 +158,10 @@ export function GameScreen({
           orderedPlayers={orderedPlayers}
           removeMode={removeMode}
           playerRotations={playerRotations}
-          playerGridColumns={getPlayerGridColumns(playerGridLayout, game.players.length)}
+          playerGridColumns={getPlayerGridColumns(
+            playerGridLayout,
+            game.players.length,
+          )}
           onRemovePlayer={removePlayer}
           onRenamePlayer={(playerId, name) =>
             dispatch({ type: "RENAME_PLAYER", playerId, name })
