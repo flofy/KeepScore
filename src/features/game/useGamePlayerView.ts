@@ -1,8 +1,8 @@
 import { useMemo, useState } from "react";
 import type { Game } from "../../domain/game/types";
 
-export const PLAYER_ROTATIONS = [0, 90, 180, 270] as const;
-export type PlayerRotation = (typeof PLAYER_ROTATIONS)[number];
+const PLAYER_ROTATIONS = [0, 90, 180, 270] as const;
+type PlayerRotation = (typeof PLAYER_ROTATIONS)[number];
 
 export function nextPlayerRotation(rotation: number): PlayerRotation {
   const index = PLAYER_ROTATIONS.indexOf(rotation as PlayerRotation);

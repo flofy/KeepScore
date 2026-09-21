@@ -71,9 +71,10 @@ test.describe("history grouping", () => {
     const dialog = page.getByRole("dialog", { name: "History" });
     await dialog.getByRole("button", { name: "By player" }).click();
 
-    const aliceGroup = dialog.locator(".history-group").filter({
-      has: dialog.getByRole("heading", { name: "Alice" }),
-    });
+    const aliceGroup = dialog
+      .locator(".history-group")
+      .filter({ has: page.getByRole("heading", { name: "Alice" }) });
+    await expect(aliceGroup).toHaveCount(1);
     await aliceGroup.getByRole("button", { name: "Edit" }).click();
 
     const editor = aliceGroup.locator(".history-editor");

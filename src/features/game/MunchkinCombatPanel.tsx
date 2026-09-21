@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   addCombatHelper,
   createMunchkinWorkflow,
@@ -56,6 +56,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
   });
   const [monsterLevel, setMonsterLevel] = useState("1");
   const [result, setResult] = useState<"won" | "lost" | null>(null);
+  const monsterInputRef = useRef<HTMLInputElement>(null);
 
   const activePlayer = game.players.find(
     (player) => player.id === workflow.activePlayerId,
@@ -77,6 +78,14 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
     (total, player) => total + playerPower(player),
     0,
   );
+
+  /*
+   * Le niveau du monstre est le seul point d'entree du panneau : on lui donne
+   * le focus des qu'il est affiche, comme l'edition de score de PlayerCard.
+   */
+  useEffect(() => {
+    if (workflow.phase !== "event") monsterInputRef.current?.focus();
+  }, [workflow.phase]);
 
   if (game.presetId !== "munchkin" || game.players.length === 0) return null;
 
@@ -141,6 +150,7 @@ export function MunchkinCombatPanel({ game, onUpdateLevel }: Props) {
           <label>
             {labels.monsterLevel}
             <input
+              ref={monsterInputRef}
               type="number"
               min="0"
               value={monsterLevel}

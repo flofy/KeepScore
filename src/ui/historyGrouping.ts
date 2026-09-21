@@ -1,8 +1,6 @@
-import type { ScoreEntry } from "../domain/game/types";
+import type { HistoryGrouping, ScoreEntry } from "../domain/game/types";
 
-export type HistoryGrouping = "round" | "player";
-
-export type HistoryGroup = {
+type HistoryGroup = {
   key: string;
   round: number;
   entries: ScoreEntry[];

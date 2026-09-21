@@ -35,15 +35,17 @@ A fast, offline-first score keeper designed for playing tabletop and card games 
 Built with **React + TypeScript + Vite**. Styling is hand-written CSS (no framework) with a mobile-first approach.
 
 ```bash
-npm install
-npm run dev       # development server
-npm run build     # production build (tsc + vite)
-npm run test      # run tests
+pnpm install
+pnpm run dev           # development server
+pnpm run build         # production build (tsc + vite)
+pnpm run test          # run tests
+pnpm run format        # format with oxfmt
 ```
 
 ## Architecture
 
 - `src/domain/game` — pure domain logic (reducer, history, factory), independent from React
+- Shared domain types live in `src/domain/game/types.ts` (single source of truth)
 - `src/ui` — React components (App, GameSetup, SavedGames, i18n, etc.)
 - `src/infrastructure` — persistence (gameRepository) and portability (export/import)
 - A game is a list of **players** plus an **append-only score history**; every non-zero move creates a history entry

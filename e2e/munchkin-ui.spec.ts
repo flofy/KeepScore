@@ -45,7 +45,9 @@ test.describe("Munchkin player card", () => {
     await firstCard.getByRole("button", { name: /Supprimer Alice/ }).click();
 
     await expect(page.locator(".munchkin-player-card")).toHaveCount(1);
-    await expect(page.getByDisplayValue("Alice")).toHaveCount(0);
+    const nameInputs = page.getByLabel(/Nom du joueur/);
+    await expect(nameInputs).toHaveCount(1);
+    await expect(nameInputs).not.toHaveValue("Alice");
   });
 
   test("focuses number inputs when starting an edit", async ({ page }) => {

@@ -26,7 +26,7 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --strictPort --port 5173",
+    command: "pnpm run dev -- --strictPort --port 5173",
     url: "http://localhost:5173/KeepScore/",
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,

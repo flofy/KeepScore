@@ -2,7 +2,7 @@ import type { Game } from "../../domain/game/types";
 
 const STORAGE_KEY = "keepscore.games.v1";
 
-export interface GameRepository {
+interface GameRepository {
   list(): Game[];
   get(id: string): Game | undefined;
   save(game: Game): void;

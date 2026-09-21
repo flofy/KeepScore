@@ -1,4 +1,4 @@
-export type WorkflowPhase = "setup" | "turn" | "event" | "finished";
+import type { WorkflowAction, WorkflowPhase } from "./types";
 
 export type WorkflowState<TContext> = {
   phase: WorkflowPhase;
@@ -6,13 +6,6 @@ export type WorkflowState<TContext> = {
   turn: number;
   context: TContext;
 };
-
-export type WorkflowAction =
-  | { type: "START"; playerId: string }
-  | { type: "NEXT_PLAYER"; playerId: string }
-  | { type: "OPEN_EVENT" }
-  | { type: "CLOSE_EVENT" }
-  | { type: "FINISH" };
 
 export function createWorkflowState<TContext>(
   context: TContext,

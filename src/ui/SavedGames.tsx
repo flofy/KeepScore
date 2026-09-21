@@ -8,7 +8,7 @@ interface SavedGamesListProps {
   compact?: boolean;
 }
 
-export function SavedGamesList({
+function SavedGamesList({
   games,
   onResume,
   onDelete,

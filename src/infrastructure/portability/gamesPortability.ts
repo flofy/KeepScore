@@ -1,9 +1,9 @@
 import type { Game, Player, ScoreEntry } from "../../domain/game/types";
 
-export const PORTABLE_GAMES_FORMAT = "keepscore";
-export const PORTABLE_GAMES_VERSION = 1;
+const PORTABLE_GAMES_FORMAT = "keepscore";
+const PORTABLE_GAMES_VERSION = 1;
 
-export type PortableGames = {
+type PortableGames = {
   format: typeof PORTABLE_GAMES_FORMAT;
   version: typeof PORTABLE_GAMES_VERSION;
   exportedAt: number;
@@ -83,14 +83,4 @@ export function importGames(json: string): Game[] {
     throw new Error("The exported games are invalid.");
 
   return data.games;
-}
-
-export function downloadGames(games: Game[]) {
-  const blob = new Blob([exportGames(games)], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = `keepscore-backup-${new Date().toISOString().slice(0, 10)}.json`;
-  anchor.click();
-  URL.revokeObjectURL(url);
 }
