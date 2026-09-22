@@ -15,7 +15,7 @@
   box-sizing: border-box;
 }
 html {
-  overscroll-behavior-x: none;
+  overscroll-behavior: none;
 }
 body {
   margin: 0;
@@ -1217,6 +1217,27 @@ html:fullscreen .menu-drawer .menu-row {
 
 .app-shell.fullscreen-hide-header .players {
   min-height: 100dvh;
+}
+
+.fullscreen-minimal-controls {
+  position: fixed;
+  top: max(12px, env(safe-area-inset-top));
+  right: max(12px, env(safe-area-inset-right));
+  z-index: 40;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 16px;
+  background: rgb(8 12 24 / 82%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 28px rgb(0 0 0 / 30%);
+}
+
+.fullscreen-minimal-controls .icon-fab,
+.fullscreen-minimal-controls .burger-button {
+  flex: 0 0 auto;
 }
 
 .app-shell.fullscreen .game-header {
