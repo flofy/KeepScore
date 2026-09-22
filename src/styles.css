@@ -1585,7 +1585,6 @@ html:fullscreen .menu-drawer .menu-row {
   transform: scale(0.97);
 }
 
-
 /* Player grid selector: compact visual presets instead of text buttons. */
 .player-grid-options {
   display: grid;
