@@ -744,7 +744,8 @@ h2 {
   overscroll-behavior: contain;
   scrollbar-width: thin;
   gap: 8px;
-  padding: max(72px, calc(56px + env(safe-area-inset-top))) 20px max(24px, env(safe-area-inset-bottom));
+  padding: max(72px, calc(56px + env(safe-area-inset-top))) 20px
+    max(24px, env(safe-area-inset-bottom));
   animation: menu-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .menu-item {
