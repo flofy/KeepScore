@@ -1265,12 +1265,29 @@ html:fullscreen .menu-drawer .menu-row {
     padding-right: 14px;
   }
   .app-header {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-direction: row;
+    gap: 10px;
   }
-  .toolbar {
-    width: 100%;
-    justify-content: flex-start;
+  .app-header > div:first-child {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .app-header .toolbar {
+    width: auto;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
+  .app-header .quick-actions {
+    flex-shrink: 0;
+  }
+  .app-header .install-button {
+    display: none;
+  }
+  .app-header .game-name {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .players {
     grid-template-columns: 1fr;
