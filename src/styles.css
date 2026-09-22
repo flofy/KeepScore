@@ -1584,3 +1584,91 @@ html:fullscreen .menu-drawer .menu-row {
 .install-button:active {
   transform: scale(0.97);
 }
+
+
+/* Player grid selector: compact visual presets instead of text buttons. */
+.player-grid-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+  width: min(360px, 100%);
+  margin: 0 auto;
+  padding: 8px 0 4px;
+}
+
+.player-grid-option {
+  min-height: 52px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 4%);
+  color: #cbd5e1;
+}
+
+.player-grid-option:hover {
+  background: rgb(255 255 255 / 8%);
+  color: #f8fafc;
+}
+
+.player-grid-option.active {
+  border-color: rgb(125 211 252 / 60%);
+  background: rgb(125 211 252 / 10%);
+  color: #7dd3fc;
+}
+
+.menu-grid-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid currentColor;
+  border-radius: 5px;
+}
+
+.menu-grid-icon span {
+  min-width: 0;
+  min-height: 0;
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.85;
+}
+
+.menu-grid-icon[data-columns="1"] {
+  grid-template-columns: 1fr;
+}
+
+.menu-grid-icon[data-columns="2"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.menu-grid-icon[data-columns="3"] {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.menu-grid-icon[data-columns="4"] {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.menu-grid-icon[data-columns="auto"] {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (max-width: 620px) {
+  .player-grid-options {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .player-grid-option {
+    min-height: 48px;
+  }
+
+  .menu-grid-icon {
+    width: 26px;
+    height: 26px;
+  }
+}
