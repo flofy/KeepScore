@@ -162,6 +162,52 @@ export function GameScreen({
           onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
         />
 
+        {!keepHeaderInFullscreen && fullscreen && (
+          <div className="fullscreen-minimal-controls" aria-label={t("menu")}>
+            <button
+              className="icon-fab"
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={t("exitFullscreen")}
+            >
+              <svg
+                className="fab-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </button>
+            <button
+              className="burger-button"
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              aria-label={t("menu")}
+            >
+              <svg
+                className="burger-icon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M4 6h16M4 12h16M4 18h16"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
+            </button>
+          </div>
+        )}
+
         <GamePlayerArea
           game={game}
           orderedPlayers={orderedPlayers}
