@@ -3,6 +3,7 @@ import type { Game, MunchkinStats } from "../../domain/game/types";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useFullscreen } from "../../ui/useFullscreen";
 import { useI18n } from "../../ui/i18n";
+import { appToast } from "../../ui/toast";
 import { GameHistoryOverlay } from "./GameHistoryOverlay";
 import { GameMenuDrawer } from "./GameMenuDrawer";
 import { MunchkinCombatPanel } from "./MunchkinCombatPanel";
@@ -71,6 +72,7 @@ export function GameScreen({
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
+    appToast.success(t("playerRemoved"));
     haptic();
     if (game.players.length <= 2) setRemoveMode(false);
   };
@@ -107,6 +109,7 @@ export function GameScreen({
 
   const addPlayer = () => {
     dispatch({ type: "ADD_PLAYER" });
+    appToast.success(t("playerAdded"));
     haptic();
   };
 
@@ -222,10 +225,12 @@ export function GameScreen({
         onHistory={openHistory}
         onUndo={() => {
           undo();
+          appToast.info(t("undoApplied"));
           closeMenu();
         }}
         onRedo={() => {
           redo();
+          appToast.info(t("redoApplied"));
           closeMenu();
         }}
         canUndo={Boolean(past.length)}
