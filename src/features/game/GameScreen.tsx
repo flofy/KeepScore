@@ -170,11 +170,7 @@ export function GameScreen({
               onClick={toggleFullscreen}
               aria-label={t("exitFullscreen")}
             >
-              <svg
-                className="fab-icon"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-              >
+              <svg className="fab-icon" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"
                   stroke="currentColor"
