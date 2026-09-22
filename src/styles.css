@@ -1721,7 +1721,6 @@ html:fullscreen .menu-drawer .menu-row {
   }
 }
 
-
 /* Global toast notifications */
 .keepscore-toast {
   width: min(420px, calc(100vw - 28px));
