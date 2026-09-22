@@ -40,7 +40,12 @@ export function GameScreen({
     redo,
   } = useGameHistory(initialGame);
   const { t, lang, setLang } = useI18n();
-  const { fullscreen, toggleFullscreen } = useFullscreen();
+  const {
+    fullscreen,
+    toggleFullscreen,
+    keepHeaderInFullscreen,
+    setKeepHeaderPreference,
+  } = useFullscreen();
   const {
     editingEntry,
     draftDelta,
@@ -125,6 +130,7 @@ export function GameScreen({
   const shellClassName = [
     "app-shell",
     fullscreen ? "fullscreen" : "",
+    fullscreen && !keepHeaderInFullscreen ? "fullscreen-hide-header" : "",
     game.presetId === "munchkin" ? "munchkin-theme" : "",
   ]
     .filter(Boolean)
@@ -239,6 +245,8 @@ export function GameScreen({
         isMunchkin={game.presetId === "munchkin"}
         playerGridLayout={playerGridLayout}
         onPlayerGridLayoutChange={setPlayerGridLayout}
+        keepHeaderInFullscreen={keepHeaderInFullscreen}
+        onKeepHeaderInFullscreenChange={setKeepHeaderPreference}
         onAddPlayer={addPlayer}
         onRemovePlayerMode={() => {
           haptic();
