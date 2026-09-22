@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Game, MunchkinStats } from "../../domain/game/types";
 import { useGameHistory } from "../../ui/useGameHistory";
 import { useFullscreen } from "../../ui/useFullscreen";
@@ -16,6 +16,24 @@ import "./munchkin-combat.css";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
+}
+
+const FLOATING_CONTROL_KEY = "keepscore-fullscreen-exit-control-position";
+const CONTROL_SIZE = 34;
+const CONTROL_MARGIN = 8;
+
+type ControlPosition = { x: number; y: number };
+
+function getInitialControlPosition(): ControlPosition {
+  if (typeof window === "undefined") return { x: 0, y: 0 };
+  try {
+    const stored = JSON.parse(localStorage.getItem(FLOATING_CONTROL_KEY) ?? "null");
+    if (stored && Number.isFinite(stored.x) && Number.isFinite(stored.y)) return stored;
+  } catch {}
+  return {
+    x: Math.max(CONTROL_MARGIN, window.innerWidth - CONTROL_SIZE - CONTROL_MARGIN),
+    y: Math.max(CONTROL_MARGIN, window.innerHeight - CONTROL_SIZE - CONTROL_MARGIN),
+  };
 }
 
 export function GameScreen({
@@ -74,6 +92,41 @@ export function GameScreen({
   const [menuOpen, setMenuOpen] = useState(false);
   const [removeMode, setRemoveMode] = useState(false);
   const [combatPlayerId, setCombatPlayerId] = useState<string | null>(null);
+  const [controlPosition, setControlPosition] = useState<ControlPosition>(getInitialControlPosition);
+  const dragRef = useRef<{ pointerId: number; offsetX: number; offsetY: number } | null>(null);
+
+  useEffect(() => {
+    if (!fullscreen || keepHeaderInFullscreen) return;
+    const clamped = clampControlPosition(controlPosition);
+    if (clamped.x !== controlPosition.x || clamped.y !== controlPosition.y) setControlPosition(clamped);
+  }, [fullscreen, keepHeaderInFullscreen]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") localStorage.setItem(FLOATING_CONTROL_KEY, JSON.stringify(controlPosition));
+  }, [controlPosition]);
+
+  const handleControlPointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = {
+      pointerId: event.pointerId,
+      offsetX: event.clientX - controlPosition.x,
+      offsetY: event.clientY - controlPosition.y,
+    };
+  };
+
+  const handleControlPointerMove = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (dragRef.current?.pointerId !== event.pointerId) return;
+    setControlPosition(clampControlPosition({
+      x: event.clientX - dragRef.current.offsetX,
+      y: event.clientY - dragRef.current.offsetY,
+    }));
+  };
+
+  const handleControlPointerUp = (event: React.PointerEvent<HTMLButtonElement>) => {
+    if (dragRef.current?.pointerId !== event.pointerId) return;
+    dragRef.current = null;
+    event.currentTarget.releasePointerCapture(event.pointerId);
+  };
 
   const removePlayer = (playerId: string) => {
     dispatch({ type: "REMOVE_PLAYER", playerId });
@@ -90,11 +143,7 @@ export function GameScreen({
   const setScore = (playerId: string, value: number) => {
     const player = game.players.find((candidate) => candidate.id === playerId);
     if (!player) return;
-    dispatch({
-      type: "ADD_SCORE",
-      playerId,
-      delta: value - player.score,
-    });
+    dispatch({ type: "ADD_SCORE", playerId, delta: value - player.score });
     haptic();
   };
 
@@ -106,10 +155,7 @@ export function GameScreen({
   const updateMunchkinLevel = (playerId: string, level: number) => {
     const player = game.players.find((candidate) => candidate.id === playerId);
     if (!player?.munchkin) return;
-    updateMunchkinStats(playerId, {
-      ...player.munchkin,
-      level: Math.max(0, Math.min(10, Math.trunc(level))),
-    });
+    updateMunchkinStats(playerId, { ...player.munchkin, level: Math.max(0, Math.min(10, Math.trunc(level))) });
   };
 
   const addPlayer = () => {
@@ -118,176 +164,50 @@ export function GameScreen({
     haptic();
   };
 
-  const openHistory = () => {
-    openHistoryView();
-    setMenuOpen(false);
-  };
-
+  const openHistory = () => { openHistoryView(); setMenuOpen(false); };
   const closeMenu = () => setMenuOpen(false);
-  const combatPlayer = game.players.find(
-    (player) => player.id === combatPlayerId,
-  );
+  const combatPlayer = game.players.find((player) => player.id === combatPlayerId);
   const shellClassName = [
     "app-shell",
     fullscreen ? "fullscreen" : "",
     fullscreen && !keepHeaderInFullscreen ? "fullscreen-hide-header" : "",
     game.presetId === "munchkin" ? "munchkin-theme" : "",
-  ]
-    .filter(Boolean)
-    .join(" ");
+  ].filter(Boolean).join(" ");
 
   return (
     <>
       <main className={shellClassName}>
-        {removeMode && (
-          <div className="remove-mode-banner" role="status">
-            <span className="remove-mode-hint">{t("removePlayersHint")}</span>
-            <button
-              className="remove-mode-done"
-              type="button"
-              onClick={() => setRemoveMode(false)}
-            >
-              {t("done")}
-            </button>
-          </div>
-        )}
-
-        <GameToolbar
-          game={game}
-          fullscreen={fullscreen}
-          onFullscreenToggle={toggleFullscreen}
-          swapped={swapped}
-          onSwap={toggleSwap}
-          onMenuOpen={() => setMenuOpen(true)}
-          onRename={(name) => dispatch({ type: "RENAME_GAME", name })}
-        />
+        {removeMode && <div className="remove-mode-banner" role="status"><span className="remove-mode-hint">{t("removePlayersHint")}</span><button className="remove-mode-done" type="button" onClick={() => setRemoveMode(false)}>{t("done")}</button></div>}
+        <GameToolbar game={game} fullscreen={fullscreen} onFullscreenToggle={toggleFullscreen} swapped={swapped} onSwap={toggleSwap} onMenuOpen={() => setMenuOpen(true)} onRename={(name) => dispatch({ type: "RENAME_GAME", name })} />
 
         {!keepHeaderInFullscreen && fullscreen && (
           <button
             className="fullscreen-exit-control"
             type="button"
             onClick={toggleFullscreen}
+            onPointerDown={handleControlPointerDown}
+            onPointerMove={handleControlPointerMove}
+            onPointerUp={handleControlPointerUp}
+            style={{ left: controlPosition.x, top: controlPosition.y }}
             aria-label={t("exitFullscreen")}
           >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                fill="none"
-              />
-            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" /></svg>
           </button>
         )}
 
-        <GamePlayerArea
-          game={game}
-          orderedPlayers={orderedPlayers}
-          removeMode={removeMode}
-          playerRotations={playerRotations}
-          playerGridColumns={getPlayerGridColumns(
-            playerGridLayout,
-            game.players.length,
-          )}
-          onRemovePlayer={removePlayer}
-          onRenamePlayer={(playerId, name) =>
-            dispatch({ type: "RENAME_PLAYER", playerId, name })
-          }
-          onAddScore={addScore}
-          onSetScore={setScore}
-          onUpdateMunchkinStats={updateMunchkinStats}
-          onFlipPlayer={togglePlayerRotation}
-          onCombat={setCombatPlayerId}
-        />
-
-        {combatPlayer && (
-          <div className="munchkin-combat-backdrop">
-            <div className="munchkin-combat-modal">
-              <button
-                className="munchkin-combat-close"
-                type="button"
-                onClick={() => setCombatPlayerId(null)}
-                aria-label={lang === "fr" ? "Fermer" : "Close"}
-              >
-                ×
-              </button>
-              <MunchkinCombatPanel
-                key={combatPlayer.id}
-                game={{ ...game, startingPlayerId: combatPlayer.id }}
-                onUpdateLevel={updateMunchkinLevel}
-              />
-            </div>
-          </div>
-        )}
-
-        {historyOpen && (
-          <GameHistoryOverlay
-            game={game}
-            historyGrouping={historyGrouping}
-            onHistoryGroupingChange={setHistoryGrouping}
-            historyFlipped={historyFlipped}
-            onClose={closeHistory}
-            onFlip={() => setHistoryFlipped((current) => !current)}
-            editingEntry={editingEntry}
-            draftDelta={draftDelta}
-            onBeginEdit={beginEdit}
-            onDraftDeltaChange={setDraftDelta}
-            onSaveEdit={saveEdit}
-            onCancelEdit={cancelEdit}
-            onDeleteEntry={deleteEntry}
-          />
-        )}
+        <GamePlayerArea game={game} orderedPlayers={orderedPlayers} removeMode={removeMode} playerRotations={playerRotations} playerGridColumns={getPlayerGridColumns(playerGridLayout, game.players.length)} onRemovePlayer={removePlayer} onRenamePlayer={(playerId, name) => dispatch({ type: "RENAME_PLAYER", playerId, name })} onAddScore={addScore} onSetScore={setScore} onUpdateMunchkinStats={updateMunchkinStats} onFlipPlayer={togglePlayerRotation} onCombat={setCombatPlayerId} />
+        {combatPlayer && <div className="munchkin-combat-backdrop"><div className="munchkin-combat-modal"><button className="munchkin-combat-close" type="button" onClick={() => setCombatPlayerId(null)} aria-label={lang === "fr" ? "Fermer" : "Close">×</button><MunchkinCombatPanel key={combatPlayer.id} game={{ ...game, startingPlayerId: combatPlayer.id }} onUpdateLevel={updateMunchkinLevel} /></div></div>}
+        {historyOpen && <GameHistoryOverlay game={game} historyGrouping={historyGrouping} onHistoryGroupingChange={setHistoryGrouping} historyFlipped={historyFlipped} onClose={closeHistory} onFlip={() => setHistoryFlipped((current) => !current)} editingEntry={editingEntry} draftDelta={draftDelta} onBeginEdit={beginEdit} onDraftDeltaChange={setDraftDelta} onSaveEdit={saveEdit} onCancelEdit={cancelEdit} onDeleteEntry={deleteEntry} />}
       </main>
-
-      <GameMenuDrawer
-        open={menuOpen}
-        onClose={closeMenu}
-        onHome={() => {
-          closeMenu();
-          onHome();
-        }}
-        onHistory={openHistory}
-        onUndo={() => {
-          undo();
-          appToast.info(t("undoApplied"));
-          closeMenu();
-        }}
-        onRedo={() => {
-          redo();
-          appToast.info(t("redoApplied"));
-          closeMenu();
-        }}
-        canUndo={Boolean(past.length)}
-        canRedo={Boolean(future.length)}
-        playerCount={game.players.length}
-        isMunchkin={game.presetId === "munchkin"}
-        playerGridLayout={playerGridLayout}
-        onPlayerGridLayoutChange={setPlayerGridLayout}
-        keepHeaderInFullscreen={keepHeaderInFullscreen}
-        onKeepHeaderInFullscreenChange={setKeepHeaderPreference}
-        onAddPlayer={addPlayer}
-        onRemovePlayerMode={() => {
-          haptic();
-          closeMenu();
-          setRemoveMode(true);
-        }}
-        onSavedGames={() => {
-          closeMenu();
-          onSavedGames();
-        }}
-        onNewGame={() => {
-          closeMenu();
-          onNewGame();
-        }}
-        onChwatzi={() => {
-          closeMenu();
-          onChwatzi();
-        }}
-        lang={lang}
-        onLanguageChange={setLang}
-      />
+      <GameMenuDrawer open={menuOpen} onClose={closeMenu} onHome={() => { closeMenu(); onHome(); }} onHistory={openHistory} onUndo={() => { undo(); appToast.info(t("undoApplied")); closeMenu(); }} onRedo={() => { redo(); appToast.info(t("redoApplied")); closeMenu(); }} canUndo={Boolean(past.length)} canRedo={Boolean(future.length)} playerCount={game.players.length} isMunchkin={game.presetId === "munchkin"} playerGridLayout={playerGridLayout} onPlayerGridLayoutChange={setPlayerGridLayout} keepHeaderInFullscreen={keepHeaderInFullscreen} onKeepHeaderInFullscreenChange={setKeepHeaderPreference} onAddPlayer={addPlayer} onRemovePlayerMode={() => { haptic(); closeMenu(); setRemoveMode(true); }} onSavedGames={() => { closeMenu(); onSavedGames(); }} onNewGame={() => { closeMenu(); onNewGame(); }} onChwatzi={() => { closeMenu(); onChwatzi(); }} lang={lang} onLanguageChange={setLang} />
     </>
   );
+}
+
+function clampControlPosition(position: ControlPosition): ControlPosition {
+  if (typeof window === "undefined") return position;
+  return {
+    x: Math.min(Math.max(CONTROL_MARGIN, position.x), Math.max(CONTROL_MARGIN, window.innerWidth - CONTROL_SIZE - CONTROL_MARGIN)),
+    y: Math.min(Math.max(CONTROL_MARGIN, position.y), Math.max(CONTROL_MARGIN, window.innerHeight - CONTROL_SIZE - CONTROL_MARGIN)),
+  };
 }
