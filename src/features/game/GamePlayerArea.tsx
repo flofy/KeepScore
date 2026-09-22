@@ -66,6 +66,17 @@ export function GamePlayerArea({
     return undefined;
   };
 
+  const playerAreaClass = [
+    "players",
+    "player-grid",
+    isDuo ? "duo" : "",
+    isMunchkin ? "munchkin-players" : "",
+    removeMode ? "remove-mode" : "",
+    !isDuo && game.players.length >= 4 ? "crowded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   const removeMunchkinPlayer = (playerId: string, playerName: string) => {
     if (game.players.length <= 1) return;
     if (!window.confirm(`${t("delete")} ${playerName} ?`)) return;
