@@ -12,6 +12,7 @@ type Props = {
   canUndo: boolean;
   canRedo: boolean;
   playerCount: number;
+  isMunchkin: boolean;
   playerGridLayout: PlayerGridLayout;
   onPlayerGridLayoutChange: (layout: PlayerGridLayout) => void;
   onAddPlayer: () => void;
@@ -33,6 +34,7 @@ export function GameMenuDrawer({
   canUndo,
   canRedo,
   playerCount,
+  isMunchkin,
   playerGridLayout,
   onPlayerGridLayoutChange,
   onAddPlayer,
@@ -47,7 +49,10 @@ export function GameMenuDrawer({
 
   if (!open) return null;
 
-  const gridOptions: Array<{ value: PlayerGridLayout; label: string }> =
+  const gridOptions: Array<{
+    value: PlayerGridLayout;
+    label: string;
+  }> =
     lang === "fr"
       ? [
           { value: "auto", label: "Auto" },
@@ -138,29 +143,46 @@ export function GameMenuDrawer({
             −
           </button>
         </div>
-        <details className="menu-item menu-item-accordion">
-          <summary>
-            <span className="menu-icon">▦</span>
-            {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
-          </summary>
-          <div className="menu-accordion-options">
-            {gridOptions.map((option) => (
-              <button
-                key={option.value}
-                className={
-                  option.value === playerGridLayout
-                    ? "menu-option active"
-                    : "menu-option"
-                }
-                type="button"
-                aria-pressed={option.value === playerGridLayout}
-                onClick={() => onPlayerGridLayoutChange(option.value)}
-              >
-                {option.label}
-              </button>
-            ))}
-          </div>
-        </details>
+        {!isMunchkin && (
+          <details className="menu-item menu-item-accordion">
+            <summary>
+              <span className="menu-icon">▦</span>
+              {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
+            </summary>
+            <div
+              className="menu-accordion-options player-grid-options"
+              role="group"
+              aria-label={lang === "fr" ? "Disposition" : "Layout"}
+            >
+              {gridOptions.map((option) => (
+                <button
+                  key={option.value}
+                  className={
+                    option.value === playerGridLayout
+                      ? "menu-option player-grid-option active"
+                      : "menu-option player-grid-option"
+                  }
+                  type="button"
+                  aria-label={option.label}
+                  aria-pressed={option.value === playerGridLayout}
+                  title={option.label}
+                  onClick={() => onPlayerGridLayoutChange(option.value)}
+                >
+                  <span
+                    className="menu-grid-icon"
+                    data-columns={option.value}
+                    aria-hidden="true"
+                  >
+                    <span />
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </details>
+        )}
         <button className="menu-item" type="button" onClick={onSavedGames}>
           <span className="menu-icon">💾</span>
           {t("savedGames")}
