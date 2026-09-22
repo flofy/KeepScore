@@ -1720,3 +1720,40 @@ html:fullscreen .menu-drawer .menu-row {
     height: 26px;
   }
 }
+
+
+/* Global toast notifications */
+.keepscore-toast {
+  width: min(420px, calc(100vw - 28px));
+  min-height: 48px;
+  margin-bottom: max(8px, env(safe-area-inset-bottom));
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 14px;
+  background: rgb(15 23 42 / 96%);
+  color: #f8fafc;
+  box-shadow: 0 14px 36px rgb(0 0 0 / 32%);
+  backdrop-filter: blur(12px);
+  font: inherit;
+}
+
+.Toastify__toast-container {
+  width: auto;
+  max-width: 100vw;
+  padding: 0 14px;
+}
+
+@media (max-width: 620px) {
+  .Toastify__toast-container {
+    width: 100%;
+    left: 0;
+    right: 0;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    padding: 0 10px;
+  }
+
+  .keepscore-toast {
+    width: 100%;
+    margin-bottom: 0;
+    border-radius: 12px;
+  }
+}
