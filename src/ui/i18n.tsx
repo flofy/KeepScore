@@ -264,6 +264,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     closeMenu: "Fermer",
     fullscreen: "Plein ecran",
     exitFullscreen: "Quitter le plein ecran",
+    keepHeaderInFullscreen: "Conserver le header en plein écran",
     language: "Langue",
     newGameMenuItem: "Nouvelle partie",
     install: "Installer l app",
