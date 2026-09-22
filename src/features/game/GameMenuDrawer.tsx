@@ -120,7 +120,7 @@ export function GameMenuDrawer({
           </button>
         </div>
         <div className="menu-separator" />
-        {!isMunchkin && (
+        {
           <div className="menu-player-grid">
             <div className="menu-item menu-player-grid-label">
               <span className="menu-icon">▦</span>
@@ -159,7 +159,7 @@ export function GameMenuDrawer({
               ))}
             </div>
           </div>
-        )}
+        }
 
         <div className="menu-separator" />
         <div className="menu-row player-count-row">
