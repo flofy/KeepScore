@@ -82,17 +82,18 @@ export function GameMenuDrawer({
           ✕
         </button>
 
-        <button
-          className="menu-item"
+        <div className="menu-content">
+          <button
+            className="menu-item"
           type="button"
-          onClick={() => {
-            onClose();
-            onHome();
-          }}
-        >
-          <span className="menu-icon">🏠</span>
-          {t("home")}
-        </button>
+            onClick={() => {
+              onClose();
+              onHome();
+            }}
+          >
+            <span className="menu-icon">🏠</span>
+            {t("home")}
+          </button>
 
         <button className="menu-item" type="button" onClick={onHistory}>
           <span className="menu-icon">🕘</span>
