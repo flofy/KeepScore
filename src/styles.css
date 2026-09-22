@@ -1171,7 +1171,11 @@ html:fullscreen .menu-drawer .menu-row {
   opacity: 0.72;
   cursor: grab;
   touch-action: none;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
 }
 .fullscreen-exit-control:active {
   cursor: grabbing;
