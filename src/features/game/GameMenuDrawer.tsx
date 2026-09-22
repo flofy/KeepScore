@@ -15,6 +15,8 @@ type Props = {
   isMunchkin: boolean;
   playerGridLayout: PlayerGridLayout;
   onPlayerGridLayoutChange: (layout: PlayerGridLayout) => void;
+  keepHeaderInFullscreen: boolean;
+  onKeepHeaderInFullscreenChange: (keepHeader: boolean) => void;
   onAddPlayer: () => void;
   onRemovePlayerMode: () => void;
   onSavedGames: () => void;
@@ -37,6 +39,8 @@ export function GameMenuDrawer({
   isMunchkin: _isMunchkin,
   playerGridLayout,
   onPlayerGridLayoutChange,
+  keepHeaderInFullscreen,
+  onKeepHeaderInFullscreenChange,
   onAddPlayer,
   onRemovePlayerMode,
   onSavedGames,
@@ -158,6 +162,26 @@ export function GameMenuDrawer({
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="menu-separator" />
+          <div className="menu-setting">
+            <label className="menu-setting-toggle">
+              <span className="menu-item menu-setting-label">
+                <span className="menu-icon">▣</span>
+                {t("keepHeaderInFullscreen")}
+              </span>
+              <input
+                type="checkbox"
+                checked={keepHeaderInFullscreen}
+                onChange={(event) =>
+                  onKeepHeaderInFullscreenChange(event.target.checked)
+                }
+              />
+              <span className="menu-toggle-track" aria-hidden="true">
+                <span className="menu-toggle-thumb" />
+              </span>
+            </label>
           </div>
 
           <div className="menu-separator" />

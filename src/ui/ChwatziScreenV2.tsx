@@ -12,7 +12,7 @@ type Props = {
 type Phase = "idle" | "counting" | "wiping" | "done";
 type Finger = { pointerId: number; x: number; y: number; color: string };
 
-const FINGER_SETTLE_MS = 3000;
+const FINGER_SETTLE_MS = 2000;
 const WATER_FILL_MS = 5000;
 
 export function ChwatziScreenV2({ onBack }: Props) {
@@ -135,9 +135,8 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const scheduleCountdown = useCallback(() => {
     if (fingersRef.current.length < 2) return;
 
-    if (settleTimerRef.current !== null) {
+    if (settleTimerRef.current !== null)
       window.clearTimeout(settleTimerRef.current);
-    }
     if (countdownTimerRef.current !== null) {
       window.clearInterval(countdownTimerRef.current);
       countdownTimerRef.current = null;
@@ -170,15 +169,12 @@ export function ChwatziScreenV2({ onBack }: Props) {
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
       const next = updateFingers((current) => {
-        if (current.some((finger) => finger.pointerId === event.pointerId)) {
+        if (current.some((finger) => finger.pointerId === event.pointerId))
           return current;
-        }
-
         const color =
           fingerColorsRef.current.get(event.pointerId) ??
           PLAYER_COLORS[fingerColorsRef.current.size % PLAYER_COLORS.length];
         fingerColorsRef.current.set(event.pointerId, color);
-
         return [
           ...current,
           {
@@ -190,10 +186,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
         ];
       });
       if ("vibrate" in navigator) navigator.vibrate(25);
-
-      if (next.length >= 2) {
-        scheduleCountdown();
-      }
+      if (next.length >= 2) scheduleCountdown();
     },
     [phase, scheduleCountdown, updateFingers],
   );
@@ -214,9 +207,8 @@ export function ChwatziScreenV2({ onBack }: Props) {
       if (
         movedFinger &&
         movedFinger.pointerId === selectedFingerRef.current?.pointerId
-      ) {
+      )
         selectedFingerRef.current = movedFinger;
-      }
     },
     [phase, updateFingers],
   );
@@ -227,7 +219,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
       const next = updateFingers((current) =>
         current.filter((finger) => finger.pointerId !== event.pointerId),
       );
-
       if (next.length < 2 && phase !== "wiping") {
         if (settleTimerRef.current !== null) {
           window.clearTimeout(settleTimerRef.current);
@@ -240,10 +231,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
         setCountdown(3);
         setPhase("idle");
       }
-
-      if (phase === "wiping" && next.length === 0) {
-        finish();
-      }
+      if (phase === "wiping" && next.length === 0) finish();
     },
     [finish, phase, updateFingers],
   );
@@ -285,7 +273,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
             ✕
           </button>
         )}
-
         {reducedMotion && (
           <div
             className="chwatzi-v2-animation-status"
@@ -297,24 +284,19 @@ export function ChwatziScreenV2({ onBack }: Props) {
               : "Animations are reduced by your device settings."}
           </div>
         )}
-
         {phase === "counting" && (
           <div className="chwatzi-v2-countdown" aria-live="assertive">
             {countdown}
           </div>
         )}
-
         {phase !== "done" &&
           fingers.map((finger) => {
             const isSelected = finger.pointerId === selectedFingerId;
             if (phase === "wiping" && !isSelected) return null;
-
             return (
               <div
                 key={finger.pointerId}
-                className={`chwatzi-v2-finger${
-                  isSelected ? " chwatzi-v2-finger--selected" : ""
-                }`}
+                className={`chwatzi-v2-finger${isSelected ? " chwatzi-v2-finger--selected" : ""}`}
                 style={{
                   left: finger.x,
                   top: finger.y,
@@ -325,7 +307,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
               />
             );
           })}
-
         {phase === "wiping" && selectedColor && (
           <div
             className="chwatzi-v2-water"
@@ -333,11 +314,9 @@ export function ChwatziScreenV2({ onBack }: Props) {
             aria-hidden="true"
           />
         )}
-
         {phase === "done" && (
           <div className="chwatzi-v2-background" aria-hidden="true" />
         )}
-
         {phase === "idle" && fingers.length === 0 && (
           <div className="chwatzi-v2-instructions">
             <span className="chwatzi-v2-icon" aria-hidden="true">
@@ -346,11 +325,9 @@ export function ChwatziScreenV2({ onBack }: Props) {
             <p>{t("multitouchInstructions")}</p>
           </div>
         )}
-
         {phase === "idle" && fingers.length === 1 && (
           <p className="chwatzi-v2-hint">{t("multitouchSingleHint")}</p>
         )}
-
         {showResult && selectedColor && (
           <div className="chwatzi-v2-result" role="dialog" aria-modal="true">
             <div className="chwatzi-v2-result-card">

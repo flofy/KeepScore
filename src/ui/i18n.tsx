@@ -59,6 +59,7 @@ type TranslationKey =
   | "closeMenu"
   | "fullscreen"
   | "exitFullscreen"
+  | "keepHeaderInFullscreen"
   | "language"
   | "newGameMenuItem"
   | "swapPlayers"
@@ -160,6 +161,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     closeMenu: "Close",
     fullscreen: "Fullscreen",
     exitFullscreen: "Exit fullscreen",
+    keepHeaderInFullscreen: "Keep header in fullscreen",
     language: "Language",
     newGameMenuItem: "New game",
     install: "Install app",
@@ -262,6 +264,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     closeMenu: "Fermer",
     fullscreen: "Plein ecran",
     exitFullscreen: "Quitter le plein ecran",
+    keepHeaderInFullscreen: "Conserver le header en plein écran",
     language: "Langue",
     newGameMenuItem: "Nouvelle partie",
     install: "Installer l app",

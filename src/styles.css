@@ -15,7 +15,7 @@
   box-sizing: border-box;
 }
 html {
-  overscroll-behavior-x: none;
+  overscroll-behavior: none;
 }
 body {
   margin: 0;
@@ -1150,6 +1150,48 @@ html:fullscreen .menu-drawer .menu-row {
   background: rgb(8 12 24 / 88%);
   backdrop-filter: blur(10px);
 }
+.app-shell.fullscreen-hide-header .app-header {
+  display: none;
+}
+
+.fullscreen-exit-control {
+  position: fixed;
+  z-index: 40;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 50%;
+  background: rgb(8 12 24 / 42%);
+  color: rgb(226 232 240 / 58%);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
+  backdrop-filter: blur(6px);
+  opacity: 0.72;
+  cursor: grab;
+  touch-action: none;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease,
+    transform 0.15s ease;
+}
+.fullscreen-exit-control:active {
+  cursor: grabbing;
+  transform: scale(0.92);
+}
+.fullscreen-exit-control svg {
+  width: 16px;
+  height: 16px;
+}
+.fullscreen-exit-control:hover,
+.fullscreen-exit-control:focus-visible {
+  opacity: 1;
+  background: rgb(8 12 24 / 72%);
+  color: #f8fafc;
+}
+
 .app-shell.fullscreen .game-header {
   align-items: center;
 }
