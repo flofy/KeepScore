@@ -1,10 +1,17 @@
 import { useEffect, useState } from "react";
+import {
+  getFullscreenHeaderPreference,
+  setFullscreenHeaderPreference,
+} from "./fullscreenHeaderPreference";
 
 const STORAGE_KEY = "keepscore-fullscreen";
 
 export function useFullscreen() {
   const [fullscreen, setFullscreen] = useState(
     () => localStorage.getItem(STORAGE_KEY) === "1",
+  );
+  const [keepHeaderInFullscreen, setKeepHeaderInFullscreen] = useState(
+    getFullscreenHeaderPreference,
   );
 
   useEffect(() => {
@@ -34,5 +41,15 @@ export function useFullscreen() {
     }
   };
 
-  return { fullscreen, toggleFullscreen };
+  const setKeepHeaderPreference = (keepHeader: boolean) => {
+    setKeepHeaderInFullscreen(keepHeader);
+    setFullscreenHeaderPreference(keepHeader);
+  };
+
+  return {
+    fullscreen,
+    toggleFullscreen,
+    keepHeaderInFullscreen,
+    setKeepHeaderPreference,
+  };
 }
