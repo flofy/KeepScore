@@ -738,15 +738,26 @@ h2 {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  overflow-y: auto;
+  overflow: hidden;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  gap: 8px;
-  padding: max(72px, calc(56px + env(safe-area-inset-top))) 20px
-    max(24px, env(safe-area-inset-bottom));
+  padding: 0 20px;
   animation: menu-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.menu-content {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: max(88px, calc(68px + env(safe-area-inset-top))) 0
+    max(24px, env(safe-area-inset-bottom));
 }
 .menu-item {
   width: 100%;
