@@ -22,8 +22,6 @@ const FLOATING_CONTROL_KEY = "keepscore-fullscreen-exit-control-position";
 const CONTROL_SIZE = 34;
 const CONTROL_MARGIN = 8;
 const TAP_MAX_DURATION_MS = 300;
-const DRAG_THRESHOLD_PX = 8;
-const TAP_MAX_DURATION_MS = 300;
 const TAP_MAX_DISTANCE_PX = 8;
 
 type ControlPosition = { x: number; y: number };
