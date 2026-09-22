@@ -159,7 +159,7 @@ export function GameScreen({
           removeMode={removeMode}
           playerRotations={playerRotations}
           playerGridColumns={getPlayerGridColumns(
-            game.presetId === "munchkin" ? "auto" : playerGridLayout,
+            playerGridLayout,
             game.players.length,
           )}
           onRemovePlayer={removePlayer}
