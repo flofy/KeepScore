@@ -8,6 +8,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  min-height: 44px;
 }
 
 .saved-games-title {
@@ -25,6 +26,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex: 0 0 auto;
   font-size: 22px;
   color: #94a3b8;
   background: transparent;
@@ -40,8 +42,9 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  padding: 80px 20px 20px;
-  min-height: 100vh;
+  padding: max(14px, env(safe-area-inset-top)) 20px
+    max(20px, env(safe-area-inset-bottom));
+  min-height: 100dvh;
   gap: 16px;
 }
 
@@ -74,5 +77,10 @@
   .saved-game {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .saved-games-container {
+    padding-right: max(14px, env(safe-area-inset-right));
+    padding-left: max(14px, env(safe-area-inset-left));
   }
 }
