@@ -94,6 +94,32 @@ export function GameMenuDrawer({
           {t("home")}
         </button>
 
+        <button className="menu-item" type="button" onClick={onHistory}>
+          <span className="menu-icon">🕘</span>
+          {t("history")}
+        </button>
+        <div className="menu-separator" />
+        <div className="menu-row">
+          <button
+            className="menu-item"
+            type="button"
+            onClick={onUndo}
+            disabled={!canUndo}
+          >
+            <span className="menu-icon">↩</span>
+            {t("undo")}
+          </button>
+          <button
+            className="menu-item"
+            type="button"
+            onClick={onRedo}
+            disabled={!canRedo}
+          >
+            <span className="menu-icon">↪</span>
+            {t("redo")}
+          </button>
+        </div>
+        <div className="menu-separator" />
         {!isMunchkin && (
           <div className="menu-player-grid">
             <div className="menu-item menu-player-grid-label">
@@ -135,31 +161,6 @@ export function GameMenuDrawer({
           </div>
         )}
 
-        <button className="menu-item" type="button" onClick={onHistory}>
-          <span className="menu-icon">🕘</span>
-          {t("history")}
-        </button>
-        <div className="menu-separator" />
-        <div className="menu-row">
-          <button
-            className="menu-item"
-            type="button"
-            onClick={onUndo}
-            disabled={!canUndo}
-          >
-            <span className="menu-icon">↩</span>
-            {t("undo")}
-          </button>
-          <button
-            className="menu-item"
-            type="button"
-            onClick={onRedo}
-            disabled={!canRedo}
-          >
-            <span className="menu-icon">↪</span>
-            {t("redo")}
-          </button>
-        </div>
         <div className="menu-separator" />
         <div className="menu-row player-count-row">
           <button
