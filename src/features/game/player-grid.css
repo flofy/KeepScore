@@ -5,3 +5,19 @@
 .players.player-grid.duo {
   grid-template-columns: repeat(var(--player-grid-cols, 1), minmax(0, 1fr));
 }
+
+@media (max-width: 620px) {
+  .players.player-grid {
+    grid-template-columns: repeat(
+      min(2, var(--player-grid-cols, 1)),
+      minmax(0, 1fr)
+    );
+  }
+
+  .players.player-grid.duo {
+    grid-template-columns: repeat(
+      min(2, var(--player-grid-cols, 1)),
+      minmax(0, 1fr)
+    );
+  }
+}
