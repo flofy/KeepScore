@@ -121,8 +121,7 @@ export function GameMenuDrawer({
           </button>
         </div>
         <div className="menu-separator" />
-        {
-          <div className="menu-player-grid">
+        <div className="menu-player-grid">
             <div className="menu-item menu-player-grid-label">
               <span className="menu-icon">▦</span>
               {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
@@ -159,8 +158,7 @@ export function GameMenuDrawer({
                 </button>
               ))}
             </div>
-          </div>
-        }
+        </div>
 
         <div className="menu-separator" />
         <div className="menu-row player-count-row">
