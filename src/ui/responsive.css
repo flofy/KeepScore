@@ -112,6 +112,13 @@ body::after {
   }
 
   .game-header .toolbar {
+    display: flex;
+    width: auto;
+    flex: 0 0 auto;
+    justify-content: flex-end;
+  }
+
+  .game-header .toolbar .install-button {
     display: none;
   }
 
