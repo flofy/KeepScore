@@ -740,8 +740,11 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
   gap: 8px;
-  padding: 60px 24px 40px;
+  padding: max(72px, calc(56px + env(safe-area-inset-top))) 20px max(24px, env(safe-area-inset-bottom)); 60px 24px 40px;
   animation: menu-rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .menu-item {
@@ -1672,6 +1675,22 @@ html:fullscreen .menu-drawer .menu-row {
 
 .menu-grid-icon[data-columns="auto"] {
   grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+}
+
+.menu-grid-icon[data-columns="auto"] span:first-child {
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+  width: 100%;
+  height: 100%;
+  border: 2px solid currentColor;
+  background: transparent;
+  opacity: 0.8;
+  border-radius: 3px;
+}
+
+.menu-grid-icon[data-columns="auto"] span:not(:first-child) {
+  display: none;
 }
 
 @media (max-width: 620px) {
