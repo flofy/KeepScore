@@ -1202,14 +1202,6 @@ html:fullscreen .menu-drawer .menu-row {
   background: #7dd3fc;
 }
 
-.app-shell.fullscreen-hide-header .app-header {
-  display: none;
-}
-
-.app-shell.fullscreen-hide-header .players {
-  min-height: 100dvh;
-}
-
 .app-shell.fullscreen .app-header {
   display: flex;
   flex-shrink: 0;
@@ -1219,6 +1211,14 @@ html:fullscreen .menu-drawer .menu-row {
   background: rgb(8 12 24 / 88%);
   backdrop-filter: blur(10px);
 }
+.app-shell.fullscreen-hide-header .app-header {
+  display: none;
+}
+
+.app-shell.fullscreen-hide-header .players {
+  min-height: 100dvh;
+}
+
 .app-shell.fullscreen .game-header {
   align-items: center;
 }
