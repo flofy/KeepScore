@@ -10,6 +10,32 @@ function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
 }
 
+function usePlayerTileDimensions() {
+  const ref = useRef<HTMLElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const update = () => {
+      const { width, height } = element.getBoundingClientRect();
+      setDimensions((current) =>
+        current.width === width && current.height === height
+          ? current
+          : { width, height },
+      );
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, dimensions };
+}
+
 function formatDelta(delta: number): string {
   return delta > 0 ? `+${delta}` : `${delta}`;
 }
@@ -68,6 +94,7 @@ export function PlayerCard({
 }: PlayerCardProps) {
   const { t } = useI18n();
   const tileOrientation = getPlayerTileOrientation(rotation);
+  const tileDimensions = usePlayerTileDimensions();
   const longPressTimer = useRef<number | null>(null);
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null);
   const longPressFired = useRef(false);
@@ -246,6 +273,7 @@ export function PlayerCard({
 
   return (
     <article
+      ref={tileDimensions.ref}
       className={[
         "player-card",
         `orientation-${tileOrientation}`,
@@ -260,6 +288,8 @@ export function PlayerCard({
           "--player-color": player.color ?? "#38bdf8",
           "--digits": String(Math.abs(player.score)).length,
           "--tile-rotation": `${rotation}deg`,
+          "--tile-width": `${tileDimensions.dimensions.width}px`,
+          "--tile-height": `${tileDimensions.dimensions.height}px`,
         } as CSSProperties
       }
       onPointerDown={(event) => startLongPress(event)}
