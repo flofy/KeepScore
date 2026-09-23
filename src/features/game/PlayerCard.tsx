@@ -273,6 +273,7 @@ export function PlayerCard({
 
   return (
     <article
+      ref={tileDimensions.ref}
       className={[
         "player-card",
         `orientation-${tileOrientation}`,
