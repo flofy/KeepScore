@@ -331,21 +331,21 @@ export function PlayerCard({
         </button>
       )}
       <div className={`card-content tile-${tileOrientation}`}>
-      {deltas.length > 0 && (
-        <div
-          className="player-deltas"
-          aria-label={`${t("history")} — ${player.name}`}
-        >
-          {deltas.map((delta, index) => (
-            <span
-              key={index}
-              className={delta > 0 ? "delta-plus" : "delta-minus"}
-            >
-              {formatDelta(delta)}
-            </span>
-          ))}
-        </div>
-      )}
+        {deltas.length > 0 && (
+          <div
+            className="player-deltas"
+            aria-label={`${t("history")} — ${player.name}`}
+          >
+            {deltas.map((delta, index) => (
+              <span
+                key={index}
+                className={delta > 0 ? "delta-plus" : "delta-minus"}
+              >
+                {formatDelta(delta)}
+              </span>
+            ))}
+          </div>
+        )}
         <input
           className="player-name"
           value={player.name}
