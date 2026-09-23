@@ -125,7 +125,7 @@
 
 .player-card.rotated-90 .player-deltas {
   top: auto;
-  right: 12px;
+  right: 0;
   bottom: 14px;
   left: auto;
   align-items: flex-end;
