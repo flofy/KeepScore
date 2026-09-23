@@ -94,7 +94,8 @@ export function PlayerCard({
   onFlip,
 }: PlayerCardProps) {
   const { t } = useI18n();
-  const tileOrientation = getPlayerTileOrientation(rotation);\n  const tileDimensions = usePlayerTileDimensions();
+  const tileOrientation = getPlayerTileOrientation(rotation);
+  const tileDimensions = usePlayerTileDimensions();
   const longPressTimer = useRef<number | null>(null);
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null);
   const longPressFired = useRef(false);
