@@ -1,23 +1,31 @@
 /* Rotation-aware player tile geometry.
  *
- * Keep .card-content on the original physical card geometry. The base rule
- * in styles.css already gives it `position: absolute; inset: 0`, so changing
- * its dimensions here with cqh/cqw would create a second sizing model and
- * break the flex centering of the score row. Rotation is purely visual.
+ * Measure the physical player card once and keep the logical content surface
+ * independent from container query sizing. On a quarter turn, the surface
+ * swaps W/H first and is then rotated around its center. This preserves the
+ * existing flex centering for rectangular tiles without circular cqw/cqh
+ * dependencies.
  */
 .card-content {
-  width: auto;
-  height: auto;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: var(--tile-width, 100%);
+  height: var(--tile-height, 100%);
   box-sizing: border-box;
   transform-origin: center center;
 }
 
 .card-content.tile-horizontal {
-  transform: rotate(var(--tile-rotation, 0deg));
+  transform: translate(-50%, -50%) rotate(var(--tile-rotation, 0deg));
 }
 
 .card-content.tile-vertical {
-  transform: rotate(var(--tile-rotation, 0deg));
+  width: var(--tile-height, 100%);
+  height: var(--tile-width, 100%);
+  transform: translate(-50%, -50%) rotate(var(--tile-rotation, 0deg));
 }
 
 /* The score row stays in the original flex/grid layout. */
