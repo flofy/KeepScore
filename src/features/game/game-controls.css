@@ -160,11 +160,11 @@
 }
 
 .player-card.rotated-270 .player-deltas {
-  top: auto;
+  top: 14px;
   right: auto;
-  bottom: 14px;
+  bottom: auto;
   left: 12px;
   align-items: flex-start;
   transform: rotate(270deg);
-  transform-origin: bottom left;
+  transform-origin: top left;
 }
