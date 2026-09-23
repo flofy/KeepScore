@@ -286,7 +286,9 @@ export function PlayerCard({
         {
           "--player-color": player.color ?? "#38bdf8",
           "--digits": String(Math.abs(player.score)).length,
-          "--tile-rotation": `${rotation}deg`,\n          "--tile-width": `${tileDimensions.dimensions.width}px`,\n          "--tile-height": `${tileDimensions.dimensions.height}px`,
+          "--tile-rotation": `${rotation}deg`,
+          "--tile-width": `${tileDimensions.dimensions.width}px`,
+          "--tile-height": `${tileDimensions.dimensions.height}px`,
         } as CSSProperties
       }
       onPointerDown={(event) => startLongPress(event)}
