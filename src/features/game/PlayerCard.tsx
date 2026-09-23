@@ -330,6 +330,7 @@ export function PlayerCard({
           ↻
         </button>
       )}
+      <div className={`card-content tile-${tileOrientation}`}>
       {deltas.length > 0 && (
         <div
           className="player-deltas"
@@ -345,7 +346,6 @@ export function PlayerCard({
           ))}
         </div>
       )}
-      <div className={`card-content tile-${tileOrientation}`}>
         <input
           className="player-name"
           value={player.name}
