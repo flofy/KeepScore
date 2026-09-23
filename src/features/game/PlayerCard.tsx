@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { Player } from "../../domain/game/types";
+import { getPlayerTileOrientation } from "./player-tile";
 import "./game-controls.css";
+import "./player-tile-rotation.css";
 import { useI18n } from "../../ui/i18n";
 
 function haptic() {
@@ -65,6 +67,7 @@ export function PlayerCard({
   onFlip,
 }: PlayerCardProps) {
   const { t } = useI18n();
+  const tileOrientation = getPlayerTileOrientation(rotation);
   const longPressTimer = useRef<number | null>(null);
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null);
   const longPressFired = useRef(false);
@@ -243,17 +246,20 @@ export function PlayerCard({
 
   return (
     <article
-      className={
-        removeMode
-          ? `player-card remove-mode${tilt ? ` tilt-${tilt}` : ""}`
-          : rotation
-            ? `player-card rotated-${rotation}`
-            : "player-card"
-      }
+      className={[
+        "player-card",
+        `orientation-${tileOrientation}`,
+        removeMode ? "remove-mode" : "",
+        removeMode && tilt ? `tilt-${tilt}` : "",
+        !removeMode && rotation ? `rotated-${rotation}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={
         {
           "--player-color": player.color ?? "#38bdf8",
           "--digits": String(Math.abs(player.score)).length,
+          "--tile-rotation": `${rotation}deg`,
         } as CSSProperties
       }
       onPointerDown={(event) => startLongPress(event)}
@@ -309,10 +315,7 @@ export function PlayerCard({
           ))}
         </div>
       )}
-      <div
-        className="card-content"
-        style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}
-      >
+      <div className={`card-content tile-${tileOrientation}`}>
         <input
           className="player-name"
           value={player.name}
@@ -489,6 +492,7 @@ export function PlayerCard({
             </div>
           </div>
         </div>
+
         {quickOpen && (
           <div
             ref={quickRef}
