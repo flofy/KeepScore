@@ -5,22 +5,24 @@
  * is intentionally reused: after the surface rotates, left/right become
  * top/bottom without introducing a second, conflicting layout model.
  */
+/* Keep the player card as the size container. The rotated surface must use
+ * the physical card's cqw/cqh values; making .card-content its own size
+ * container creates a circular sizing dependency and breaks flex centering. */
 .card-content {
-  container-type: size;
-  container-name: tile;
+  container-type: normal;
 }
 
 .card-content.tile-horizontal {
   width: 100cqw;
-  height: 100cqh;
+  height: 100%;
   box-sizing: border-box;
   transform-origin: center center;
   transform: rotate(var(--tile-rotation, 0deg));
 }
 
 .card-content.tile-vertical {
-  width: 100cqh;
-  height: 100cqw;
+  width: 100%;
+  height: 100%;
   top: 50%;
   left: 50%;
   right: auto;
@@ -31,7 +33,7 @@
 }
 
 /* The logical surface is already rotated as a whole. Keep one layout model
- * for the score controls so there is no second set of absolute/grid rules
+ * for the score controls so there is no second, conflicting layout model
  * that can overlap on short or narrow cards. */
 .card-content.tile-vertical .score-row {
   min-width: 0;
