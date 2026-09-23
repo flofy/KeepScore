@@ -1,28 +1,24 @@
 /* Rotation-aware player tile geometry.
  *
- * The article is the physical W×H tile. For a quarter turn, the logical
- * surface becomes H×W before it is rotated. The existing horizontal layout
- * is intentionally reused: after the surface rotates, left/right become
- * top/bottom without introducing a second, conflicting layout model.
+ * The player card is the physical size container. The card-content keeps the
+ * original flex layout; only its logical rectangle changes for quarter turns.
+ * Rotation is then applied around the exact center of that logical rectangle.
  */
-/* Keep the player card as the size container. The rotated surface must use
- * the physical card's cqw/cqh values; making .card-content its own size
- * container creates a circular sizing dependency and breaks flex centering. */
 .card-content {
   container-type: normal;
 }
 
 .card-content.tile-horizontal {
   width: 100cqw;
-  height: 100%;
+  height: 100cqh;
   box-sizing: border-box;
   transform-origin: center center;
   transform: rotate(var(--tile-rotation, 0deg));
 }
 
 .card-content.tile-vertical {
-  width: 100%;
-  height: 100%;
+  width: 100cqh;
+  height: 100cqw;
   top: 50%;
   left: 50%;
   right: auto;
@@ -32,17 +28,13 @@
   transform: translate(-50%, -50%) rotate(var(--tile-rotation, 0deg));
 }
 
-/* The logical surface is already rotated as a whole. Keep one layout model
- * for the score controls so there is no second, conflicting layout model
- * that can overlap on short or narrow cards. */
+/* The score row remains in the existing flex layout. Do not absolutely
+ * position it: its vertical centering depends on the logical surface. */
 .card-content.tile-vertical .score-row {
   min-width: 0;
   min-height: 0;
 }
 
-/* Particularly extreme physical aspect ratios need smaller controls. These
- * rules are scoped to the physical card, while the actual tile geometry stays
- * driven by the swapped logical dimensions above. */
 @container card (min-aspect-ratio: 5 / 3) {
   .card-content {
     padding: clamp(8px, 2.5cqw, 14px) clamp(8px, 3cqw, 18px);
