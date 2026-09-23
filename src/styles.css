@@ -740,8 +740,7 @@ h2 {
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-gutter: stable;
-  padding: max(72px, calc(56px + env(safe-area-inset-top))) 20px
-    max(24px, env(safe-area-inset-bottom));
+  padding: 20px 20px max(24px, env(safe-area-inset-bottom));
 }
 .menu-item {
   width: 100%;
