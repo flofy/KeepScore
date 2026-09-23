@@ -10,7 +10,6 @@ function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
 }
 
-
 function usePlayerTileDimensions() {
   const ref = useRef<HTMLElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
