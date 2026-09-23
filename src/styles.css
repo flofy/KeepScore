@@ -15,7 +15,7 @@
   box-sizing: border-box;
 }
 html {
-  overscroll-behavior: none;
+  overscroll-behavior-x: none;
 }
 body {
   margin: 0;
@@ -165,7 +165,7 @@ h2 {
 }
 .player-card {
   position: relative;
-  container-type: inline-size;
+  container-type: size;
   container-name: card;
   overflow: hidden;
   min-height: clamp(150px, 32cqi, 300px);
@@ -186,8 +186,8 @@ h2 {
 }
 .card-flip-btn {
   position: absolute;
-  top: clamp(6px, 4cqw, 10px);
-  left: clamp(6px, 4cqw, 10px);
+  top: 4%;
+  left: 4%;
   width: clamp(28px, 10cqw, 38px);
   height: clamp(28px, 10cqw, 38px);
   display: flex;
@@ -493,28 +493,11 @@ h2 {
   transform-origin: center center;
   text-align: center;
 }
-.player-card.rotated-180 .card-content {
-  transform: rotate(180deg);
-}
-.player-card.rotated-180 .card-flip-btn {
-  top: auto;
-  bottom: 10px;
-  left: auto;
-  right: 10px;
-}
-.player-card.rotated-180 .player-deltas {
-  top: auto;
-  right: auto;
-  bottom: 14px;
-  left: 12px;
-  align-items: flex-end;
-  transform: rotate(180deg);
-}
 
 .player-deltas {
   position: absolute;
-  top: 14px;
-  right: 12px;
+  top: 4%;
+  right: 4%;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -1150,48 +1133,6 @@ html:fullscreen .menu-drawer .menu-row {
   background: rgb(8 12 24 / 88%);
   backdrop-filter: blur(10px);
 }
-.app-shell.fullscreen-hide-header .app-header {
-  display: none;
-}
-
-.fullscreen-exit-control {
-  position: fixed;
-  z-index: 40;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 50%;
-  background: rgb(8 12 24 / 42%);
-  color: rgb(226 232 240 / 58%);
-  box-shadow: 0 4px 14px rgb(0 0 0 / 18%);
-  backdrop-filter: blur(6px);
-  opacity: 0.72;
-  cursor: grab;
-  touch-action: none;
-  transition:
-    opacity 0.15s ease,
-    background 0.15s ease,
-    color 0.15s ease,
-    transform 0.15s ease;
-}
-.fullscreen-exit-control:active {
-  cursor: grabbing;
-  transform: scale(0.92);
-}
-.fullscreen-exit-control svg {
-  width: 16px;
-  height: 16px;
-}
-.fullscreen-exit-control:hover,
-.fullscreen-exit-control:focus-visible {
-  opacity: 1;
-  background: rgb(8 12 24 / 72%);
-  color: #f8fafc;
-}
-
 .app-shell.fullscreen .game-header {
   align-items: center;
 }
