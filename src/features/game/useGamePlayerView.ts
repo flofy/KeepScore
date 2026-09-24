@@ -2,17 +2,24 @@ import { useMemo, useState } from "react";
 import type { Game } from "../../domain/game/types";
 
 const PLAYER_ROTATIONS = [0, 90, 180, 270] as const;
-type PlayerRotation = (typeof PLAYER_ROTATIONS)[number];
 
-export function nextPlayerRotation(rotation: number): PlayerRotation {
-  const index = PLAYER_ROTATIONS.indexOf(rotation as PlayerRotation);
-  return PLAYER_ROTATIONS[(index + 1) % PLAYER_ROTATIONS.length];
+/**
+ * Advance by one quarter turn without wrapping back to 0° at the end of a
+ * cycle. Keeping the absolute angle makes the CSS transition continue from
+ * 270° to 360° instead of taking the equivalent -90° path.
+ */
+export function nextPlayerRotation(rotation: number): number {
+  const normalizedRotation = ((rotation % 360) + 360) % 360;
+  const index = PLAYER_ROTATIONS.indexOf(
+    normalizedRotation as (typeof PLAYER_ROTATIONS)[number],
+  );
+  return index === -1 ? 0 : rotation + 90;
 }
 
 export function useGamePlayerView(game: Game) {
   const [swapped, setSwapped] = useState(false);
   const [playerRotations, setPlayerRotations] = useState<
-    Record<string, PlayerRotation>
+    Record<string, number>
   >({});
 
   const isDuo = game.players.length === 2;
