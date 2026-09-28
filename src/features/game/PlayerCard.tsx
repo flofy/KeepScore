@@ -1,11 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { Player } from "../../domain/game/types";
+import { getPlayerTileOrientation } from "./player-tile";
 import "./game-controls.css";
+import "./player-tile-rotation.css";
 import { useI18n } from "../../ui/i18n";
 
 function haptic() {
   if ("vibrate" in navigator) navigator.vibrate(8);
+}
+
+function usePlayerTileDimensions() {
+  const ref = useRef<HTMLElement>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return;
+
+    const update = () => {
+      const { width, height } = element.getBoundingClientRect();
+      setDimensions((current) =>
+        current.width === width && current.height === height
+          ? current
+          : { width, height },
+      );
+    };
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  return { ref, dimensions };
 }
 
 function formatDelta(delta: number): string {
@@ -65,6 +93,8 @@ export function PlayerCard({
   onFlip,
 }: PlayerCardProps) {
   const { t } = useI18n();
+  const tileOrientation = getPlayerTileOrientation(rotation);
+  const tileDimensions = usePlayerTileDimensions();
   const longPressTimer = useRef<number | null>(null);
   const longPressOrigin = useRef<{ x: number; y: number } | null>(null);
   const longPressFired = useRef(false);
@@ -243,17 +273,23 @@ export function PlayerCard({
 
   return (
     <article
-      className={
-        removeMode
-          ? `player-card remove-mode${tilt ? ` tilt-${tilt}` : ""}`
-          : rotation
-            ? `player-card rotated-${rotation}`
-            : "player-card"
-      }
+      ref={tileDimensions.ref}
+      className={[
+        "player-card",
+        `orientation-${tileOrientation}`,
+        removeMode ? "remove-mode" : "",
+        removeMode && tilt ? `tilt-${tilt}` : "",
+        !removeMode && rotation ? `rotated-${rotation}` : "",
+      ]
+        .filter(Boolean)
+        .join(" ")}
       style={
         {
           "--player-color": player.color ?? "#38bdf8",
           "--digits": String(Math.abs(player.score)).length,
+          "--tile-rotation": `${rotation}deg`,
+          "--tile-width": `${tileDimensions.dimensions.width}px`,
+          "--tile-height": `${tileDimensions.dimensions.height}px`,
         } as CSSProperties
       }
       onPointerDown={(event) => startLongPress(event)}
@@ -294,25 +330,22 @@ export function PlayerCard({
           ↻
         </button>
       )}
-      {deltas.length > 0 && (
-        <div
-          className="player-deltas"
-          aria-label={`${t("history")} — ${player.name}`}
-        >
-          {deltas.map((delta, index) => (
-            <span
-              key={index}
-              className={delta > 0 ? "delta-plus" : "delta-minus"}
-            >
-              {formatDelta(delta)}
-            </span>
-          ))}
-        </div>
-      )}
-      <div
-        className="card-content"
-        style={{ transform: rotation ? `rotate(${rotation}deg)` : undefined }}
-      >
+      <div className={`card-content tile-${tileOrientation}`}>
+        {deltas.length > 0 && (
+          <div
+            className="player-deltas"
+            aria-label={`${t("history")} — ${player.name}`}
+          >
+            {deltas.map((delta, index) => (
+              <span
+                key={index}
+                className={delta > 0 ? "delta-plus" : "delta-minus"}
+              >
+                {formatDelta(delta)}
+              </span>
+            ))}
+          </div>
+        )}
         <input
           className="player-name"
           value={player.name}
@@ -489,6 +522,7 @@ export function PlayerCard({
             </div>
           </div>
         </div>
+
         {quickOpen && (
           <div
             ref={quickRef}

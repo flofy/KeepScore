@@ -1,0 +1,64 @@
+/* Rotation-aware player tile geometry.
+ *
+ * Measure the physical player card once and keep the logical content surface
+ * independent from container query sizing. On a quarter turn, the surface
+ * swaps W/H first and is then rotated around its center. This preserves the
+ * existing flex centering for rectangular tiles without circular cqw/cqh
+ * dependencies.
+ */
+.card-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  width: var(--tile-width, 100%);
+  height: var(--tile-height, 100%);
+  box-sizing: border-box;
+  transform-origin: center center;
+}
+
+.card-content.tile-horizontal {
+  transform: translate(-50%, -50%) rotate(var(--tile-rotation, 0deg));
+}
+
+.card-content.tile-vertical {
+  width: var(--tile-height, 100%);
+  height: var(--tile-width, 100%);
+  transform: translate(-50%, -50%) rotate(var(--tile-rotation, 0deg));
+}
+
+/* The score row stays in the original flex/grid layout. */
+.card-content .score-row {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Keep the existing responsive control sizing for extreme physical cards. */
+@container card (min-aspect-ratio: 5 / 3) {
+  .card-content {
+    padding: clamp(8px, 2.5cqw, 14px) clamp(8px, 3cqw, 18px);
+  }
+
+  .inline-step {
+    width: clamp(38px, 12cqw, 56px);
+    min-width: clamp(38px, 12cqw, 56px);
+    height: clamp(38px, 12cqw, 56px);
+  }
+
+  .score-row {
+    gap: clamp(8px, 2cqw, 12px);
+  }
+}
+
+@container card (max-aspect-ratio: 3 / 5) {
+  .card-content {
+    padding: clamp(8px, 2.5cqw, 14px) clamp(8px, 3cqw, 18px);
+  }
+
+  .inline-step {
+    width: clamp(38px, 12cqw, 56px);
+    min-width: clamp(38px, 12cqw, 56px);
+    height: clamp(38px, 12cqw, 56px);
+  }
+}

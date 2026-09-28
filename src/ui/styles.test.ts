@@ -45,7 +45,7 @@ describe("player card fluid layout (styles.css)", () => {
       (rule) => rule.selector === ".player-card",
     );
     expect(card).toBeDefined();
-    expect(card?.body).toContain("container-type: inline-size");
+    expect(card?.body).toContain("container-type: size");
   });
 
   it("scales the card height with the container, not a fixed value", () => {

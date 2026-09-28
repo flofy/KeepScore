@@ -20,6 +20,10 @@ type TranslationKey =
   | "playerName"
   | "removePlayer"
   | "removePlayersHint"
+  | "playerAdded"
+  | "playerRemoved"
+  | "undoApplied"
+  | "redoApplied"
   | "done"
   | "playersPlural"
   | "colorForPlayer"
@@ -55,6 +59,7 @@ type TranslationKey =
   | "closeMenu"
   | "fullscreen"
   | "exitFullscreen"
+  | "keepHeaderInFullscreen"
   | "language"
   | "newGameMenuItem"
   | "swapPlayers"
@@ -117,6 +122,10 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerName: "name",
     removePlayer: "Remove player",
     removePlayersHint: "Tap a player card to remove it",
+    playerAdded: "Player added",
+    playerRemoved: "Player removed",
+    undoApplied: "Last change undone",
+    redoApplied: "Last change restored",
     done: "Done",
     playersPlural: "players",
     colorForPlayer: "Color for player",
@@ -152,6 +161,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     closeMenu: "Close",
     fullscreen: "Fullscreen",
     exitFullscreen: "Exit fullscreen",
+    keepHeaderInFullscreen: "Keep header in fullscreen",
     language: "Language",
     newGameMenuItem: "New game",
     install: "Install app",
@@ -214,6 +224,10 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     playerName: "nom",
     removePlayer: "Retirer le joueur",
     removePlayersHint: "Touchez une carte pour retirer le joueur",
+    playerAdded: "Joueur ajoute",
+    playerRemoved: "Joueur retire",
+    undoApplied: "Derniere modification annulee",
+    redoApplied: "Derniere modification retablie",
     done: "Terminer",
     playersPlural: "joueurs",
     colorForPlayer: "Couleur du joueur",
@@ -250,6 +264,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     closeMenu: "Fermer",
     fullscreen: "Plein ecran",
     exitFullscreen: "Quitter le plein ecran",
+    keepHeaderInFullscreen: "Conserver le header en plein écran",
     language: "Langue",
     newGameMenuItem: "Nouvelle partie",
     install: "Installer l app",
