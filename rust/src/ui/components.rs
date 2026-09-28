@@ -1,4 +1,3 @@
-use android_activity::{AndroidApp, MainEvent, WindowEvent};
 use crate::game::{Game, Player, ScoreAction};
 
 pub struct UIState {
@@ -32,7 +31,7 @@ impl UIState {
     }
 
     pub fn reset_scores(&mut self) {
-        self.game.apply_action(ScoreAction::ResetAll);
+        self.game.reset_all();
     }
 
     pub fn undo(&mut self) {
