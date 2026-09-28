@@ -4,12 +4,24 @@ use serde::{Deserialize, Serialize};
 
 use crate::game::player::Player;
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub enum ScoreAction {
-    Add { player_id: String, delta: i32 },
-    Set { player_id: String, score: i32 },
-    ResetAll,
-    TogglePlayer { player_id: String },
+    Add {
+        player_id: String,
+        delta: i32,
+    },
+    Set {
+        player_id: String,
+        previous_score: i32,
+        score: i32,
+    },
+    ResetAll {
+        previous_scores: Vec<(String, i32)>,
+    },
+    TogglePlayer {
+        player_id: String,
+        previous_active: bool,
+    },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -51,7 +63,6 @@ impl Game {
         self.players.iter_mut().find(|p| p.id == player_id)
     }
 
-    /// Applies an action to the players, without touching the history.
     fn apply_to_players(&mut self, action: &ScoreAction) {
         match action {
             ScoreAction::Add { player_id, delta } => {
@@ -59,17 +70,19 @@ impl Game {
                     player.add_score(*delta);
                 }
             }
-            ScoreAction::Set { player_id, score } => {
+            ScoreAction::Set {
+                player_id, score, ..
+            } => {
                 if let Some(player) = self.get_player_mut(player_id) {
                     player.set_score(*score);
                 }
             }
-            ScoreAction::ResetAll => {
+            ScoreAction::ResetAll { .. } => {
                 for player in &mut self.players {
                     player.set_score(0);
                 }
             }
-            ScoreAction::TogglePlayer { player_id } => {
+            ScoreAction::TogglePlayer { player_id, .. } => {
                 if let Some(player) = self.get_player_mut(player_id) {
                     player.toggle_active();
                 }
@@ -80,7 +93,6 @@ impl Game {
     pub fn apply_action(&mut self, action: ScoreAction) {
         self.apply_to_players(&action);
 
-        // Drop any redo history, then record the action.
         while self.history.len() > self.current_index {
             self.history.pop_back();
         }
@@ -94,8 +106,8 @@ impl Game {
             return None;
         }
 
-        let action = self.history[self.current_index - 1].clone();
         self.current_index -= 1;
+        let action = self.history[self.current_index].clone();
 
         match &action {
             ScoreAction::Add { player_id, delta } => {
@@ -103,19 +115,28 @@ impl Game {
                     player.add_score(-delta);
                 }
             }
-            ScoreAction::Set { player_id, .. } => {
-                // Best-effort: the previous score is not stored in the history,
-                // so undoing a `Set` resets the player's score.
+            ScoreAction::Set {
+                player_id,
+                previous_score,
+                ..
+            } => {
                 if let Some(player) = self.get_player_mut(player_id) {
-                    player.set_score(0);
+                    player.set_score(*previous_score);
                 }
             }
-            ScoreAction::ResetAll => {
-                // `ResetAll` cannot be undone exactly: previous scores are not stored.
+            ScoreAction::ResetAll { previous_scores } => {
+                for (player_id, score) in previous_scores {
+                    if let Some(player) = self.get_player_mut(player_id) {
+                        player.set_score(*score);
+                    }
+                }
             }
-            ScoreAction::TogglePlayer { player_id } => {
+            ScoreAction::TogglePlayer {
+                player_id,
+                previous_active,
+            } => {
                 if let Some(player) = self.get_player_mut(player_id) {
-                    player.toggle_active();
+                    player.is_active = *previous_active;
                 }
             }
         }
@@ -198,7 +219,12 @@ mod tests {
             player_id: "p2".to_string(),
             delta: 9,
         });
-        game.apply_action(ScoreAction::ResetAll);
+        game.apply_action(ScoreAction::ResetAll {
+            previous_scores: vec![
+                ("p1".to_string(), 5),
+                ("p2".to_string(), 9),
+            ],
+        });
         assert_eq!(game.get_player("p1").unwrap().score, 0);
         assert_eq!(game.get_player("p2").unwrap().score, 0);
     }
@@ -230,30 +256,66 @@ mod tests {
     }
 
     #[test]
-    fn redo_allows_multiple_steps_after_undo() {
+    fn undo_set_restores_previous_score() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 10,
+        });
+        game.apply_action(ScoreAction::Set {
+            player_id: "p1".to_string(),
+            previous_score: 10,
+            score: 42,
+        });
+
+        assert_eq!(game.get_player("p1").unwrap().score, 42);
+        assert!(game.undo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 10);
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 42);
+    }
+
+    #[test]
+    fn undo_reset_restores_all_scores() {
         let mut game = game_with_two_players();
         game.apply_action(ScoreAction::Add {
             player_id: "p1".to_string(),
             delta: 5,
         });
         game.apply_action(ScoreAction::Add {
-            player_id: "p1".to_string(),
-            delta: 3,
+            player_id: "p2".to_string(),
+            delta: 9,
         });
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".to_string(),
-            delta: 2,
+        game.apply_action(ScoreAction::ResetAll {
+            previous_scores: vec![
+                ("p1".to_string(), 5),
+                ("p2".to_string(), 9),
+            ],
         });
 
-        assert!(game.undo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 0);
+        assert_eq!(game.get_player("p2").unwrap().score, 0);
         assert!(game.undo().is_some());
         assert_eq!(game.get_player("p1").unwrap().score, 5);
+        assert_eq!(game.get_player("p2").unwrap().score, 9);
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 0);
+        assert_eq!(game.get_player("p2").unwrap().score, 0);
+    }
 
+    #[test]
+    fn undo_toggle_restores_previous_state() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::TogglePlayer {
+            player_id: "p1".to_string(),
+            previous_active: true,
+        });
+
+        assert!(!game.get_player("p1").unwrap().is_active);
+        assert!(game.undo().is_some());
+        assert!(game.get_player("p1").unwrap().is_active);
         assert!(game.redo().is_some());
-        assert_eq!(game.get_player("p1").unwrap().score, 8);
-        assert!(game.redo().is_some());
-        assert_eq!(game.get_player("p1").unwrap().score, 10);
-        assert!(!game.can_redo());
+        assert!(!game.get_player("p1").unwrap().is_active);
     }
 
     #[test]
@@ -264,7 +326,10 @@ mod tests {
             delta: 5,
         });
         game.undo();
-        game.apply_action(ScoreAction::Add { player_id: "p2".to_string(), delta: 1 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p2".to_string(),
+            delta: 1,
+        });
         assert!(!game.can_redo());
         assert_eq!(game.get_player("p2").unwrap().score, 1);
         assert_eq!(game.get_player("p1").unwrap().score, 0);
@@ -273,7 +338,10 @@ mod tests {
     #[test]
     fn json_round_trip() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 7 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 7,
+        });
         let json = game.export_to_json();
         let restored = Game::import_from_json(&json).unwrap();
         assert_eq!(restored.players.len(), 2);
