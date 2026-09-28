@@ -33,6 +33,7 @@ cargo {
     module = '../rust'
     libname = 'keepscore'
     targets = ['arm', 'arm64', 'x86', 'x86_64']
+    cargoCommand = System.getProperty('user.home') + '/.cargo/bin/cargo'
 }
 
 afterEvaluate {
