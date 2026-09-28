@@ -34,9 +34,12 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
-      - uses: android-actions/setup-android@v3
-        with:
-          packages: "platform-tools ndk;29.0.14206865"
+      - uses: android-actions/setup-android@v4
+      - name: Install Android SDK and NDK
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;29.0.14206865"
+          yes | sdkmanager --licenses >/dev/null || true
+          test -d "$ANDROID_SDK_ROOT/ndk/29.0.14206865"
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
