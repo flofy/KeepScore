@@ -2,7 +2,7 @@ use std::path::PathBuf;
 use std::sync::{Mutex, OnceLock};
 
 use jni::objects::{JObject, JString};
-use jni::sys::JNIEnv;
+use jni::JNIEnv;
 
 mod game;
 mod ui;
@@ -25,7 +25,7 @@ fn initialize(files_dir: PathBuf) {
 
 #[no_mangle]
 #[allow(non_snake_case)]
-pub extern "C" fn Java_com_keepscore_MainActivity_nativeInit(
+pub extern "system" fn Java_com_keepscore_MainActivity_nativeInit(
     mut env: JNIEnv,
     _: JObject,
     files_dir: JString,
