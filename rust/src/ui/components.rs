@@ -28,11 +28,13 @@ impl UIState {
     }
 
     pub fn add_score(&mut self, player_id: String, delta: i32) {
-        self.game.apply_action(ScoreAction::Add { player_id, delta });
+        self.game
+            .apply_action(ScoreAction::Add { player_id, delta });
     }
 
     pub fn set_score(&mut self, player_id: String, score: i32) {
-        self.game.apply_action(ScoreAction::Set { player_id, score });
+        self.game
+            .apply_action(ScoreAction::Set { player_id, score });
     }
 
     pub fn reset_scores(&mut self) {
