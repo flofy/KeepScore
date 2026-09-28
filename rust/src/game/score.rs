@@ -179,7 +179,10 @@ mod tests {
     #[test]
     fn add_score_updates_player() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 5,
+        });
         assert_eq!(game.get_player("p1").unwrap().score, 5);
         assert_eq!(game.get_player("p2").unwrap().score, 0);
     }
@@ -187,8 +190,14 @@ mod tests {
     #[test]
     fn reset_all_zeroes_every_player() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
-        game.apply_action(ScoreAction::Add { player_id: "p2".to_string(), delta: 9 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 5,
+        });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p2".to_string(),
+            delta: 9,
+        });
         game.apply_action(ScoreAction::ResetAll);
         assert_eq!(game.get_player("p1").unwrap().score, 0);
         assert_eq!(game.get_player("p2").unwrap().score, 0);
@@ -197,8 +206,14 @@ mod tests {
     #[test]
     fn undo_and_redo_add() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 3 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 5,
+        });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 3,
+        });
         assert_eq!(game.get_player("p1").unwrap().score, 8);
 
         assert!(game.undo().is_some());
@@ -217,9 +232,18 @@ mod tests {
     #[test]
     fn redo_allows_multiple_steps_after_undo() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 3 });
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 2 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 5,
+        });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 3,
+        });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 2,
+        });
 
         assert!(game.undo().is_some());
         assert!(game.undo().is_some());
@@ -235,7 +259,10 @@ mod tests {
     #[test]
     fn new_action_drops_redo_history() {
         let mut game = game_with_two_players();
-        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.apply_action(ScoreAction::Add {
+            player_id: "p1".to_string(),
+            delta: 5,
+        });
         game.undo();
         game.apply_action(ScoreAction::Add { player_id: "p2".to_string(), delta: 1 });
         assert!(!game.can_redo());
