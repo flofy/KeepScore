@@ -11,10 +11,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialisation via Rust
-        nativeInit(this);
+        nativeInit(getFilesDir().getAbsolutePath());
     }
 
-    // Appel natif vers Rust
-    public native void nativeInit(MainActivity activity);
+    private static native void nativeInit(String filesDir);
 }
