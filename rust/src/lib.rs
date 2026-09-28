@@ -167,6 +167,7 @@ pub extern "system" fn Java_com_keepscore_MainActivity_nativeGetState<'local>(
         app.state.game.export_to_json()
     };
     env.new_string(json).unwrap_or_else(|_| {
-        env.new_string(String::new()).expect("Failed to allocate Java string")
+        env.new_string(String::new())
+            .expect("Failed to allocate Java string")
     })
 }
