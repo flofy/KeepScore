@@ -54,8 +54,10 @@ mod tests {
     use crate::game::player::Player;
 
     fn temp_dir() -> PathBuf {
-        let dir = std::env::temp_dir()
-            .join(format!("keepscore_storage_test_{}", std::process::id()));
+        let dir = std::env::temp_dir().join(format!(
+            "keepscore_storage_test_{}",
+            std::process::id()
+        ));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
@@ -104,6 +106,9 @@ mod tests {
         assert_eq!(imported.players.len(), 1);
 
         let missing = dir.join("missing.json");
-        assert!(storage.import_game(missing.to_str().unwrap()).unwrap().is_none());
+        assert!(storage
+            .import_game(missing.to_str().unwrap())
+            .unwrap()
+            .is_none());
     }
 }
