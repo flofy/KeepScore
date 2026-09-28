@@ -1,5 +1,6 @@
 use crate::game::{Game, Player, ScoreAction};
 
+/// UI state shared between the Rust core and the Java layer.
 pub struct UIState {
     pub game: Game,
     pub selected_player_id: Option<String>,
@@ -11,7 +12,7 @@ pub struct UIState {
 impl UIState {
     pub fn new() -> Self {
         Self {
-            game: Game::new("Nouvelle Partie".to_string()),
+            game: Game::new("Nouvelle partie".to_string()),
             selected_player_id: None,
             show_player_form: false,
             new_player_name: String::new(),
@@ -30,16 +31,20 @@ impl UIState {
         self.game.apply_action(ScoreAction::Add { player_id, delta });
     }
 
+    pub fn set_score(&mut self, player_id: String, score: i32) {
+        self.game.apply_action(ScoreAction::Set { player_id, score });
+    }
+
     pub fn reset_scores(&mut self) {
-        self.game.reset_all();
+        self.game.apply_action(ScoreAction::ResetAll);
     }
 
-    pub fn undo(&mut self) {
-        self.game.undo();
+    pub fn undo(&mut self) -> bool {
+        self.game.undo().is_some()
     }
 
-    pub fn redo(&mut self) {
-        self.game.redo();
+    pub fn redo(&mut self) -> bool {
+        self.game.redo().is_some()
     }
 
     pub fn toggle_player_form(&mut self) {
@@ -56,5 +61,29 @@ impl UIState {
 
     pub fn select_player(&mut self, player_id: Option<String>) {
         self.selected_player_id = player_id;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn new_state_has_empty_game() {
+        let state = UIState::new();
+        assert_eq!(state.game.players.len(), 0);
+        assert!(!state.show_player_form);
+        assert_eq!(state.new_player_color, "#F44336");
+    }
+
+    #[test]
+    fn add_player_and_score() {
+        let mut state = UIState::new();
+        state.add_player("Alice".to_string(), "#F44336".to_string());
+        assert_eq!(state.game.players.len(), 1);
+        assert!(!state.show_player_form);
+
+        state.add_score("player_1".to_string(), 5);
+        assert_eq!(state.game.get_player("player_1").unwrap().score, 5);
     }
 }

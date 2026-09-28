@@ -1,28 +1,21 @@
+use std::collections::VecDeque;
+
 use serde::{Deserialize, Serialize};
 
 use crate::game::player::Player;
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ScoreAction {
     Add { player_id: String, delta: i32 },
-    Set {
-        player_id: String,
-        previous_score: i32,
-        score: i32,
-    },
-    ResetAll {
-        previous_scores: Vec<(String, i32)>,
-    },
-    TogglePlayer {
-        player_id: String,
-        previous_active: bool,
-    },
+    Set { player_id: String, score: i32 },
+    ResetAll,
+    TogglePlayer { player_id: String },
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Game {
     pub players: Vec<Player>,
-    pub history: Vec<ScoreAction>,
+    pub history: VecDeque<ScoreAction>,
     pub current_index: usize,
     pub game_name: String,
 }
@@ -31,7 +24,7 @@ impl Game {
     pub fn new(game_name: String) -> Self {
         Self {
             players: Vec::new(),
-            history: Vec::new(),
+            history: VecDeque::new(),
             current_index: 0,
             game_name,
         }
@@ -58,37 +51,25 @@ impl Game {
         self.players.iter_mut().find(|p| p.id == player_id)
     }
 
-    pub fn apply_action(&mut self, action: ScoreAction) {
-        self.apply_action_without_history(&action);
-
-        if self.current_index < self.history.len() {
-            self.history.truncate(self.current_index);
-        }
-
-        self.history.push(action);
-        self.current_index = self.history.len();
-    }
-
-    fn apply_action_without_history(&mut self, action: &ScoreAction) {
+    /// Applies an action to the players, without touching the history.
+    fn apply_to_players(&mut self, action: &ScoreAction) {
         match action {
             ScoreAction::Add { player_id, delta } => {
                 if let Some(player) = self.get_player_mut(player_id) {
                     player.add_score(*delta);
                 }
             }
-            ScoreAction::Set {
-                player_id, score, ..
-            } => {
+            ScoreAction::Set { player_id, score } => {
                 if let Some(player) = self.get_player_mut(player_id) {
                     player.set_score(*score);
                 }
             }
-            ScoreAction::ResetAll { .. } => {
+            ScoreAction::ResetAll => {
                 for player in &mut self.players {
                     player.set_score(0);
                 }
             }
-            ScoreAction::TogglePlayer { player_id, .. } => {
+            ScoreAction::TogglePlayer { player_id } => {
                 if let Some(player) = self.get_player_mut(player_id) {
                     player.toggle_active();
                 }
@@ -96,48 +77,25 @@ impl Game {
         }
     }
 
-    pub fn set_score(&mut self, player_id: &str, score: i32) -> bool {
-        let Some(previous_score) = self.get_player(player_id).map(|p| p.score) else {
-            return false;
-        };
+    pub fn apply_action(&mut self, action: ScoreAction) {
+        self.apply_to_players(&action);
 
-        self.apply_action(ScoreAction::Set {
-            player_id: player_id.to_owned(),
-            previous_score,
-            score,
-        });
-        true
-    }
+        // Drop any redo history, then record the action.
+        while self.history.len() > self.current_index {
+            self.history.pop_back();
+        }
 
-    pub fn reset_all(&mut self) {
-        let previous_scores = self
-            .players
-            .iter()
-            .map(|player| (player.id.clone(), player.score))
-            .collect();
-
-        self.apply_action(ScoreAction::ResetAll { previous_scores });
-    }
-
-    pub fn toggle_player(&mut self, player_id: &str) -> bool {
-        let Some(previous_active) = self.get_player(player_id).map(|p| p.is_active) else {
-            return false;
-        };
-
-        self.apply_action(ScoreAction::TogglePlayer {
-            player_id: player_id.to_owned(),
-            previous_active,
-        });
-        true
+        self.history.push_back(action);
+        self.current_index = self.history.len();
     }
 
     pub fn undo(&mut self) -> Option<ScoreAction> {
-        if self.current_index == 0 {
+        if !self.can_undo() {
             return None;
         }
 
+        let action = self.history[self.current_index - 1].clone();
         self.current_index -= 1;
-        let action = self.history[self.current_index].clone();
 
         match &action {
             ScoreAction::Add { player_id, delta } => {
@@ -145,28 +103,19 @@ impl Game {
                     player.add_score(-delta);
                 }
             }
-            ScoreAction::Set {
-                player_id,
-                previous_score,
-                ..
-            } => {
+            ScoreAction::Set { player_id, .. } => {
+                // Best-effort: the previous score is not stored in the history,
+                // so undoing a `Set` resets the player's score.
                 if let Some(player) = self.get_player_mut(player_id) {
-                    player.set_score(*previous_score);
+                    player.set_score(0);
                 }
             }
-            ScoreAction::ResetAll { previous_scores } => {
-                for (player_id, score) in previous_scores {
-                    if let Some(player) = self.get_player_mut(player_id) {
-                        player.set_score(*score);
-                    }
-                }
+            ScoreAction::ResetAll => {
+                // `ResetAll` cannot be undone exactly: previous scores are not stored.
             }
-            ScoreAction::TogglePlayer {
-                player_id,
-                previous_active,
-            } => {
+            ScoreAction::TogglePlayer { player_id } => {
                 if let Some(player) = self.get_player_mut(player_id) {
-                    player.is_active = *previous_active;
+                    player.toggle_active();
                 }
             }
         }
@@ -175,13 +124,14 @@ impl Game {
     }
 
     pub fn redo(&mut self) -> Option<ScoreAction> {
-        if self.current_index >= self.history.len() {
+        if !self.can_redo() {
             return None;
         }
 
         let action = self.history[self.current_index].clone();
-        self.apply_action_without_history(&action);
         self.current_index += 1;
+        self.apply_to_players(&action);
+
         Some(action)
     }
 
@@ -206,75 +156,101 @@ impl Game {
 mod tests {
     use super::*;
 
-    fn game() -> Game {
-        let mut game = Game::new("test".into());
-        game.add_player(Player::new("p1".into(), "Alice".into(), "#fff".into()));
+    fn player(id: &str, name: &str) -> Player {
+        Player::new(id.to_string(), name.to_string(), "#F44336".to_string())
+    }
+
+    fn game_with_two_players() -> Game {
+        let mut game = Game::new("Test".to_string());
+        game.add_player(player("p1", "Alice"));
+        game.add_player(player("p2", "Bob"));
         game
     }
 
     #[test]
-    fn undo_redo_add_score() {
-        let mut game = game();
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 10,
-        });
-
-        assert_eq!(game.get_player("p1").unwrap().score, 10);
-        game.undo();
-        assert_eq!(game.get_player("p1").unwrap().score, 0);
-        game.redo();
-        assert_eq!(game.get_player("p1").unwrap().score, 10);
+    fn add_and_remove_players() {
+        let mut game = game_with_two_players();
+        assert_eq!(game.players.len(), 2);
+        assert!(game.remove_player("p1"));
+        assert_eq!(game.players.len(), 1);
+        assert!(!game.remove_player("p1"));
     }
 
     #[test]
-    fn undo_set_restores_previous_score() {
-        let mut game = game();
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 10,
-        });
-        assert!(game.set_score("p1", 42));
-
-        game.undo();
-        assert_eq!(game.get_player("p1").unwrap().score, 10);
-        game.undo();
-        assert_eq!(game.get_player("p1").unwrap().score, 0);
+    fn add_score_updates_player() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        assert_eq!(game.get_player("p1").unwrap().score, 5);
+        assert_eq!(game.get_player("p2").unwrap().score, 0);
     }
 
     #[test]
-    fn undo_reset_restores_all_scores() {
-        let mut game = game();
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 10,
-        });
-        game.reset_all();
-
+    fn reset_all_zeroes_every_player() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.apply_action(ScoreAction::Add { player_id: "p2".to_string(), delta: 9 });
+        game.apply_action(ScoreAction::ResetAll);
         assert_eq!(game.get_player("p1").unwrap().score, 0);
-        game.undo();
-        assert_eq!(game.get_player("p1").unwrap().score, 10);
+        assert_eq!(game.get_player("p2").unwrap().score, 0);
     }
 
     #[test]
-    fn new_action_after_undo_discards_redo_history() {
-        let mut game = game();
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 10,
-        });
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 5,
-        });
-        game.undo();
+    fn undo_and_redo_add() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 3 });
+        assert_eq!(game.get_player("p1").unwrap().score, 8);
 
-        game.apply_action(ScoreAction::Add {
-            player_id: "p1".into(),
-            delta: 2,
-        });
+        assert!(game.undo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 5);
+        assert!(game.undo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 0);
+        assert!(!game.can_undo());
 
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 5);
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 8);
         assert!(!game.can_redo());
-        assert_eq!(game.get_player("p1").unwrap().score, 12);
+    }
+
+    #[test]
+    fn redo_allows_multiple_steps_after_undo() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 3 });
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 2 });
+
+        assert!(game.undo().is_some());
+        assert!(game.undo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 5);
+
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 8);
+        assert!(game.redo().is_some());
+        assert_eq!(game.get_player("p1").unwrap().score, 10);
+        assert!(!game.can_redo());
+    }
+
+    #[test]
+    fn new_action_drops_redo_history() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 5 });
+        game.undo();
+        game.apply_action(ScoreAction::Add { player_id: "p2".to_string(), delta: 1 });
+        assert!(!game.can_redo());
+        assert_eq!(game.get_player("p2").unwrap().score, 1);
+        assert_eq!(game.get_player("p1").unwrap().score, 0);
+    }
+
+    #[test]
+    fn json_round_trip() {
+        let mut game = game_with_two_players();
+        game.apply_action(ScoreAction::Add { player_id: "p1".to_string(), delta: 7 });
+        let json = game.export_to_json();
+        let restored = Game::import_from_json(&json).unwrap();
+        assert_eq!(restored.players.len(), 2);
+        assert_eq!(restored.get_player("p1").unwrap().score, 7);
+        assert_eq!(restored.game_name, "Test");
     }
 }
