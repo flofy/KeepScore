@@ -54,8 +54,14 @@ mod tests {
     use crate::game::player::Player;
 
     fn temp_dir() -> PathBuf {
-        let dir =
-            std::env::temp_dir().join(format!("keepscore_storage_test_{}_{}", std::process::id(), std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        let dir = std::env::temp_dir().join(format!(
+            "keepscore_storage_test_{}_{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
         let _ = fs::remove_dir_all(&dir);
         fs::create_dir_all(&dir).unwrap();
         dir
