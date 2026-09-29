@@ -220,10 +220,7 @@ mod tests {
             delta: 9,
         });
         game.apply_action(ScoreAction::ResetAll {
-            previous_scores: vec![
-                ("p1".to_string(), 5),
-                ("p2".to_string(), 9),
-            ],
+            previous_scores: vec![("p1".to_string(), 5), ("p2".to_string(), 9)],
         });
         assert_eq!(game.get_player("p1").unwrap().score, 0);
         assert_eq!(game.get_player("p2").unwrap().score, 0);
@@ -287,10 +284,7 @@ mod tests {
             delta: 9,
         });
         game.apply_action(ScoreAction::ResetAll {
-            previous_scores: vec![
-                ("p1".to_string(), 5),
-                ("p2".to_string(), 9),
-            ],
+            previous_scores: vec![("p1".to_string(), 5), ("p2".to_string(), 9)],
         });
 
         assert_eq!(game.get_player("p1").unwrap().score, 0);
