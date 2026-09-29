@@ -33,10 +33,7 @@ impl UIState {
     }
 
     pub fn set_score(&mut self, player_id: String, score: i32) {
-        let Some(previous_score) = self
-            .game
-            .get_player(&player_id)
-            .map(|player| player.score)
+        let Some(previous_score) = self.game.get_player(&player_id).map(|player| player.score)
         else {
             return;
         };
