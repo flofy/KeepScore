@@ -1,0 +1,65 @@
+name: Android Build
+
+on:
+  push:
+    branches: [main, rust-android-port]
+  pull_request:
+    branches: [main]
+
+jobs:
+  rust:
+    name: Rust (fmt, test, build)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Check formatting
+        run: cargo fmt --all -- --check
+        working-directory: rust
+      - name: Run tests
+        run: cargo test
+        working-directory: rust
+      - name: Build (host)
+        run: cargo build
+        working-directory: rust
+
+  android:
+    name: Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v4
+      - name: Install Android SDK and NDK
+        run: |
+          sdkmanager --install "platform-tools" "platforms;android-34" "build-tools;34.0.0" "ndk;29.0.14206865"
+          yes | sdkmanager --licenses >/dev/null || true
+          test -d "$ANDROID_SDK_ROOT/ndk/29.0.14206865"
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android,i686-linux-android
+          components: rust-src
+      - name: Configure Cargo for rust-android-gradle
+        run: |
+          CARGO_BIN="$(rustup which cargo)"
+          RUSTC_BIN="$(rustup which rustc)"
+          test -x "$CARGO_BIN"
+          test -x "$RUSTC_BIN"
+          echo "RUST_ANDROID_GRADLE_CARGO_COMMAND=$CARGO_BIN" >> "$GITHUB_ENV"
+          echo "RUST_ANDROID_GRADLE_RUSTC_COMMAND=$RUSTC_BIN" >> "$GITHUB_ENV"
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.7"
+      - name: Build debug APK
+        run: gradle assembleDebug --no-daemon --stacktrace
+        working-directory: android
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: keepscore-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk

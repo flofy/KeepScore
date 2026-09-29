@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#6200EE</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC6</color>
+    <color name="colorBackground">#FFFFFF</color>
+    <color name="colorSurface">#FFFFFF</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorOnSurface">#000000</color>
+    <color name="colorError">#B00020</color>
+    <color name="colorOnError">#FFFFFF</color>
+    
+    <!-- Player colors -->
+    <color name="playerRed">#F44336</color>
+    <color name="playerBlue">#2196F3</color>
+    <color name="playerGreen">#4CAF50</color>
+    <color name="playerYellow">#FFC107</color>
+    <color name="playerPurple">#9C27B0</color>
+    <color name="playerOrange">#FF5722</color>
+    <color name="playerTeal">#009688</color>
+    <color name="playerPink">#E91E63</color>
+</resources>
