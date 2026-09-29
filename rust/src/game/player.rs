@@ -130,8 +130,8 @@ mod tests {
             1,
         );
         let json = serde_json::to_string(&player).unwrap();
-        assert!(json.contains(""equipmentBonus":0"));
-        assert!(json.contains(""gender":"male""));
+        assert!(json.contains("\"equipmentBonus\":0"));
+        assert!(json.contains("\"gender\":\"male\""));
         let restored: Player = serde_json::from_str(&json).unwrap();
         assert_eq!(restored, player);
     }
