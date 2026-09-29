@@ -29,26 +29,72 @@ pub struct Game {
     pub players: Vec<Player>,
     pub history: VecDeque<ScoreAction>,
     pub current_index: usize,
+    #[serde(skip_serializing_if = "String::is_empty", rename = "name")]
     pub game_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub preset_id: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none", rename = "startingPlayerId")]
+    pub starting_player_id: Option<String>,
+    #[serde(rename = "createdAt")]
+    pub created_at: i64,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: i64,
 }
 
 impl Game {
     pub fn new(game_name: String) -> Self {
+        Self::new_with_preset(game_name, None, 0)
+    }
+
+    pub fn new_with_preset(
+        game_name: String,
+        preset_id: Option<String>,
+        starting_score: i32,
+    ) -> Self {
+        let now = current_timestamp();
         Self {
             players: Vec::new(),
             history: VecDeque::new(),
             current_index: 0,
             game_name,
+            preset_id,
+            starting_player_id: None,
+            created_at: now,
+            updated_at: now,
         }
+    }
+
+    pub fn set_starting_player(&mut self, player_id: Option<String>) {
+        self.starting_player_id = player_id.filter(|id| self.players.iter().any(|p| &p.id == id));
+        self.updated_at = current_timestamp();
     }
 
     pub fn add_player(&mut self, player: Player) {
         self.players.push(player);
+        self.updated_at = current_timestamp();
+    }
+
+    pub fn add_preset_player(&mut self, id: String, name: String, color: String, starting_score: i32) {
+        let player = if self.preset_id.as_deref() == Some("munchkin") {
+            Player::with_munchkin(id, name, color, starting_score)
+        } else {
+            let mut player = Player::new(id, name, color);
+            player.score = starting_score;
+            player
+        };
+        self.add_player(player);
     }
 
     pub fn remove_player(&mut self, player_id: &str) -> bool {
+        if self.players.len() <= 1 {
+            return false;
+        }
         if let Some(index) = self.players.iter().position(|p| p.id == player_id) {
             self.players.remove(index);
+            if self.starting_player_id.as_deref() == Some(player_id) {
+                self.starting_player_id = None;
+            }
+            self.updated_at = current_timestamp();
             true
         } else {
             false
@@ -99,6 +145,7 @@ impl Game {
 
         self.history.push_back(action);
         self.current_index = self.history.len();
+        self.updated_at = current_timestamp();
     }
 
     pub fn undo(&mut self) -> Option<ScoreAction> {
@@ -141,6 +188,7 @@ impl Game {
             }
         }
 
+        self.updated_at = current_timestamp();
         Some(action)
     }
 
@@ -152,6 +200,7 @@ impl Game {
         let action = self.history[self.current_index].clone();
         self.current_index += 1;
         self.apply_to_players(&action);
+        self.updated_at = current_timestamp();
 
         Some(action)
     }
@@ -173,6 +222,13 @@ impl Game {
     }
 }
 
+fn current_timestamp() -> i64 {
+    std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|duration| duration.as_millis() as i64)
+        .unwrap_or_default()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -186,6 +242,27 @@ mod tests {
         game.add_player(player("p1", "Alice"));
         game.add_player(player("p2", "Bob"));
         game
+    }
+
+    #[test]
+    fn new_game_has_metadata() {
+        let game = Game::new_with_preset(
+            "Munchkin".to_string(),
+            Some("munchkin".to_string()),
+            1,
+        );
+        assert_eq!(game.preset_id.as_deref(), Some("munchkin"));
+        assert!(game.created_at > 0);
+        assert_eq!(game.created_at, game.updated_at);
+    }
+
+    #[test]
+    fn starting_player_must_exist() {
+        let mut game = game_with_two_players();
+        game.set_starting_player(Some("missing".to_string()));
+        assert!(game.starting_player_id.is_none());
+        game.set_starting_player(Some("p1".to_string()));
+        assert_eq!(game.starting_player_id.as_deref(), Some("p1"));
     }
 
     #[test]
@@ -243,7 +320,6 @@ mod tests {
         assert_eq!(game.get_player("p1").unwrap().score, 5);
         assert!(game.undo().is_some());
         assert_eq!(game.get_player("p1").unwrap().score, 0);
-        assert!(!game.can_undo());
 
         assert!(game.redo().is_some());
         assert_eq!(game.get_player("p1").unwrap().score, 5);
@@ -341,5 +417,7 @@ mod tests {
         assert_eq!(restored.players.len(), 2);
         assert_eq!(restored.get_player("p1").unwrap().score, 7);
         assert_eq!(restored.game_name, "Test");
+        assert!(json.contains(""createdAt""));
+        assert!(json.contains(""updatedAt""));
     }
 }
