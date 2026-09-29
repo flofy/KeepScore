@@ -30,7 +30,7 @@ android {
 
 // Cross-compile the Rust crate into jniLibs for each Android ABI.
 cargo {
-    module = '../rust'
+    module = '../../rust'
     libname = 'keepscore'
     targets = ['arm', 'arm64', 'x86', 'x86_64']
 }
