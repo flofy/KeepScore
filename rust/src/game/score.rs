@@ -423,7 +423,7 @@ mod tests {
         assert_eq!(restored.players.len(), 2);
         assert_eq!(restored.get_player("p1").unwrap().score, 7);
         assert_eq!(restored.game_name, "Test");
-        assert!(json.contains("\\\"createdAt\\\""));
-        assert!(json.contains("\\\"updatedAt\\\""));
+        assert!(json.contains("\"createdAt\""));
+        assert!(json.contains("\"updatedAt\""));
     }
 }
