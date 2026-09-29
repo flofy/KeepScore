@@ -16,7 +16,7 @@ impl UIState {
             selected_player_id: None,
             show_player_form: false,
             new_player_name: String::new(),
-            new_player_color: "#F44336".to_string(), // Rouge par défaut
+            new_player_color: "#F44336".to_string(),
         }
     }
 
@@ -33,12 +33,25 @@ impl UIState {
     }
 
     pub fn set_score(&mut self, player_id: String, score: i32) {
-        self.game
-            .apply_action(ScoreAction::Set { player_id, score });
+        let Some(previous_score) = self.game.get_player(&player_id).map(|player| player.score) else {
+            return;
+        };
+        self.game.apply_action(ScoreAction::Set {
+            player_id,
+            previous_score,
+            score,
+        });
     }
 
     pub fn reset_scores(&mut self) {
-        self.game.apply_action(ScoreAction::ResetAll);
+        let previous_scores = self
+            .game
+            .players
+            .iter()
+            .map(|player| (player.id.clone(), player.score))
+            .collect();
+        self.game
+            .apply_action(ScoreAction::ResetAll { previous_scores });
     }
 
     pub fn undo(&mut self) -> bool {
@@ -63,6 +76,16 @@ impl UIState {
 
     pub fn select_player(&mut self, player_id: Option<String>) {
         self.selected_player_id = player_id;
+    }
+
+    pub fn toggle_player(&mut self, player_id: String) {
+        let Some(previous_active) = self.game.get_player(&player_id).map(|player| player.is_active) else {
+            return;
+        };
+        self.game.apply_action(ScoreAction::TogglePlayer {
+            player_id,
+            previous_active,
+        });
     }
 }
 
