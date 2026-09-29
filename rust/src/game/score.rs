@@ -29,7 +29,11 @@ pub struct Game {
     pub players: Vec<Player>,
     pub history: VecDeque<ScoreAction>,
     pub current_index: usize,
-    #[serde(skip_serializing_if = "String::is_empty", rename = "name", alias = "game_name")]
+    #[serde(
+        skip_serializing_if = "String::is_empty",
+        rename = "name",
+        alias = "game_name"
+    )]
     pub game_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preset_id: Option<String>,
@@ -74,7 +78,13 @@ impl Game {
         self.updated_at = current_timestamp();
     }
 
-    pub fn add_preset_player(&mut self, id: String, name: String, color: String, starting_score: i32) {
+    pub fn add_preset_player(
+        &mut self,
+        id: String,
+        name: String,
+        color: String,
+        starting_score: i32,
+    ) {
         let player = if self.preset_id.as_deref() == Some("munchkin") {
             Player::with_munchkin(id, name, color, starting_score)
         } else {
@@ -246,11 +256,7 @@ mod tests {
 
     #[test]
     fn new_game_has_metadata() {
-        let game = Game::new_with_preset(
-            "Munchkin".to_string(),
-            Some("munchkin".to_string()),
-            1,
-        );
+        let game = Game::new_with_preset("Munchkin".to_string(), Some("munchkin".to_string()), 1);
         assert_eq!(game.preset_id.as_deref(), Some("munchkin"));
         assert!(game.created_at > 0);
         assert_eq!(game.created_at, game.updated_at);
@@ -417,7 +423,7 @@ mod tests {
         assert_eq!(restored.players.len(), 2);
         assert_eq!(restored.get_player("p1").unwrap().score, 7);
         assert_eq!(restored.game_name, "Test");
-        assert!(json.contains(""createdAt""));
-        assert!(json.contains(""updatedAt""));
+        assert!(json.contains("\\\"createdAt\\\""));
+        assert!(json.contains("\\\"updatedAt\\\""));
     }
 }
