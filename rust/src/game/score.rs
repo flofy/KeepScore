@@ -29,15 +29,15 @@ pub struct Game {
     pub players: Vec<Player>,
     pub history: VecDeque<ScoreAction>,
     pub current_index: usize,
-    #[serde(skip_serializing_if = "String::is_empty", rename = "name")]
+    #[serde(skip_serializing_if = "String::is_empty", rename = "name", alias = "game_name")]
     pub game_name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub preset_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none", rename = "startingPlayerId")]
     pub starting_player_id: Option<String>,
-    #[serde(rename = "createdAt")]
+    #[serde(default, rename = "createdAt")]
     pub created_at: i64,
-    #[serde(rename = "updatedAt")]
+    #[serde(default, rename = "updatedAt")]
     pub updated_at: i64,
 }
 
