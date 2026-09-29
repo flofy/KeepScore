@@ -62,11 +62,7 @@ mod tests {
     }
 
     fn player(name: &str) -> Player {
-        Player::new(
-            "p1".to_string(),
-            name.to_string(),
-            "#F44336".to_string(),
-        )
+        Player::new("p1".to_string(), name.to_string(), "#F44336".to_string())
     }
 
     #[test]
