@@ -22,7 +22,7 @@ impl UIState {
 
     pub fn add_player(&mut self, name: String, color: String) {
         let id = format!("player_{}", self.game.players.len() + 1);
-        self.game.add_player(Player::new(id, name, color));
+        let player = if self.game.preset_id.as_deref() == Some("munchkin") {\n            Player::with_munchkin(id, name, color, 1)\n        } else {\n            Player::new(id, name, color)\n        };\n        self.game.add_player(player);
         self.show_player_form = false;
         self.new_player_name.clear();
     }
