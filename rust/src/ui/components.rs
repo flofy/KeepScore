@@ -33,7 +33,11 @@ impl UIState {
     }
 
     pub fn set_score(&mut self, player_id: String, score: i32) {
-        let Some(previous_score) = self.game.get_player(&player_id).map(|player| player.score) else {
+        let Some(previous_score) = self
+            .game
+            .get_player(&player_id)
+            .map(|player| player.score)
+        else {
             return;
         };
         self.game.apply_action(ScoreAction::Set {
@@ -79,7 +83,11 @@ impl UIState {
     }
 
     pub fn toggle_player(&mut self, player_id: String) {
-        let Some(previous_active) = self.game.get_player(&player_id).map(|player| player.is_active) else {
+        let Some(previous_active) = self
+            .game
+            .get_player(&player_id)
+            .map(|player| player.is_active)
+        else {
             return;
         };
         self.game.apply_action(ScoreAction::TogglePlayer {
