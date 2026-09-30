@@ -3,16 +3,14 @@ package com.keepscore;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.widget.Toast;
-
-import androidx.annotation.Nullable;
-
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
+
+import java.util.function.Consumer;
 
 final class UpdateChecker {
     private static final String RELEASES_URL =
@@ -26,7 +24,7 @@ final class UpdateChecker {
         this.queue = Volley.newRequestQueue(context);
     }
 
-    void check(@Nullable Runnable onUpdateAvailable) {
+    void check(Consumer<Release> onUpdateAvailable) {
         JsonObjectRequest request = new JsonObjectRequest(
                 Request.Method.GET,
                 RELEASES_URL,
@@ -35,7 +33,7 @@ final class UpdateChecker {
                     String tag = response.optString("tag_name", "");
                     String url = response.optString("html_url", "");
                     if (isNewerVersion(tag) && !url.isEmpty() && onUpdateAvailable != null) {
-                        onUpdateAvailable.run();
+                        onUpdateAvailable.accept(new Release(normalizeVersion(tag), url));
                     }
                 },
                 error -> {
@@ -46,8 +44,12 @@ final class UpdateChecker {
         queue.add(request);
     }
 
+    private String normalizeVersion(String tag) {
+        return tag.startsWith("v") ? tag.substring(1) : tag;
+    }
+
     private boolean isNewerVersion(String tag) {
-        String latest = tag.startsWith("v") ? tag.substring(1) : tag;
+        String latest = normalizeVersion(tag);
         String current = BuildConfig.VERSION_NAME;
 
         try {
@@ -73,7 +75,13 @@ final class UpdateChecker {
         return Integer.parseInt(value.replaceAll("[^0-9].*", ""));
     }
 
-    void openLatestRelease(String url) {
-        context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+    static final class Release {
+        final String version;
+        final String url;
+
+        Release(String version, String url) {
+            this.version = version;
+            this.url = url;
+        }
     }
 }
