@@ -13,5 +13,9 @@
     <string name="score">Score</string>
     <string name="game_name">Nom de la partie</string>
     <string name="export_game">Exporter la partie</string>
-    <string name="import_game">Importer une partie</string>
+    <string name="import_game">Importer la partie</string>
+    <string name="update_available_title">Mise à jour disponible</string>
+    <string name="update_available_message">Une nouvelle version de KeepScore est disponible.</string>
+    <string name="update_now">Mettre à jour</string>
+    <string name="update_later">Plus tard</string>
 </resources>
