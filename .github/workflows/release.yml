@@ -38,6 +38,18 @@ jobs:
               -f "sha=${GITHUB_SHA}"
           fi
 
+      - name: Resolve release commit
+        id: release_commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          sha="$(gh api \
+            "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" \
+            --jq '.object.sha')"
+          test -n "$sha"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+
       - name: Start Android Build
         env:
           GH_TOKEN: ${{ github.token }}
@@ -48,19 +60,22 @@ jobs:
         id: android_run
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
+          RELEASE_SHA: ${{ steps.release_commit.outputs.sha }}
         run: |
           for attempt in {1..60}; do
             run="$(gh api \
-              "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?event=workflow_dispatch&branch=${VERSION}&per_page=10" \
-              --jq '.workflow_runs | map(select(.head_branch == env.VERSION)) | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
+              "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?event=workflow_dispatch&per_page=20" \
+              --jq '.workflow_runs | map(select(.head_sha == env.RELEASE_SHA)) | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
 
             if [[ -n "$run" ]]; then
               read -r run_id status conclusion <<< "$run"
               echo "Android Build run $run_id: $status $conclusion"
 
               if [[ "$status" == "completed" ]]; then
-                [[ "$conclusion" == "success" ]]
+                if [[ "$conclusion" != "success" ]]; then
+                  echo "Android Build failed."
+                  exit 1
+                fi
                 echo "id=$run_id" >> "$GITHUB_OUTPUT"
                 break
               fi
@@ -95,13 +110,15 @@ jobs:
             "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" \
             > /tmp/apk-artifact.zip
           unzip -o /tmp/apk-artifact.zip -d dist
-          test "$(find dist -maxdepth 1 -type f -name '*.apk' | wc -l)" -eq 1
-          test "$(find dist -maxdepth 1 -type f | wc -l)" -eq 1
+          apk="$(find dist -maxdepth 1 -type f -name '*.apk' -print -quit)"
+          test -n "$apk"
+          echo "APK found: $apk"
+          echo "apk=$apk" >> "$GITHUB_OUTPUT"
 
       - name: Rename APK
         env:
           VERSION: ${{ inputs.version }}
-        run: mv dist/app-debug.apk "dist/KeepScore-${VERSION}.apk"
+        run: mv "${{ steps.artifact.outputs.apk }}" "dist/KeepScore-${VERSION}.apk"
 
       - name: Create or update GitHub Release
         env:
