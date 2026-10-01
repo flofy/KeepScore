@@ -1,15 +1,11 @@
 name: Release
 
 on:
-  workflow_dispatch:
-    inputs:
-      version:
-        description: "Release tag (for example v0.1.0)"
-        required: true
-        type: string
+  push:
+    tags: ["v*"]
 
 permissions:
-  actions: write
+  actions: read
   contents: write
 
 jobs:
@@ -17,44 +13,17 @@ jobs:
     name: Build and publish release
     runs-on: ubuntu-latest
     steps:
-      - name: Validate version
-        env:
-          VERSION: ${{ inputs.version }}
-        run: |
-          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
-
-      - name: Create tag when needed
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
-        run: |
-          if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" >/dev/null 2>&1; then
-            echo "Tag ${VERSION} already exists"
-          else
-            gh api \
-              --method POST \
-              "repos/${GITHUB_REPOSITORY}/git/refs" \
-              -f "ref=refs/tags/${VERSION}" \
-              -f "sha=${GITHUB_SHA}"
-          fi
-
       - name: Resolve release commit
         id: release_commit
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ github.ref_name }}
         run: |
           sha="$(gh api \
             "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" \
             --jq '.object.sha')"
           test -n "$sha"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
-
-      - name: Start Android Build
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
-        run: gh workflow run "Android Build" --repo "${GITHUB_REPOSITORY}" --ref "${VERSION}"
 
       - name: Wait for Android Build
         id: android_run
@@ -64,7 +33,7 @@ jobs:
         run: |
           for attempt in {1..60}; do
             run="$(gh api \
-              "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?event=workflow_dispatch&per_page=20" \
+              "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?event=push&per_page=20" \
               --jq '.workflow_runs | map(select(.head_sha == env.RELEASE_SHA)) | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
 
             if [[ -n "$run" ]]; then
@@ -117,13 +86,13 @@ jobs:
 
       - name: Rename APK
         env:
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ github.ref_name }}
         run: mv "${{ steps.artifact.outputs.apk }}" "dist/KeepScore-${VERSION}.apk"
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
+          VERSION: ${{ github.ref_name }}
         run: |
           if gh release view "${VERSION}" >/dev/null 2>&1; then
             gh release upload "${VERSION}" "dist/KeepScore-${VERSION}.apk" --clobber

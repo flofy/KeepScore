@@ -33,7 +33,8 @@ jobs:
               - 'rust/**'
               - 'Cargo.toml'
               - 'Cargo.lock'
-
+              - '.github/workflows/android-build.yml'
+              - '.github/workflows/release.yml'
 
   rust:
     name: Rust (fmt, test, build)
