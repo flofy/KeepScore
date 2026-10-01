@@ -1,8 +1,37 @@
 name: Quality Checks
-on: [push, pull_request]
+
+on:
+  push:
+  pull_request:
+    branches: [main]
 
 jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+    outputs:
+      react: ${{ steps.filter.outputs.react }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            react:
+              - 'src/**'
+              - 'public/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'tsconfig*.json'
+              - 'vite.config.*'
+              - 'playwright.config.*'
+              - 'vitest.config.*'
+              - 'index.html'
+
   quality:
+    name: React quality
+    needs: changes
+    if: needs.changes.outputs.react == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
