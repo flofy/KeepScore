@@ -12,6 +12,9 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.Intent;
+import android.net.Uri;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
@@ -20,6 +23,7 @@ import org.json.JSONObject;
 public class MainActivity extends AppCompatActivity {
     private LinearLayout playersContainer;
     private TextView emptyState;
+    private UpdateChecker updateChecker;
 
     static {
         System.loadLibrary("keepscore");
@@ -31,6 +35,28 @@ public class MainActivity extends AppCompatActivity {
         nativeInit(getFilesDir().getAbsolutePath());
         buildScreen();
         refreshPlayers();
+        updateChecker = new UpdateChecker(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (updateChecker != null) {
+            updateChecker.check(release -> runOnUiThread(() -> showUpdateDialog(
+                    release.version,
+                    release.url)));
+        }
+    }
+
+    private void showUpdateDialog(String version, String url) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.update_available_title)
+                .setMessage(getString(R.string.update_available_message, version))
+                .setNegativeButton(R.string.update_later, null)
+                .setPositiveButton(R.string.update_now, (dialog, which) -> {
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                })
+                .show();
     }
 
     private void buildScreen() {

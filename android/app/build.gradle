@@ -4,6 +4,9 @@ plugins {
 }
 
 android {
+    buildFeatures {
+        buildConfig true
+    }
     namespace 'com.keepscore'
     compileSdk 34
     ndkVersion '29.0.14206865'
@@ -28,7 +31,6 @@ android {
     }
 }
 
-// Cross-compile the Rust crate into jniLibs for each Android ABI.
 cargo {
     module = '../../rust'
     libname = 'keepscore'
@@ -43,5 +45,6 @@ afterEvaluate {
 
 dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.android.volley:volley:1.2.1'
     implementation 'com.google.android.material:material:1.9.0'
 }
