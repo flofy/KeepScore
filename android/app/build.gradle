@@ -4,6 +4,9 @@ plugins {
 }
 
 android {
+    buildFeatures {
+        buildConfig true
+    }
     namespace 'com.keepscore'
     compileSdk 34
     ndkVersion '29.0.14206865'
