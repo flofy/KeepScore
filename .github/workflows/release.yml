@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag (for example v0.1.0)"
+        required: true
+        type: string
+  workflow_run:
+    workflows: ["Android Build"]
+    types: [completed]
+
+permissions:
+  actions: write
+  contents: write
+
+jobs:
+  tag:
+    name: Create release tag
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate version
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          [[ "$VERSION" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]
+
+      - name: Create tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh api             --method POST             "repos/${GITHUB_REPOSITORY}/git/refs"             -f "ref=refs/tags/${VERSION}"             -f "sha=${GITHUB_SHA}"
+
+      - name: Start Android Build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: gh workflow run "Android Build" --ref "${VERSION}"
+
+  release:
+    name: Create GitHub Release
+    if: >-
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.conclusion == 'success' &&
+      startsWith(github.event.workflow_run.head_branch, 'v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find APK artifact
+        id: artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_ID: ${{ github.event.workflow_run.id }}
+        run: |
+          artifact_id="$(gh api             "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts"             --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id'             | head -n 1)"
+
+          test -n "$artifact_id"
+          echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
+
+      - name: Download APK artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ARTIFACT_ID: ${{ steps.artifact.outputs.id }}
+        run: |
+          mkdir -p dist
+          gh api             "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip"             > /tmp/apk.zip
+          unzip -o /tmp/apk.zip -d dist
+          test -f dist/app-debug.apk
+
+      - name: Rename APK
+        env:
+          VERSION: ${{ github.event.workflow_run.head_branch }}
+        run: mv dist/app-debug.apk "dist/KeepScore-${VERSION}.apk"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ github.event.workflow_run.head_branch }}
+        run: |
+          gh release create "${VERSION}"             "dist/KeepScore-${VERSION}.apk"             --generate-notes
