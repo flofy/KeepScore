@@ -9,6 +9,7 @@ on:
         type: string
 
 permissions:
+  actions: write
   contents: write
 
 jobs:
@@ -29,11 +30,20 @@ jobs:
         run: |
           if gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" >/dev/null 2>&1; then
             echo "Tag ${VERSION} already exists"
-            exit 0
+          else
+            gh api               --method POST               "repos/${GITHUB_REPOSITORY}/git/refs"               -f "ref=refs/tags/${VERSION}"               -f "sha=${GITHUB_SHA}"
           fi
 
-          gh api \
-            --method POST \
-            "repos/${GITHUB_REPOSITORY}/git/refs" \
-            -f "ref=refs/tags/${VERSION}" \
-            -f "sha=${GITHUB_SHA}"
+      - name: Build Android APK
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh workflow run android-build.yml             --repo "${GITHUB_REPOSITORY}"             --ref "${VERSION}"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+        run: |
+          gh workflow run release.yml             --repo "${GITHUB_REPOSITORY}"             --ref "${VERSION}"             -f "version=${VERSION}"
