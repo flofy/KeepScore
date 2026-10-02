@@ -1,10 +1,10 @@
 name: Release
 
 on:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       version:
-        description: "Release tag (for example v0.1.0)"
+        description: "Release tag"
         required: true
         type: string
 
@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   release:
-    name: Build and publish release
+    name: Publish release
     runs-on: ubuntu-latest
     steps:
       - name: Resolve release commit
@@ -23,36 +23,29 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
         run: |
-          sha="$(gh api             "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}"             --jq '.object.sha')"
+          sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" --jq '.object.sha')"
           test -n "$sha"
           echo "sha=$sha" >> "$GITHUB_OUTPUT"
 
-      - name: Wait for Android Build
+      - name: Find Android Build
         id: android_run
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_SHA: ${{ steps.release_commit.outputs.sha }}
         run: |
           for attempt in {1..60}; do
-            run="$(gh api               "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?event=workflow_dispatch&per_page=50"               --jq '.workflow_runs | map(select(.head_sha == env.RELEASE_SHA)) | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
-
+            run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?per_page=50"               --jq '.workflow_runs | map(select(.head_sha == env.RELEASE_SHA)) | sort_by(.created_at) | reverse | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
             if [[ -n "$run" ]]; then
               read -r run_id status conclusion <<< "$run"
               echo "Android Build run $run_id: $status $conclusion"
-
               if [[ "$status" == "completed" ]]; then
-                if [[ "$conclusion" != "success" ]]; then
-                  echo "Android Build failed."
-                  exit 1
-                fi
+                [[ "$conclusion" == "success" ]] || exit 1
                 echo "id=$run_id" >> "$GITHUB_OUTPUT"
                 break
               fi
             fi
-
             sleep 10
           done
-
           test -n "${{ steps.android_run.outputs.id }}"
 
       - name: Find APK artifact
@@ -61,38 +54,29 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ steps.android_run.outputs.id }}
         run: |
-          artifact_id="$(gh api             "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts"             --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id'             | head -n 1)"
-
+          artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts"             --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id' | head -n 1)"
           test -n "$artifact_id"
           echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
 
       - name: Download APK artifact
-        id: apk
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.artifact.outputs.id }}
         run: |
           mkdir -p dist
-          gh api             "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip"             > /tmp/apk-artifact.zip
-          unzip -o /tmp/apk-artifact.zip -d dist
+          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/apk.zip
+          unzip -o /tmp/apk.zip -d dist
           apk="$(find dist -maxdepth 1 -type f -name '*.apk' -print -quit)"
           test -n "$apk"
-          echo "APK found: $apk"
-          echo "path=$apk" >> "$GITHUB_OUTPUT"
-
-      - name: Rename APK
-        env:
-          APK_PATH: ${{ steps.apk.outputs.path }}
-          VERSION: ${{ inputs.version }}
-        run: mv "$APK_PATH" "dist/KeepScore-${VERSION}.apk"
+          mv "$apk" "dist/KeepScore-${{ inputs.version }}.apk"
 
       - name: Create or update GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
         run: |
-          if gh release view "${VERSION}" >/dev/null 2>&1; then
-            gh release upload "${VERSION}" "dist/KeepScore-${VERSION}.apk" --clobber
+          if gh release view "$VERSION" >/dev/null 2>&1; then
+            gh release upload "$VERSION" "dist/KeepScore-$VERSION.apk" --clobber
           else
-            gh release create "${VERSION}"               "dist/KeepScore-${VERSION}.apk"               --generate-notes
+            gh release create "$VERSION" "dist/KeepScore-$VERSION.apk" --generate-notes
           fi
