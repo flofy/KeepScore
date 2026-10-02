@@ -35,6 +35,7 @@ jobs:
               - 'Cargo.lock'
               - '.github/workflows/android-build.yml'
               - '.github/workflows/release.yml'
+              - '.github/workflows/create-tag.yml'
 
   rust:
     name: Rust (fmt, test, build)

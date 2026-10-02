@@ -70,6 +70,7 @@ jobs:
           echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
 
       - name: Download APK artifact
+        id: apk
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.artifact.outputs.id }}
@@ -82,12 +83,13 @@ jobs:
           apk="$(find dist -maxdepth 1 -type f -name '*.apk' -print -quit)"
           test -n "$apk"
           echo "APK found: $apk"
-          echo "apk=$apk" >> "$GITHUB_OUTPUT"
+          echo "path=$apk" >> "$GITHUB_OUTPUT"
 
       - name: Rename APK
         env:
+          APK_PATH: ${{ steps.apk.outputs.path }}
           VERSION: ${{ github.ref_name }}
-        run: mv "${{ steps.artifact.outputs.apk }}" "dist/KeepScore-${VERSION}.apk"
+        run: mv "$APK_PATH" "dist/KeepScore-${VERSION}.apk"
 
       - name: Create or update GitHub Release
         env:
