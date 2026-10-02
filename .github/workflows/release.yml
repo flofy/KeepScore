@@ -17,44 +17,23 @@ jobs:
     name: Publish release
     runs-on: ubuntu-latest
     steps:
-      - name: Resolve release commit
-        id: release_commit
+      - name: Verify release tag
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
         run: |
           sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" --jq '.object.sha')"
           test -n "$sha"
-          echo "sha=$sha" >> "$GITHUB_OUTPUT"
-
-      - name: Find Android Build
-        id: android_run
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RELEASE_SHA: ${{ steps.release_commit.outputs.sha }}
-        run: |
-          for attempt in {1..60}; do
-            run="$(gh api "repos/${GITHUB_REPOSITORY}/actions/workflows/android-build.yml/runs?per_page=50"               --jq '.workflow_runs | map(select(.head_sha == env.RELEASE_SHA)) | sort_by(.created_at) | reverse | .[0] | [.id, .status, (.conclusion // "")] | @tsv')"
-            if [[ -n "$run" ]]; then
-              read -r run_id status conclusion <<< "$run"
-              echo "Android Build run $run_id: $status $conclusion"
-              if [[ "$status" == "completed" ]]; then
-                [[ "$conclusion" == "success" ]] || exit 1
-                echo "id=$run_id" >> "$GITHUB_OUTPUT"
-                break
-              fi
-            fi
-            sleep 10
-          done
-          test -n "${{ steps.android_run.outputs.id }}"
+          echo "Release tag ${VERSION} points to ${sha}"
 
       - name: Find APK artifact
         id: artifact
         env:
           GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ steps.android_run.outputs.id }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts"             --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id' | head -n 1)"
+          artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" \
+            --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id' | head -n 1)"
           test -n "$artifact_id"
           echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
 
