@@ -1,10 +1,16 @@
 name: Android Build
 
 on:
-  push:
-    branches: [main, rust-android-port]
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref to build"
+        required: true
+        type: string
   pull_request:
     branches: [main]
+  push:
+    branches: [main, rust-android-port]
   workflow_dispatch:
 
 permissions:
@@ -19,6 +25,8 @@ jobs:
       android: ${{ steps.filter.outputs.android }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: dorny/paths-filter@v3
         id: filter
         with:
@@ -39,10 +47,12 @@ jobs:
   rust:
     name: Rust (fmt, test, build)
     needs: changes
-    if: needs.changes.outputs.rust == 'true' || github.event_name == 'workflow_dispatch'
+    if: needs.changes.outputs.rust == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt
@@ -59,10 +69,12 @@ jobs:
   android:
     name: Android APK
     needs: changes
-    if: needs.changes.outputs.android == 'true' || github.event_name == 'workflow_dispatch'
+    if: needs.changes.outputs.android == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -81,8 +93,6 @@ jobs:
         run: |
           CARGO_BIN="$(rustup which cargo)"
           RUSTC_BIN="$(rustup which rustc)"
-          test -x "$CARGO_BIN"
-          test -x "$RUSTC_BIN"
           echo "RUST_ANDROID_GRADLE_CARGO_COMMAND=$CARGO_BIN" >> "$GITHUB_ENV"
           echo "RUST_ANDROID_GRADLE_RUSTC_COMMAND=$RUSTC_BIN" >> "$GITHUB_ENV"
       - uses: gradle/actions/setup-gradle@v4
@@ -91,8 +101,7 @@ jobs:
       - name: Build debug APK
         run: gradle assembleDebug --no-daemon --stacktrace
         working-directory: android
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: keepscore-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
