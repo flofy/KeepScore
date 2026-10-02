@@ -9,6 +9,7 @@ on:
         type: string
 
 permissions:
+  actions: read
   contents: write
 
 jobs:
@@ -31,7 +32,9 @@ jobs:
             echo "Tag ${VERSION} already exists"
             exit 0
           fi
-          gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs"             -f "ref=refs/tags/${VERSION}"             -f "sha=${GITHUB_SHA}"
+          gh api --method POST "repos/${GITHUB_REPOSITORY}/git/refs" \
+            -f "ref=refs/tags/${VERSION}" \
+            -f "sha=${GITHUB_SHA}"
 
   android-build:
     name: Build Android
