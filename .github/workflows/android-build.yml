@@ -3,7 +3,6 @@ name: Android Build
 on:
   push:
     branches: [main, rust-android-port]
-    tags: ["v*"]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -40,7 +39,7 @@ jobs:
   rust:
     name: Rust (fmt, test, build)
     needs: changes
-    if: needs.changes.outputs.rust == 'true' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    if: needs.changes.outputs.rust == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +59,7 @@ jobs:
   android:
     name: Android APK
     needs: changes
-    if: needs.changes.outputs.android == 'true' || github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
+    if: needs.changes.outputs.android == 'true' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
