@@ -2,6 +2,7 @@ package com.keepscore;
 
 import android.app.AlertDialog;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 
@@ -24,6 +26,10 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout playersContainer;
     private TextView emptyState;
     private UpdateChecker updateChecker;
+    private static final int BG = Color.rgb(15, 23, 42);
+    private static final int SURFACE = Color.rgb(30, 41, 59);
+    private static final int TEXT = Color.rgb(248, 250, 252);
+    private static final int MUTED = Color.rgb(148, 163, 184);
 
     static {
         System.loadLibrary("keepscore");
@@ -62,71 +68,69 @@ public class MainActivity extends AppCompatActivity {
     private void buildScreen() {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
-        root.setPadding(dp(16), dp(16), dp(16), dp(16));
+        root.setBackgroundColor(BG);
+        root.setPadding(dp(14), dp(10), dp(14), dp(14));
 
-        LinearLayout toolbar = new LinearLayout(this);
-        toolbar.setGravity(Gravity.CENTER_VERTICAL);
-
-        TextView title = new TextView(this);
-        title.setText(getString(R.string.app_name));
-        title.setTextSize(26);
-        title.setTextColor(Color.BLACK);
-        title.setTypeface(null, android.graphics.Typeface.BOLD);
-        toolbar.addView(title, new LinearLayout.LayoutParams(0, -2, 1));
-
-        Button addPlayer = new Button(this);
-        addPlayer.setText(getString(R.string.add_player));
+        LinearLayout header = new LinearLayout(this);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        TextView title = text(getString(R.string.app_name), 22, TEXT);
+        title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        header.addView(title, new LinearLayout.LayoutParams(0, dp(52), 1));
+        Button addPlayer = compactButton("+", TEXT);
         addPlayer.setOnClickListener(v -> showAddPlayerDialog());
-        toolbar.addView(addPlayer);
-
-        root.addView(toolbar);
+        header.addView(addPlayer, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        root.addView(header);
 
         LinearLayout actions = new LinearLayout(this);
-        actions.setGravity(Gravity.CENTER);
-        Button undo = actionButton(R.string.undo, v -> {
-            nativeUndo();
-            refreshPlayers();
-        });
-        Button redo = actionButton(R.string.redo, v -> {
-            nativeRedo();
-            refreshPlayers();
-        });
-        Button reset = actionButton(R.string.reset, v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle(R.string.reset)
-                    .setMessage("Réinitialiser tous les scores ?")
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                        nativeResetScores();
-                        refreshPlayers();
-                    })
-                    .show();
-        });
-        actions.addView(undo);
-        actions.addView(redo);
-        actions.addView(reset);
+        actions.setGravity(Gravity.CENTER_VERTICAL);
+        actions.setPadding(0, 0, 0, dp(10));
+        actions.addView(actionButton(R.string.undo, v -> { nativeUndo(); refreshPlayers(); }), weightParams());
+        actions.addView(actionButton(R.string.redo, v -> { nativeRedo(); refreshPlayers(); }), weightParams());
+        actions.addView(actionButton(R.string.reset, v -> confirmReset()), weightParams());
         root.addView(actions);
 
         ScrollView scroll = new ScrollView(this);
+        scroll.setFillViewport(true);
         playersContainer = new LinearLayout(this);
         playersContainer.setOrientation(LinearLayout.VERTICAL);
         scroll.addView(playersContainer);
         root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
 
-        emptyState = new TextView(this);
-        emptyState.setText("Aucun joueur. Ajoutez un joueur pour commencer.");
+        emptyState = text("Aucun joueur. Ajoutez un joueur pour commencer.", 16, MUTED);
         emptyState.setGravity(Gravity.CENTER);
-        emptyState.setTextSize(18);
         emptyState.setPadding(dp(24), dp(48), dp(24), dp(48));
-
         setContentView(root);
     }
 
+    private LinearLayout.LayoutParams weightParams() {
+        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, dp(42), 1);
+        p.setMargins(dp(3), 0, dp(3), 0);
+        return p;
+    }
+
     private Button actionButton(int label, View.OnClickListener listener) {
-        Button button = new Button(this);
-        button.setText(label);
-        button.setOnClickListener(listener);
-        return button;
+        Button b = compactButton(getString(label), TEXT);
+        b.setOnClickListener(listener);
+        return b;
+    }
+
+    private Button compactButton(String label, int color) {
+        Button b = new Button(this);
+        b.setText(label);
+        b.setTextColor(color);
+        b.setTextSize(13);
+        b.setAllCaps(false);
+        b.setPadding(dp(6), 0, dp(6), 0);
+        b.setBackground(round(SURFACE, 12, Color.rgb(71, 85, 105)));
+        return b;
+    }
+
+    private TextView text(String value, float size, int color) {
+        TextView v = new TextView(this);
+        v.setText(value);
+        v.setTextSize(size);
+        v.setTextColor(color);
+        return v;
     }
 
     private void refreshPlayers() {
@@ -161,49 +165,133 @@ public class MainActivity extends AppCompatActivity {
     private void addPlayerView(String id, String name, int score, String color) {
         LinearLayout card = new LinearLayout(this);
         card.setOrientation(LinearLayout.VERTICAL);
-        card.setPadding(dp(12), dp(12), dp(12), dp(12));
-        card.setBackgroundColor(parseColor(color));
+        card.setGravity(Gravity.CENTER_HORIZONTAL);
+        card.setPadding(dp(14), dp(12), dp(14), dp(14));
+        card.setBackground(round(BG, 22, parseColor(color)));
 
-        TextView nameView = new TextView(this);
-        nameView.setText(name);
-        nameView.setTextSize(20);
-        nameView.setTextColor(Color.WHITE);
-        nameView.setTypeface(null, android.graphics.Typeface.BOLD);
-        card.addView(nameView);
+        TextView nameView = text(name, 16, TEXT);
+        nameView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        nameView.setGravity(Gravity.CENTER);
+        card.addView(nameView, new LinearLayout.LayoutParams(-1, dp(42)));
 
-        TextView scoreView = new TextView(this);
-        scoreView.setText(String.valueOf(score));
-        scoreView.setTextSize(40);
+        TextView scoreView = text(String.valueOf(score), 52, TEXT);
         scoreView.setGravity(Gravity.CENTER);
-        scoreView.setTextColor(Color.WHITE);
-        card.addView(scoreView, new LinearLayout.LayoutParams(-1, dp(72)));
+        scoreView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        scoreView.setOnClickListener(v -> editScore(id, score));
+        card.addView(scoreView, new LinearLayout.LayoutParams(-1, 0, 1));
+
+        LinearLayout quick = new LinearLayout(this);
+        quick.setGravity(Gravity.CENTER);
+        addQuick(quick, "-3", () -> change(id, -3));
+        addQuick(quick, "-2", () -> change(id, -2));
+        addQuick(quick, "+2", () -> change(id, 2));
+        addQuick(quick, "+3", () -> change(id, 3));
+        card.addView(quick, new LinearLayout.LayoutParams(-1, dp(38)));
 
         LinearLayout controls = new LinearLayout(this);
         controls.setGravity(Gravity.CENTER);
+        addStep(controls, "−", () -> change(id, -1));
+        addStep(controls, "+", () -> change(id, 1));
+        card.addView(controls, new LinearLayout.LayoutParams(-1, dp(50)));
 
-        Button minus = new Button(this);
-        minus.setText("−");
-        minus.setTextSize(24);
-        minus.setOnClickListener(v -> {
-            nativeAddScore(id, -1);
-            refreshPlayers();
-        });
-
-        Button plus = new Button(this);
-        plus.setText("+");
-        plus.setTextSize(24);
-        plus.setOnClickListener(v -> {
-            nativeAddScore(id, 1);
-            refreshPlayers();
-        });
-
-        controls.addView(minus, new LinearLayout.LayoutParams(0, -2, 1));
-        controls.addView(plus, new LinearLayout.LayoutParams(0, -2, 1));
-        card.addView(controls);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, dp(260));
         params.setMargins(0, 0, 0, dp(12));
         playersContainer.addView(card, params);
+    }
+
+    private void addQuick(LinearLayout container, String label, Runnable action) {
+        Button button = compactButton(label, TEXT);
+        button.setOnClickListener(v -> {
+            action.run();
+            haptic();
+        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(36), 1);
+        params.setMargins(dp(3), 0, dp(3), 0);
+        container.addView(button, params);
+    }
+
+    private void addStep(LinearLayout container, String label, Runnable action) {
+        Button button = new Button(this);
+        button.setText(label);
+        button.setTextSize(24);
+        button.setTextColor(TEXT);
+        button.setAllCaps(false);
+        button.setBackground(round(SURFACE, 16, Color.rgb(71, 85, 105)));
+        button.setOnClickListener(v -> {
+            action.run();
+            haptic();
+        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
+        params.setMargins(dp(4), 0, dp(4), 0);
+        container.addView(button, params);
+    }
+
+    private void change(String id, int delta) {
+        nativeAddScore(id, delta);
+        nativeSave();
+        refreshPlayers();
+    }
+
+    private void editScore(String id, int currentScore) {
+        EditText input = new EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER |
+                android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+        input.setText(String.valueOf(currentScore));
+        input.selectAll();
+
+        new AlertDialog.Builder(this)
+                .setTitle("Modifier le score")
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    try {
+                        nativeSetScore(id, Integer.parseInt(input.getText().toString().trim()));
+                        nativeSave();
+                        refreshPlayers();
+                        haptic();
+                    } catch (NumberFormatException ignored) {
+                        Toast.makeText(this, "Score invalide", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+    private void confirmReset() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.reset)
+                .setMessage("Réinitialiser tous les scores ?")
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    nativeResetScores();
+                    nativeSave();
+                    refreshPlayers();
+                    haptic();
+                })
+                .show();
+    }
+
+    private android.graphics.drawable.GradientDrawable round(int fill, int radius, int stroke) {
+        android.graphics.drawable.GradientDrawable drawable =
+                new android.graphics.drawable.GradientDrawable();
+        drawable.setColor(fill);
+        drawable.setCornerRadius(dp(radius));
+        drawable.setStroke(dp(1), stroke);
+        return drawable;
+    }
+
+    private void haptic() {
+        android.os.Vibrator vibrator =
+                (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            return;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            vibrator.vibrate(android.os.VibrationEffect.createOneShot(
+                    20,
+                    android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(20);
+        }
     }
 
     private void showAddPlayerDialog() {
