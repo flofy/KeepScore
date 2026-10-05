@@ -37,6 +37,7 @@ public class PlayerCard extends LinearLayout {
         LinearLayout scoreRow = new LinearLayout(context);
         scoreRow.setGravity(Gravity.CENTER);
         addStepColumn(scoreRow, false, playerId, listener);
+        addCustomDeltaButton(scoreRow, playerId, listener);
         TextView scoreView = UiUtils.text(context, String.valueOf(score), 52, TEXT);
         UiUtils.bold(scoreView);
         scoreView.setGravity(Gravity.CENTER);
@@ -48,6 +49,44 @@ public class PlayerCard extends LinearLayout {
         LayoutParams params = new LayoutParams(-1, UiUtils.dp(context, 260));
         params.setMargins(0, 0, 0, UiUtils.dp(context, 12));
         setLayoutParams(params);
+    }
+
+
+    private void addCustomDeltaButton(LinearLayout row, String playerId, Listener listener) {
+        Button button = UiUtils.compactButton(getContext(), "⋯", TEXT, SURFACE,
+                Color.rgb(71, 85, 105));
+        button.setTextSize(18);
+        button.setContentDescription("Modifier le score");
+        button.setOnClickListener(v -> showCustomDelta(playerId, listener));
+        LayoutParams params = new LayoutParams(UiUtils.dp(getContext(), 42), UiUtils.dp(getContext(), 42));
+        params.gravity = Gravity.CENTER_VERTICAL;
+        params.setMargins(UiUtils.dp(getContext(), 4), 0, UiUtils.dp(getContext(), 4), 0);
+        row.addView(button, params);
+    }
+
+    private void showCustomDelta(String playerId, Listener listener) {
+        final android.widget.EditText input = new android.widget.EditText(getContext());
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
+                | android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+        input.setSingleLine(true);
+        input.setHint("Ex. +7 ou -7");
+
+        new AlertDialog.Builder(getContext())
+                .setTitle("Modifier le score")
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String value = input.getText().toString().trim();
+                    try {
+                        int delta = Integer.parseInt(value);
+                        if (delta == 0) return;
+                        listener.onScoreChange(playerId, delta);
+                        performHaptic();
+                    } catch (NumberFormatException ignored) {
+                        input.setError("Nombre invalide");
+                    }
+                })
+                .show();
     }
 
     private void addStepColumn(LinearLayout row, boolean positive, String playerId, Listener listener) {
