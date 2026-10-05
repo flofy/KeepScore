@@ -8,6 +8,7 @@ import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.view.Gravity;
 import android.widget.Button;
+import java.util.List;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -21,7 +22,7 @@ public class PlayerCard extends LinearLayout {
     private static final int TEXT = Color.rgb(248, 250, 252);
 
     public PlayerCard(Context context, String playerId, String name, int score, String color,
-                      Listener listener) {
+                      List<Integer> history, Listener listener) {
         super(context);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER_HORIZONTAL);
@@ -33,6 +34,24 @@ public class PlayerCard extends LinearLayout {
         UiUtils.bold(nameView);
         nameView.setGravity(Gravity.CENTER);
         addView(nameView, new LayoutParams(-1, UiUtils.dp(context, 42)));
+        LinearLayout historyView = new LinearLayout(context);
+        historyView.setGravity(Gravity.CENTER);
+        historyView.setOrientation(HORIZONTAL);
+        for (Integer delta : history) {
+            TextView badge = UiUtils.text(context,
+                    formatDelta(delta),
+                    12,
+                    delta >= 0 ? Color.rgb(134, 239, 172) : Color.rgb(252, 165, 165));
+            badge.setGravity(Gravity.CENTER);
+            badge.setBackground(UiUtils.round(context, SURFACE, 10, Color.rgb(71, 85, 105)));
+            int horizontal = UiUtils.dp(context, 5);
+            badge.setPadding(horizontal, UiUtils.dp(context, 2), horizontal, UiUtils.dp(context, 2));
+            LayoutParams badgeParams = new LayoutParams(-2, UiUtils.dp(context, 26));
+            badgeParams.setMargins(UiUtils.dp(context, 2), 0, UiUtils.dp(context, 2), 0);
+            historyView.addView(badge, badgeParams);
+        }
+        addView(historyView, new LayoutParams(-1, UiUtils.dp(context, 30)));
+
 
         LinearLayout scoreRow = new LinearLayout(context);
         scoreRow.setGravity(Gravity.CENTER);
@@ -51,6 +70,10 @@ public class PlayerCard extends LinearLayout {
         setLayoutParams(params);
     }
 
+
+    private String formatDelta(int delta) {
+        return delta >= 0 ? "+" + delta : String.valueOf(delta);
+    }
 
     private void addCustomDeltaButton(LinearLayout row, String playerId, Listener listener) {
         Button button = UiUtils.compactButton(getContext(), "⋯", TEXT, SURFACE,
