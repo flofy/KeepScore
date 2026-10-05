@@ -53,26 +53,34 @@ public class PlayerCard extends LinearLayout {
         LinearLayout column = new LinearLayout(getContext());
         column.setOrientation(VERTICAL);
         column.setGravity(Gravity.CENTER);
-        addStep(column, positive ? "+" : "−",
-                () -> listener.onScoreChange(playerId, positive ? 1 : -1), 52);
-        addQuick(column, positive ? "+2" : "−2",
-                () -> listener.onScoreChange(playerId, positive ? 2 : -2));
-        addQuick(column, positive ? "+3" : "−3",
-                () -> listener.onScoreChange(playerId, positive ? 3 : -3));
+        addStep(column, positive ? "+" : "−", positive ? 1 : -1, playerId, listener, 52);
+        addQuick(column, positive ? "+2" : "−2", positive ? 2 : -2, playerId, listener);
+        addQuick(column, positive ? "+3" : "−3", positive ? 3 : -3, playerId, listener);
         row.addView(column, new LayoutParams(UiUtils.dp(getContext(), 58), -1));
     }
 
-    private void addQuick(LinearLayout container, String label, Runnable action) {
+    private void addQuick(LinearLayout container, String label, int delta, String playerId, Listener listener) {
         Button button = UiUtils.compactButton(getContext(), label, TEXT, SURFACE,
                 Color.rgb(71, 85, 105));
+        button.setOnLongClickListener(v -> {
+            showQuickDeltas(delta > 0, playerId, listener);
+            performHaptic();
+            return true;
+        });
         button.setOnClickListener(v -> {
-            action.run();
+            listener.onScoreChange(playerId, delta);
             performHaptic();
         });
         container.addView(button, new LayoutParams(-1, UiUtils.dp(getContext(), 34)));
     }
 
-    private void addStep(LinearLayout container, String label, Runnable action, int size) {
+    private void addStep(
+            LinearLayout container,
+            String label,
+            int delta,
+            String playerId,
+            Listener listener,
+            int size) {
         Button button = new Button(getContext());
         button.setText(label);
         button.setTextSize(24);
@@ -80,11 +88,28 @@ public class PlayerCard extends LinearLayout {
         button.setAllCaps(false);
         button.setBackground(UiUtils.round(getContext(), SURFACE, 16,
                 Color.rgb(71, 85, 105)));
+        button.setOnLongClickListener(v -> {
+            showQuickDeltas(delta > 0, playerId, listener);
+            performHaptic();
+            return true;
+        });
         button.setOnClickListener(v -> {
-            action.run();
+            listener.onScoreChange(playerId, delta);
             performHaptic();
         });
         container.addView(button, new LayoutParams(-1, UiUtils.dp(getContext(), size)));
+    }
+
+    private void showQuickDeltas(boolean positive, String playerId, Listener listener) {
+        int[] values = {5, 10, 20};
+        String[] labels = positive ? new String[]{"+5", "+10", "+20"} : new String[]{"−5", "−10", "−20"};
+        new AlertDialog.Builder(getContext())
+                .setTitle("Score rapide")
+                .setItems(labels, (dialog, which) -> {
+                    listener.onScoreChange(playerId, positive ? values[which] : -values[which]);
+                    performHaptic();
+                })
+                .show();
     }
 
     private void performHaptic() {
