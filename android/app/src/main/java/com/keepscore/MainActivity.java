@@ -7,14 +7,14 @@ import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
-import android.widget.GridLayout;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.content.Context;\nimport android.content.Intent;
+import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -148,6 +148,56 @@ public class MainActivity extends AppCompatActivity {
                 playersContainer.addView(emptyState);
                 return;
             }
+
+            for (int i = 0; i < players.length(); i++) {
+                JSONObject player = players.getJSONObject(i);
+                addPlayerView(
+                        player.optString("id"),
+                        player.optString("name", "Joueur"),
+                        player.optInt("score", 0),
+                        player.optString("color", "#F44336"));
+            }
+        } catch (Exception error) {
+            Toast.makeText(this, "Impossible de charger la partie", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void addPlayerView(String id, String name, int score, String color) {
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER_HORIZONTAL);
+        card.setPadding(dp(14), dp(12), dp(14), dp(14));
+        card.setBackground(round(BG, 22, parseColor(color)));
+
+        TextView nameView = text(name, 16, TEXT);
+        nameView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        nameView.setGravity(Gravity.CENTER);
+        card.addView(nameView, new LinearLayout.LayoutParams(-1, dp(42)));
+
+        TextView scoreView = text(String.valueOf(score), 52, TEXT);
+        scoreView.setGravity(Gravity.CENTER);
+        scoreView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        scoreView.setOnClickListener(v -> editScore(id, score));
+        card.addView(scoreView, new LinearLayout.LayoutParams(-1, 0, 1));
+
+        LinearLayout quick = new LinearLayout(this);
+        quick.setGravity(Gravity.CENTER);
+        addQuick(quick, "-3", () -> change(id, -3));
+        addQuick(quick, "-2", () -> change(id, -2));
+        addQuick(quick, "+2", () -> change(id, 2));
+        addQuick(quick, "+3", () -> change(id, 3));
+        card.addView(quick, new LinearLayout.LayoutParams(-1, dp(38)));
+
+        LinearLayout controls = new LinearLayout(this);
+        controls.setGravity(Gravity.CENTER);
+        addStep(controls, "−", () -> change(id, -1));
+        addStep(controls, "+", () -> change(id, 1));
+        card.addView(controls, new LinearLayout.LayoutParams(-1, dp(50)));
+
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, dp(260));
+        params.setMargins(0, 0, 0, dp(12));
+        playersContainer.addView(card, params);
+    }
 
     private void addQuick(LinearLayout container, String label, Runnable action) {
         Button button = compactButton(label, TEXT);
