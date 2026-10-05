@@ -149,54 +149,144 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            for (int i = 0; i < players.length(); i++) {
-                JSONObject player = players.getJSONObject(i);
-                addPlayerView(
-                        player.optString("id"),
-                        player.optString("name", "Joueur"),
-                        player.optInt("score", 0),
-                        player.optString("color", "#F44336"));
-            }
-        } catch (Exception error) {
-            Toast.makeText(this, "Impossible de charger la partie", Toast.LENGTH_LONG).show();
+    private void addQuick(LinearLayout container, String label, Runnable action) {
+        Button button = compactButton(label, TEXT);
+        button.setOnClickListener(v -> {
+            action.run();
+            haptic();
+        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(36), 1);
+        params.setMargins(dp(3), 0, dp(3), 0);
+        container.addView(button, params);
+    }
+
+    private void addStep(LinearLayout container, String label, Runnable action) {
+        Button button = new Button(this);
+        button.setText(label);
+        button.setTextSize(24);
+        button.setTextColor(TEXT);
+        button.setAllCaps(false);
+        button.setBackground(round(SURFACE, 16, Color.rgb(71, 85, 105)));
+        button.setOnClickListener(v -> {
+            action.run();
+            haptic();
+        });
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
+        params.setMargins(dp(4), 0, dp(4), 0);
+        container.addView(button, params);
+    }
+
+    private void change(String id, int delta) {
+        nativeAddScore(id, delta);
+        nativeSave();
+        refreshPlayers();
+    }
+
+    private void editScore(String id, int currentScore) {
+        EditText input = new EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER |
+                android.text.InputType.TYPE_NUMBER_FLAG_SIGNED);
+        input.setText(String.valueOf(currentScore));
+        input.selectAll();
+
+        new AlertDialog.Builder(this)
+                .setTitle("Modifier le score")
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    try {
+                        nativeSetScore(id, Integer.parseInt(input.getText().toString().trim()));
+                        nativeSave();
+                        refreshPlayers();
+                        haptic();
+                    } catch (NumberFormatException ignored) {
+                        Toast.makeText(this, "Score invalide", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .show();
+    }
+
+    private void confirmReset() {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.reset)
+                .setMessage("Réinitialiser tous les scores ?")
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    nativeResetScores();
+                    nativeSave();
+                    refreshPlayers();
+                    haptic();
+                })
+                .show();
+    }
+
+    private android.graphics.drawable.GradientDrawable round(int fill, int radius, int stroke) {
+        android.graphics.drawable.GradientDrawable drawable =
+                new android.graphics.drawable.GradientDrawable();
+        drawable.setColor(fill);
+        drawable.setCornerRadius(dp(radius));
+        drawable.setStroke(dp(1), stroke);
+        return drawable;
+    }
+
+    private void haptic() {
+        android.os.Vibrator vibrator =
+                (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            return;
+        }
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            vibrator.vibrate(android.os.VibrationEffect.createOneShot(
+                    20,
+                    android.os.VibrationEffect.DEFAULT_AMPLITUDE));
+        } else {
+            vibrator.vibrate(20);
         }
     }
 
-    private void addPlayerView(String id, String name, int score, String color) {
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setGravity(Gravity.CENTER_HORIZONTAL);
-        card.setPadding(dp(14), dp(12), dp(14), dp(14));
-        card.setBackground(round(BG, 22, parseColor(color)));
+    private void showAddPlayerDialog() {
+        EditText name = new EditText(this);
+        name.setHint(R.string.player_name);
+        name.setSingleLine(true);
 
-        EditText nameView = new EditText(this);
-        nameView.setText(name);
-        nameView.setTextColor(TEXT);
-        nameView.setTextSize(16);
-        nameView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        nameView.setSingleLine(true);
-        nameView.setGravity(Gravity.CENTER);
-        nameView.setBackgroundColor(Color.TRANSPARENT);
-        card.addView(nameView, new LinearLayout.LayoutParams(-1, dp(42)));
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.add_player)
+                .setView(name)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String playerName = name.getText().toString().trim();
+                    if (playerName.isEmpty()) {
+                        Toast.makeText(this, "Le nom est obligatoire", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    nativeAddPlayer(playerName, "#F44336");
+                    nativeSave();
+                    refreshPlayers();
+                })
+                .show();
+    }
 
-        TextView scoreView = text(String.valueOf(score), 52, TEXT);
-        scoreView.setGravity(Gravity.CENTER);
-        scoreView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        scoreView.setOnClickListener(v -> editScore(id, score));
-        card.addView(scoreView, new LinearLayout.LayoutParams(-1, 0, 1));
+    private int parseColor(String value) {
+        try {
+            return Color.parseColor(value);
+        } catch (IllegalArgumentException ignored) {
+            return Color.rgb(244, 67, 54);
+        }
+    }
 
-        LinearLayout quick = new LinearLayout(this);
-        quick.setGravity(Gravity.CENTER);
-        addQuick(quick, "-3", () -> change(id, -3));
-        addQuick(quick, "-2", () -> change(id, -2));
-        addQuick(quick, "+2", () -> change(id, 2));
-        addQuick(quick, "+3", () -> change(id, 3));
-        card.addView(quick, new LinearLayout.LayoutParams(-1, dp(38)));
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
+    }
 
-        LinearLayout controls = new LinearLayout(this);
-        controls.setGravity(Gravity.CENTER);
-        addStep(controls, "−", () -> change(id, -1));
-        addStep(controls, "+", () -> change(id, 1));
-        card.addView(controls, new LinearLayout.LayoutParams(-1, dp(50)));
-
-
+    public native void nativeInit(String filesDir);
+    public native void nativeAddPlayer(String name, String color);
+    public native void nativeAddScore(String playerId, int delta);
+    public native void nativeSetScore(String playerId, int score);
+    public native void nativeResetScores();
+    public native boolean nativeUndo();
+    public native boolean nativeRedo();
+    public native boolean nativeSave();
+    public native boolean nativeExport(String path);
+    public native boolean nativeImport(String path);
+    public native String nativeGetState();
+}
