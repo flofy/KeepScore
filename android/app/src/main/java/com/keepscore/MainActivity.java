@@ -143,6 +143,7 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
+            scoreScreen.configurePlayers(players.length());
             scoreScreen.clearPlayers();
             PlayerCard.Listener listener = new PlayerCard.Listener() {
                 @Override

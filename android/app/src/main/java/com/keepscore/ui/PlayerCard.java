@@ -3,7 +3,6 @@ package com.keepscore.ui;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -57,9 +56,7 @@ public class PlayerCard extends LinearLayout {
         addStep(controls, "+", () -> listener.onScoreChange(playerId, 1));
         addView(controls, new LayoutParams(-1, UiUtils.dp(context, 50)));
 
-        LayoutParams params = new LayoutParams(-1, UiUtils.dp(context, CARD_HEIGHT));
-        params.setMargins(0, 0, 0, UiUtils.dp(context, 12));
-        setLayoutParams(params);
+        setMinimumHeight(UiUtils.dp(context, CARD_HEIGHT));
     }
 
     private void addQuick(LinearLayout container, String label, Runnable action) {
