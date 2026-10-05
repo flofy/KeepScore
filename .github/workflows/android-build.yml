@@ -120,7 +120,7 @@ jobs:
         run: |
           artifact_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts/$ARTIFACT_ID"
           marker="<!-- keepscore-apk-artifact -->"
-          body="$marker\n\n📱 **Android APK built successfully**\n\n[Download the APK artifact]($artifact_url)"
+          body=$(printf '%s\n\n📱 **Android APK built successfully**\n\n[Download the APK artifact](%s)' "$marker" "$artifact_url")
 
           comment_id="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
             --jq '.[] | select(.body | contains("<!-- keepscore-apk-artifact -->")) | .id' | head -n 1)"
