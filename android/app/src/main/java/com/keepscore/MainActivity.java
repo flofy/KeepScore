@@ -1,35 +1,35 @@
 package com.keepscore;
 
 import android.app.AlertDialog;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.keepscore.ui.PlayerCard;
+import com.keepscore.ui.ScoreScreen;
+import com.keepscore.ui.UiUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
-    private LinearLayout playersContainer;
-    private TextView emptyState;
-    private UpdateChecker updateChecker;
     private static final int BG = Color.rgb(15, 23, 42);
     private static final int SURFACE = Color.rgb(30, 41, 59);
     private static final int TEXT = Color.rgb(248, 250, 252);
-    private static final int MUTED = Color.rgb(148, 163, 184);
+
+    private ScoreScreen scoreScreen;
+    private UpdateChecker updateChecker;
 
     static {
         System.loadLibrary("keepscore");
@@ -69,161 +69,105 @@ public class MainActivity extends AppCompatActivity {
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setBackgroundColor(BG);
-        root.setPadding(dp(14), dp(10), dp(14), dp(14));
+        root.setPadding(
+                UiUtils.dp(this, 14),
+                UiUtils.dp(this, 10),
+                UiUtils.dp(this, 14),
+                UiUtils.dp(this, 14));
 
         LinearLayout header = new LinearLayout(this);
         header.setGravity(Gravity.CENTER_VERTICAL);
-        TextView title = text(getString(R.string.app_name), 22, TEXT);
+
+        android.widget.TextView title = UiUtils.text(
+                this,
+                getString(R.string.app_name),
+                22,
+                TEXT);
         title.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        header.addView(title, new LinearLayout.LayoutParams(0, dp(52), 1));
-        Button addPlayer = compactButton("+", TEXT);
+        header.addView(title, new LinearLayout.LayoutParams(0, UiUtils.dp(this, 52), 1));
+
+        Button addPlayer = UiUtils.compactButton(
+                this,
+                "+",
+                TEXT,
+                SURFACE,
+                Color.rgb(71, 85, 105));
         addPlayer.setOnClickListener(v -> showAddPlayerDialog());
-        header.addView(addPlayer, new LinearLayout.LayoutParams(dp(48), dp(48)));
+        header.addView(addPlayer, new LinearLayout.LayoutParams(
+                UiUtils.dp(this, 48),
+                UiUtils.dp(this, 48)));
         root.addView(header);
 
         LinearLayout actions = new LinearLayout(this);
         actions.setGravity(Gravity.CENTER_VERTICAL);
-        actions.setPadding(0, 0, 0, dp(10));
-        actions.addView(actionButton(R.string.undo, v -> { nativeUndo(); refreshPlayers(); }), weightParams());
-        actions.addView(actionButton(R.string.redo, v -> { nativeRedo(); refreshPlayers(); }), weightParams());
-        actions.addView(actionButton(R.string.reset, v -> confirmReset()), weightParams());
+        actions.setPadding(0, 0, 0, UiUtils.dp(this, 10));
+        actions.addView(actionButton(R.string.undo, v -> {
+            nativeUndo();
+            refreshPlayers();
+        }), UiUtils.weightParams(this));
+        actions.addView(actionButton(R.string.redo, v -> {
+            nativeRedo();
+            refreshPlayers();
+        }), UiUtils.weightParams(this));
+        actions.addView(actionButton(R.string.reset, v -> confirmReset()), UiUtils.weightParams(this));
         root.addView(actions);
 
-        ScrollView scroll = new ScrollView(this);
-        scroll.setFillViewport(true);
-        playersContainer = new LinearLayout(this);
-        playersContainer.setOrientation(LinearLayout.VERTICAL);
-        scroll.addView(playersContainer);
-        root.addView(scroll, new LinearLayout.LayoutParams(-1, 0, 1));
+        scoreScreen = new ScoreScreen(this);
+        root.addView(scoreScreen, new LinearLayout.LayoutParams(-1, 0, 1));
 
-        emptyState = text("Aucun joueur. Ajoutez un joueur pour commencer.", 16, MUTED);
-        emptyState.setGravity(Gravity.CENTER);
-        emptyState.setPadding(dp(24), dp(48), dp(24), dp(48));
         setContentView(root);
     }
 
-    private LinearLayout.LayoutParams weightParams() {
-        LinearLayout.LayoutParams p = new LinearLayout.LayoutParams(0, dp(42), 1);
-        p.setMargins(dp(3), 0, dp(3), 0);
-        return p;
-    }
-
     private Button actionButton(int label, View.OnClickListener listener) {
-        Button b = compactButton(getString(label), TEXT);
-        b.setOnClickListener(listener);
-        return b;
-    }
-
-    private Button compactButton(String label, int color) {
-        Button b = new Button(this);
-        b.setText(label);
-        b.setTextColor(color);
-        b.setTextSize(13);
-        b.setAllCaps(false);
-        b.setPadding(dp(6), 0, dp(6), 0);
-        b.setBackground(round(SURFACE, 12, Color.rgb(71, 85, 105)));
-        return b;
-    }
-
-    private TextView text(String value, float size, int color) {
-        TextView v = new TextView(this);
-        v.setText(value);
-        v.setTextSize(size);
-        v.setTextColor(color);
-        return v;
+        Button button = UiUtils.compactButton(
+                this,
+                getString(label),
+                TEXT,
+                SURFACE,
+                Color.rgb(71, 85, 105));
+        button.setOnClickListener(listener);
+        return button;
     }
 
     private void refreshPlayers() {
-        if (playersContainer == null) {
+        if (scoreScreen == null) {
             return;
         }
-
-        playersContainer.removeAllViews();
 
         try {
             JSONObject state = new JSONObject(nativeGetState());
             JSONArray players = state.optJSONArray("players");
 
             if (players == null || players.length() == 0) {
-                playersContainer.addView(emptyState);
+                scoreScreen.showEmpty();
                 return;
             }
 
+            scoreScreen.clearPlayers();
+            PlayerCard.Listener listener = new PlayerCard.Listener() {
+                @Override
+                public void onScoreChange(String playerId, int delta) {
+                    change(playerId, delta);
+                }
+
+                @Override
+                public void onScoreEdit(String playerId, int score) {
+                    editScore(playerId, score);
+                }
+            };
+
             for (int i = 0; i < players.length(); i++) {
                 JSONObject player = players.getJSONObject(i);
-                addPlayerView(
+                scoreScreen.addPlayer(
                         player.optString("id"),
                         player.optString("name", "Joueur"),
                         player.optInt("score", 0),
-                        player.optString("color", "#F44336"));
+                        player.optString("color", "#F44336"),
+                        listener);
             }
         } catch (Exception error) {
             Toast.makeText(this, "Impossible de charger la partie", Toast.LENGTH_LONG).show();
         }
-    }
-
-    private void addPlayerView(String id, String name, int score, String color) {
-        LinearLayout card = new LinearLayout(this);
-        card.setOrientation(LinearLayout.VERTICAL);
-        card.setGravity(Gravity.CENTER_HORIZONTAL);
-        card.setPadding(dp(14), dp(12), dp(14), dp(14));
-        card.setBackground(round(BG, 22, parseColor(color)));
-
-        TextView nameView = text(name, 16, TEXT);
-        nameView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        nameView.setGravity(Gravity.CENTER);
-        card.addView(nameView, new LinearLayout.LayoutParams(-1, dp(42)));
-
-        TextView scoreView = text(String.valueOf(score), 52, TEXT);
-        scoreView.setGravity(Gravity.CENTER);
-        scoreView.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
-        scoreView.setOnClickListener(v -> editScore(id, score));
-        card.addView(scoreView, new LinearLayout.LayoutParams(-1, 0, 1));
-
-        LinearLayout quick = new LinearLayout(this);
-        quick.setGravity(Gravity.CENTER);
-        addQuick(quick, "-3", () -> change(id, -3));
-        addQuick(quick, "-2", () -> change(id, -2));
-        addQuick(quick, "+2", () -> change(id, 2));
-        addQuick(quick, "+3", () -> change(id, 3));
-        card.addView(quick, new LinearLayout.LayoutParams(-1, dp(38)));
-
-        LinearLayout controls = new LinearLayout(this);
-        controls.setGravity(Gravity.CENTER);
-        addStep(controls, "−", () -> change(id, -1));
-        addStep(controls, "+", () -> change(id, 1));
-        card.addView(controls, new LinearLayout.LayoutParams(-1, dp(50)));
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, dp(260));
-        params.setMargins(0, 0, 0, dp(12));
-        playersContainer.addView(card, params);
-    }
-
-    private void addQuick(LinearLayout container, String label, Runnable action) {
-        Button button = compactButton(label, TEXT);
-        button.setOnClickListener(v -> {
-            action.run();
-            haptic();
-        });
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(36), 1);
-        params.setMargins(dp(3), 0, dp(3), 0);
-        container.addView(button, params);
-    }
-
-    private void addStep(LinearLayout container, String label, Runnable action) {
-        Button button = new Button(this);
-        button.setText(label);
-        button.setTextSize(24);
-        button.setTextColor(TEXT);
-        button.setAllCaps(false);
-        button.setBackground(round(SURFACE, 16, Color.rgb(71, 85, 105)));
-        button.setOnClickListener(v -> {
-            action.run();
-            haptic();
-        });
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0, dp(48), 1);
-        params.setMargins(dp(4), 0, dp(4), 0);
-        container.addView(button, params);
     }
 
     private void change(String id, int delta) {
@@ -270,15 +214,6 @@ public class MainActivity extends AppCompatActivity {
                 .show();
     }
 
-    private android.graphics.drawable.GradientDrawable round(int fill, int radius, int stroke) {
-        android.graphics.drawable.GradientDrawable drawable =
-                new android.graphics.drawable.GradientDrawable();
-        drawable.setColor(fill);
-        drawable.setCornerRadius(dp(radius));
-        drawable.setStroke(dp(1), stroke);
-        return drawable;
-    }
-
     private void haptic() {
         android.os.Vibrator vibrator =
                 (android.os.Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
@@ -314,18 +249,6 @@ public class MainActivity extends AppCompatActivity {
                     refreshPlayers();
                 })
                 .show();
-    }
-
-    private int parseColor(String value) {
-        try {
-            return Color.parseColor(value);
-        } catch (IllegalArgumentException ignored) {
-            return Color.rgb(244, 67, 54);
-        }
-    }
-
-    private int dp(int value) {
-        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
     public native void nativeInit(String filesDir);
