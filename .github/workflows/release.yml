@@ -54,8 +54,8 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ inputs.version }}
         run: |
-          if gh release view "$VERSION" >/dev/null 2>&1; then
-            gh release upload "$VERSION" "dist/KeepScore-$VERSION.apk" --clobber
+          if gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release upload "$VERSION" "dist/KeepScore-$VERSION.apk" --repo "$GITHUB_REPOSITORY" --clobber
           else
-            gh release create "$VERSION" "dist/KeepScore-$VERSION.apk" --generate-notes
+            gh release create "$VERSION" "dist/KeepScore-$VERSION.apk" --repo "$GITHUB_REPOSITORY" --generate-notes
           fi
