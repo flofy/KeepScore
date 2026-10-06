@@ -295,6 +295,15 @@ mod tests {
     }
 
     #[test]
+    fn rename_player_updates_name() {
+        let mut game = game_with_two_players();
+        assert!(game.rename_player("p1", "Alicia".to_string()));
+        assert_eq!(game.get_player("p1").unwrap().name, "Alicia");
+        assert!(!game.rename_player("p1", "   ".to_string()));
+        assert!(!game.rename_player("missing", "Nobody".to_string()));
+    }
+
+    #[test]
     fn add_score_updates_player() {
         let mut game = game_with_two_players();
         game.apply_action(ScoreAction::Add {
