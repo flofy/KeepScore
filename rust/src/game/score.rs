@@ -111,6 +111,20 @@ impl Game {
         }
     }
 
+    pub fn rename_player(&mut self, player_id: &str, name: String) -> bool {
+        let name = name.trim();
+        if name.is_empty() {
+            return false;
+        }
+        if let Some(player) = self.get_player_mut(player_id) {
+            player.name = name.to_string();
+            self.updated_at = current_timestamp();
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn get_player(&self, player_id: &str) -> Option<&Player> {
         self.players.iter().find(|p| p.id == player_id)
     }
