@@ -23,6 +23,9 @@ import com.keepscore.ui.UiUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity {
     private static final int BG = Color.rgb(15, 23, 42);
     private static final int SURFACE = Color.rgb(30, 41, 59);
@@ -164,11 +167,57 @@ public class MainActivity extends AppCompatActivity {
                         player.optString("name", "Joueur"),
                         player.optInt("score", 0),
                         player.optString("color", "#F44336"),
+                        scoreHistory(state, player.optString("id")),
                         listener);
             }
         } catch (Exception error) {
             Toast.makeText(this, "Impossible de charger la partie", Toast.LENGTH_LONG).show();
         }
+    }
+
+    private List<Integer> scoreHistory(JSONObject state, String playerId) {
+        List<Integer> result = new ArrayList<>();
+        JSONArray history = state.optJSONArray("history");
+        int currentIndex = state.optInt("current_index", history == null ? 0 : history.length());
+        if (history == null) {
+            return result;
+        }
+
+        int end = Math.min(currentIndex, history.length());
+        for (int i = end - 1; i >= 0 && result.size() < 5; i--) {
+            JSONObject action = history.optJSONObject(i);
+            if (action == null) {
+                continue;
+            }
+
+            JSONObject add = action.optJSONObject("Add");
+            if (add != null && playerId.equals(add.optString("player_id"))) {
+                result.add(0, add.optInt("delta"));
+                continue;
+            }
+
+            JSONObject set = action.optJSONObject("Set");
+            if (set != null && playerId.equals(set.optString("player_id"))) {
+                result.add(0, set.optInt("score") - set.optInt("previous_score"));
+                continue;
+            }
+
+            JSONObject reset = action.optJSONObject("ResetAll");
+            if (reset != null) {
+                JSONArray previous = reset.optJSONArray("previous_scores");
+                if (previous != null) {
+                    for (int j = 0; j < previous.length(); j++) {
+                        JSONArray entry = previous.optJSONArray(j);
+                        if (entry != null && entry.length() >= 2
+                                && playerId.equals(entry.optString(0))) {
+                            result.add(0, -entry.optInt(1));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     private void change(String id, int delta) {
