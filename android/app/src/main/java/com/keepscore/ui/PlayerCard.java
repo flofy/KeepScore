@@ -16,6 +16,7 @@ public class PlayerCard extends LinearLayout {
     public interface Listener {
         void onScoreChange(String playerId, int delta);
         void onScoreEdit(String playerId, int score);
+        void onPlayerNameEdit(String playerId, String name);
     }
 
     private static final int SURFACE = Color.rgb(30, 41, 59);
@@ -33,6 +34,27 @@ public class PlayerCard extends LinearLayout {
         TextView nameView = UiUtils.text(context, name, 16, TEXT);
         UiUtils.bold(nameView);
         nameView.setGravity(Gravity.CENTER);
+        nameView.setOnClickListener(v -> {
+            android.widget.EditText input = new android.widget.EditText(getContext());
+            input.setSingleLine(true);
+            input.setText(name);
+            input.selectAll();
+
+            new AlertDialog.Builder(getContext())
+                    .setTitle("Modifier le nom")
+                    .setView(input)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                        String updatedName = input.getText().toString().trim();
+                        if (updatedName.isEmpty()) {
+                            input.setError("Le nom est obligatoire");
+                            return;
+                        }
+                        listener.onPlayerNameEdit(playerId, updatedName);
+                        performHaptic();
+                    })
+                    .show();
+        });
         addView(nameView, new LayoutParams(-1, UiUtils.dp(context, 42)));
         LinearLayout historyView = new LinearLayout(context);
         historyView.setGravity(Gravity.CENTER);
