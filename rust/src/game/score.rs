@@ -111,6 +111,20 @@ impl Game {
         }
     }
 
+    pub fn rename_player(&mut self, player_id: &str, name: String) -> bool {
+        let name = name.trim();
+        if name.is_empty() {
+            return false;
+        }
+        if let Some(player) = self.get_player_mut(player_id) {
+            player.name = name.to_string();
+            self.updated_at = current_timestamp();
+            true
+        } else {
+            false
+        }
+    }
+
     pub fn get_player(&self, player_id: &str) -> Option<&Player> {
         self.players.iter().find(|p| p.id == player_id)
     }
@@ -278,6 +292,15 @@ mod tests {
         assert!(game.remove_player("p1"));
         assert_eq!(game.players.len(), 1);
         assert!(!game.remove_player("p1"));
+    }
+
+    #[test]
+    fn rename_player_updates_name() {
+        let mut game = game_with_two_players();
+        assert!(game.rename_player("p1", "Alicia".to_string()));
+        assert_eq!(game.get_player("p1").unwrap().name, "Alicia");
+        assert!(!game.rename_player("p1", "   ".to_string()));
+        assert!(!game.rename_player("missing", "Nobody".to_string()));
     }
 
     #[test]

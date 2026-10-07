@@ -158,6 +158,11 @@ public class MainActivity extends AppCompatActivity {
                 public void onScoreEdit(String playerId, int score) {
                     editScore(playerId, score);
                 }
+
+                @Override
+                public void onPlayerNameEdit(String playerId, String name) {
+                    editPlayerName(playerId, name);
+                }
             };
 
             for (int i = 0; i < players.length(); i++) {
@@ -218,6 +223,31 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return result;
+    }
+
+    private void editPlayerName(String id, String currentName) {
+        EditText input = new EditText(this);
+        input.setSingleLine(true);
+        input.setText(currentName);
+        input.selectAll();
+
+        new AlertDialog.Builder(this)
+                .setTitle("Modifier le nom")
+                .setView(input)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    String name = input.getText().toString().trim();
+                    if (name.isEmpty()) {
+                        Toast.makeText(this, "Le nom est obligatoire", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (nativeRenamePlayer(id, name)) {
+                        nativeSave();
+                        refreshPlayers();
+                        haptic();
+                    }
+                })
+                .show();
     }
 
     private void change(String id, int delta) {
@@ -303,6 +333,7 @@ public class MainActivity extends AppCompatActivity {
 
     public native void nativeInit(String filesDir);
     public native void nativeAddPlayer(String name, String color);
+    public native boolean nativeRenamePlayer(String playerId, String name);
     public native void nativeAddScore(String playerId, int delta);
     public native void nativeSetScore(String playerId, int score);
     public native void nativeResetScores();

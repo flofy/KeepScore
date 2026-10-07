@@ -68,6 +68,19 @@ pub extern "system" fn Java_com_keepscore_MainActivity_nativeAddPlayer<'local>(
 }
 
 #[no_mangle]
+pub extern "system" fn Java_com_keepscore_MainActivity_nativeRenamePlayer<'local>(
+    mut env: JNIEnv<'local>,
+    _this: JObject<'local>,
+    player_id: JString<'local>,
+    name: JString<'local>,
+) -> jboolean {
+    let player_id = read_string(&mut env, &player_id);
+    let name = read_string(&mut env, &name);
+    let mut app = app_state().lock().unwrap();
+    as_jboolean(app.state.rename_player(player_id, name))
+}
+
+#[no_mangle]
 pub extern "system" fn Java_com_keepscore_MainActivity_nativeAddScore<'local>(
     mut env: JNIEnv<'local>,
     _this: JObject<'local>,
