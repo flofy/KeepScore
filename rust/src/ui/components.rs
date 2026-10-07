@@ -36,6 +36,10 @@ impl UIState {
         self.game.rename_player(&player_id, name)
     }
 
+    pub fn remove_player(&mut self, player_id: String) -> bool {
+        self.game.remove_player(&player_id)
+    }
+
     pub fn add_score(&mut self, player_id: String, delta: i32) {
         self.game
             .apply_action(ScoreAction::Add { player_id, delta });
