@@ -30,9 +30,36 @@ public final class UiUtils {
         button.setTextColor(color);
         button.setTextSize(13);
         button.setAllCaps(false);
+        button.setGravity(android.view.Gravity.CENTER);
         int padding = dp(context, 6);
         button.setPadding(padding, 0, padding, 0);
         button.setBackground(round(context, background, 12, stroke));
+        return button;
+    }
+
+    public static Button accentButton(
+            Context context,
+            String label,
+            int textColor,
+            int startColor,
+            int endColor,
+            int strokeColor) {
+        Button button = new Button(context);
+        button.setText(label);
+        button.setTextColor(textColor);
+        button.setTextSize(13);
+        button.setAllCaps(false);
+        button.setGravity(android.view.Gravity.CENTER);
+        button.setTypeface(Typeface.DEFAULT, Typeface.BOLD);
+        int padding = dp(context, 6);
+        button.setPadding(padding, 0, padding, 0);
+
+        GradientDrawable background = new GradientDrawable(
+                GradientDrawable.Orientation.TL_BR,
+                new int[]{startColor, endColor});
+        background.setCornerRadius(dp(context, 14));
+        background.setStroke(dp(context, 1), strokeColor);
+        button.setBackground(background);
         return button;
     }
 
@@ -60,7 +87,7 @@ public final class UiUtils {
         try {
             return Color.parseColor(value);
         } catch (IllegalArgumentException ignored) {
-            return Color.rgb(244, 67, 54);
+            return Color.rgb(56, 189, 248);
         }
     }
 }
