@@ -17,6 +17,7 @@ public class PlayerCard extends LinearLayout {
         void onScoreChange(String playerId, int delta);
         void onScoreEdit(String playerId, int score);
         void onPlayerNameEdit(String playerId, String name);
+        void onPlayerRemove(String playerId, String name);
     }
 
     private static final int SURFACE = Color.rgb(30, 41, 59);
@@ -34,6 +35,10 @@ public class PlayerCard extends LinearLayout {
         TextView nameView = UiUtils.text(context, name, 16, TEXT);
         UiUtils.bold(nameView);
         nameView.setGravity(Gravity.CENTER);
+        nameView.setOnLongClickListener(v -> {
+            listener.onPlayerRemove(playerId, name);
+            return true;
+        });
         nameView.setOnClickListener(v -> {
             android.widget.EditText input = new android.widget.EditText(getContext());
             input.setSingleLine(true);
