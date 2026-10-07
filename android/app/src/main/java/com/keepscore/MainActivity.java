@@ -163,6 +163,11 @@ public class MainActivity extends AppCompatActivity {
                 public void onPlayerNameEdit(String playerId, String name) {
                     editPlayerName(playerId, name);
                 }
+
+                @Override
+                public void onPlayerRemove(String playerId, String name) {
+                    confirmRemovePlayer(playerId, name);
+                }
             };
 
             for (int i = 0; i < players.length(); i++) {
@@ -173,6 +178,7 @@ public class MainActivity extends AppCompatActivity {
                         player.optInt("score", 0),
                         player.optString("color", "#F44336"),
                         scoreHistory(state, player.optString("id")),
+                        players.length() > 1,
                         listener);
             }
         } catch (Exception error) {
@@ -242,6 +248,21 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
                     if (nativeRenamePlayer(id, name)) {
+                        nativeSave();
+                        refreshPlayers();
+                        haptic();
+                    }
+                })
+                .show();
+    }
+
+    private void confirmRemovePlayer(String id, String name) {
+        new AlertDialog.Builder(this)
+                .setTitle("Supprimer le joueur")
+                .setMessage("Supprimer " + name + " ?")
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    if (nativeRemovePlayer(id)) {
                         nativeSave();
                         refreshPlayers();
                         haptic();
@@ -334,6 +355,7 @@ public class MainActivity extends AppCompatActivity {
     public native void nativeInit(String filesDir);
     public native void nativeAddPlayer(String name, String color);
     public native boolean nativeRenamePlayer(String playerId, String name);
+    public native boolean nativeRemovePlayer(String playerId);
     public native void nativeAddScore(String playerId, int delta);
     public native void nativeSetScore(String playerId, int score);
     public native void nativeResetScores();
