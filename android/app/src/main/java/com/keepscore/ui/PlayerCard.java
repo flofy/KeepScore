@@ -17,19 +17,30 @@ public class PlayerCard extends LinearLayout {
         void onScoreChange(String playerId, int delta);
         void onScoreEdit(String playerId, int score);
         void onPlayerNameEdit(String playerId, String name);
+        void onPlayerRemove(String playerId, String name);
     }
 
     private static final int SURFACE = Color.rgb(30, 41, 59);
     private static final int TEXT = Color.rgb(248, 250, 252);
 
     public PlayerCard(Context context, String playerId, String name, int score, String color,
-                      List<Integer> history, Listener listener) {
+                      List<Integer> history, boolean canRemove, Listener listener) {
         super(context);
         setOrientation(VERTICAL);
         setGravity(Gravity.CENTER_HORIZONTAL);
         int padding = UiUtils.dp(context, 14);
         setPadding(padding, UiUtils.dp(context, 12), padding, padding);
         setBackground(UiUtils.round(context, Color.rgb(15, 23, 42), 22, UiUtils.parseColor(color)));
+
+        TextView removeView = UiUtils.text(context, canRemove ? "✕" : "", 16,
+                Color.rgb(252, 165, 165));
+        removeView.setGravity(Gravity.CENTER);
+        removeView.setOnClickListener(v -> {
+            listener.onPlayerRemove(playerId, name);
+        });
+        LayoutParams removeParams = new LayoutParams(UiUtils.dp(context, 34), UiUtils.dp(context, 34));
+        removeParams.gravity = Gravity.END;
+        addView(removeView, removeParams);
 
         TextView nameView = UiUtils.text(context, name, 16, TEXT);
         UiUtils.bold(nameView);
