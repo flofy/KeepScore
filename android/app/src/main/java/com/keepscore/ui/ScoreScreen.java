@@ -70,6 +70,7 @@ public class ScoreScreen extends ScrollView {
             int score,
             String color,
             java.util.List<Integer> history,
+            boolean canRemove,
             PlayerCard.Listener listener) {
         PlayerCard card = new PlayerCard(
                 getContext(),
@@ -78,6 +79,7 @@ public class ScoreScreen extends ScrollView {
                 score,
                 color,
                 history,
+                canRemove,
                 listener);
 
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
