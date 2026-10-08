@@ -238,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
         input.setText(currentName);
         input.selectAll();
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Modifier le nom")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -252,6 +252,8 @@ public class MainActivity extends AppCompatActivity {
                         nativeSave();
                         refreshPlayers();
                         haptic();
+                    } else {
+                        Toast.makeText(this, "Impossible de modifier le nom", Toast.LENGTH_SHORT).show();
                     }
                 })
                 .show();
