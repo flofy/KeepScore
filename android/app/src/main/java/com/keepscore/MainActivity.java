@@ -242,7 +242,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Modifier le nom")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (ignoredDialog, which) -> {
                     String name = input.getText().toString().trim();
                     if (name.isEmpty()) {
                         Toast.makeText(this, "Le nom est obligatoire", Toast.LENGTH_SHORT).show();
@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Supprimer le joueur")
                 .setMessage("Supprimer " + name + " ?")
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (ignoredDialog, which) -> {
                     if (nativeRemovePlayer(id)) {
                         nativeSave();
                         refreshPlayers();
@@ -296,7 +296,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle("Modifier le score")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (ignoredDialog, which) -> {
                     try {
                         if (!nativeSetScore(id, Integer.parseInt(input.getText().toString().trim()))) {
                             Toast.makeText(this, "Impossible de modifier le score", Toast.LENGTH_SHORT).show();
@@ -318,7 +318,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(R.string.reset)
                 .setMessage("Réinitialiser tous les scores ?")
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (ignoredDialog, which) -> {
                     nativeResetScores();
                     nativeSave();
                     refreshPlayers();
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(R.string.add_player)
                 .setView(name)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (ignoredDialog, which) -> {
                     String playerName = name.getText().toString().trim();
                     if (playerName.isEmpty()) {
                         Toast.makeText(this, "Le nom est obligatoire", Toast.LENGTH_SHORT).show();
