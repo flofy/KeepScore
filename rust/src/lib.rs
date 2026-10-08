@@ -1,5 +1,6 @@
 //! JNI bridge between the Android app (`com.keepscore`) and the Rust game logic.
 
+use std::panic::{catch_unwind, AssertUnwindSafe};
 use std::sync::{Mutex, OnceLock};
 
 use jni::objects::{JObject, JString};
@@ -76,8 +77,14 @@ pub extern "system" fn Java_com_keepscore_MainActivity_nativeRenamePlayer<'local
 ) -> jboolean {
     let player_id = read_string(&mut env, &player_id);
     let name = read_string(&mut env, &name);
-    let mut app = app_state().lock().unwrap();
-    as_jboolean(app.state.rename_player(player_id, name))
+    catch_unwind(AssertUnwindSafe(|| {
+        let Ok(mut app) = app_state().lock() else {
+            return false;
+        };
+        app.state.rename_player(player_id, name)
+    }))
+    .map(as_jboolean)
+    .unwrap_or(JNI_FALSE)
 }
 
 #[no_mangle]
@@ -97,10 +104,17 @@ pub extern "system" fn Java_com_keepscore_MainActivity_nativeAddScore<'local>(
     _this: JObject<'local>,
     player_id: JString<'local>,
     delta: jint,
-) {
+) -> jboolean {
     let player_id = read_string(&mut env, &player_id);
-    let mut app = app_state().lock().unwrap();
-    app.state.add_score(player_id, delta);
+    catch_unwind(AssertUnwindSafe(|| {
+        let Ok(mut app) = app_state().lock() else {
+            return false;
+        };
+        app.state.add_score(player_id, delta);
+        true
+    }))
+    .map(as_jboolean)
+    .unwrap_or(JNI_FALSE)
 }
 
 #[no_mangle]
@@ -109,10 +123,17 @@ pub extern "system" fn Java_com_keepscore_MainActivity_nativeSetScore<'local>(
     _this: JObject<'local>,
     player_id: JString<'local>,
     score: jint,
-) {
+) -> jboolean {
     let player_id = read_string(&mut env, &player_id);
-    let mut app = app_state().lock().unwrap();
-    app.state.set_score(player_id, score);
+    catch_unwind(AssertUnwindSafe(|| {
+        let Ok(mut app) = app_state().lock() else {
+            return false;
+        };
+        app.state.set_score(player_id, score);
+        true
+    }))
+    .map(as_jboolean)
+    .unwrap_or(JNI_FALSE)
 }
 
 #[no_mangle]
