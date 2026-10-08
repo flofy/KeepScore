@@ -57,7 +57,7 @@ public class PlayerCard extends LinearLayout {
         nameView.setGravity(Gravity.CENTER_VERTICAL);
         nameView.setSingleLine(true);
         nameView.setEllipsize(android.text.TextUtils.TruncateAt.END);
-        nameView.setOnClickListener(v -> showRenameDialog(playerId, name, listener));
+        nameView.setOnClickListener(v -> listener.onPlayerNameEdit(playerId, name));
         header.addView(nameView, new LayoutParams(0, UiUtils.dp(context, 42), 1));
 
         if (canRemove) {
@@ -143,28 +143,6 @@ public class PlayerCard extends LinearLayout {
         return delta >= 0 ? "+" + delta : String.valueOf(delta);
     }
 
-    private void showRenameDialog(String playerId, String currentName, Listener listener) {
-        EditText input = new EditText(getContext());
-        input.setSingleLine(true);
-        input.setText(currentName);
-        input.selectAll();
-
-        new AlertDialog.Builder(getContext())
-                .setTitle("Modifier le nom")
-                .setView(input)
-                .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    String name = input.getText().toString().trim();
-                    if (name.isEmpty()) {
-                        input.setError("Le nom est obligatoire");
-                        return;
-                    }
-                    listener.onPlayerNameEdit(playerId, name);
-                    performHaptic();
-                })
-                .show();
-    }
-
     private void showCustomDelta(String playerId, Listener listener) {
         EditText input = new EditText(getContext());
         input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER
@@ -172,12 +150,12 @@ public class PlayerCard extends LinearLayout {
         input.setSingleLine(true);
         input.setHint("Ex. +7 ou -7");
 
-        new AlertDialog.Builder(getContext())
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle("Score personnalisé")
                 .setMessage("Saisissez la variation à appliquer.")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
-                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                .setPositiveButton(android.R.string.ok, (dialogInterface, which) -> {
                     try {
                         int delta = Integer.parseInt(input.getText().toString().trim());
                         if (delta == 0) return;
@@ -188,6 +166,7 @@ public class PlayerCard extends LinearLayout {
                     }
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void addStepColumn(
@@ -281,15 +260,16 @@ public class PlayerCard extends LinearLayout {
                 ? new String[]{"+5", "+10", "+20"}
                 : new String[]{"−5", "−10", "−20"};
 
-        new AlertDialog.Builder(getContext())
+        AlertDialog dialog = new AlertDialog.Builder(getContext())
                 .setTitle("Score rapide")
-                .setItems(labels, (dialog, which) -> {
+                .setItems(labels, (dialogInterface, which) -> {
                     listener.onScoreChange(
                             playerId,
                             positive ? values[which] : -values[which]);
                     performHaptic();
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void performHaptic() {
