@@ -1,5 +1,6 @@
 package com.keepscore.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -61,6 +62,23 @@ public final class UiUtils {
         background.setStroke(dp(context, 1), strokeColor);
         button.setBackground(background);
         return button;
+    }
+
+    public static void styleDialog(AlertDialog dialog) {
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawable(
+                    round(dialog.getContext(), Color.rgb(15, 23, 42), 22, Color.rgb(71, 85, 105)));
+        }
+        Button negative = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+        Button positive = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        if (negative != null) {
+            negative.setTextColor(Color.rgb(148, 163, 184));
+            negative.setAllCaps(false);
+        }
+        if (positive != null) {
+            positive.setTextColor(Color.rgb(74, 222, 128));
+            positive.setAllCaps(false);
+        }
     }
 
     public static GradientDrawable round(Context context, int fill, int radius, int stroke) {
