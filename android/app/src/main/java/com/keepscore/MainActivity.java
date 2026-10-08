@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
                 .setTitle(R.string.update_available_title)
                 .setMessage(getString(R.string.update_available_message, version))
                 .setNegativeButton(R.string.update_later, null)
-                .setPositiveButton(R.string.update_now, (dialog, which) -> {
+                .setPositiveButton(R.string.update_now, (ignoredDialog, which) -> {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 })
                 .show();
