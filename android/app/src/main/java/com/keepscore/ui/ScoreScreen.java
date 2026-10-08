@@ -19,6 +19,7 @@ public class ScoreScreen extends ScrollView {
     public ScoreScreen(Context context) {
         super(context);
         setFillViewport(true);
+        setClipToPadding(false);
         setBackgroundColor(BG);
 
         playersContainer = new GridLayout(context);
@@ -27,9 +28,9 @@ public class ScoreScreen extends ScrollView {
         playersContainer.setAlignmentMode(GridLayout.ALIGN_BOUNDS);
         playersContainer.setPadding(
                 UiUtils.dp(context, GRID_GAP),
-                0,
+                UiUtils.dp(context, 2),
                 UiUtils.dp(context, GRID_GAP),
-                UiUtils.dp(context, GRID_GAP));
+                UiUtils.dp(context, 18));
         addView(playersContainer, new LayoutParams(-1, -2));
 
         emptyState = UiUtils.text(
@@ -46,7 +47,7 @@ public class ScoreScreen extends ScrollView {
     }
 
     public void configurePlayers(int playerCount) {
-        columns = playerCount == 2 ? 1 : 2;
+        columns = playerCount <= 2 ? 1 : 2;
         playersContainer.setColumnCount(columns);
     }
 
@@ -84,7 +85,7 @@ public class ScoreScreen extends ScrollView {
 
         GridLayout.LayoutParams params = new GridLayout.LayoutParams();
         params.width = 0;
-        params.height = UiUtils.dp(getContext(), 260);
+        params.height = UiUtils.dp(getContext(), 270);
         int index = playersContainer.getChildCount();
         int column = index % columns;
         int row = index / columns;
