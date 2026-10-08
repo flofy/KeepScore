@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showUpdateDialog(String version, String url) {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.update_available_title)
                 .setMessage(getString(R.string.update_available_message, version))
                 .setNegativeButton(R.string.update_later, null)
@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void buildScreen() {
@@ -254,10 +255,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void confirmRemovePlayer(String id, String name) {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Supprimer le joueur")
                 .setMessage("Supprimer " + name + " ?")
                 .setNegativeButton(android.R.string.cancel, null)
@@ -269,10 +271,14 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void change(String id, int delta) {
-        nativeAddScore(id, delta);
+        if (!nativeAddScore(id, delta)) {
+            Toast.makeText(this, "Impossible de modifier le score", Toast.LENGTH_SHORT).show();
+            return;
+        }
         nativeSave();
         refreshPlayers();
     }
@@ -284,13 +290,16 @@ public class MainActivity extends AppCompatActivity {
         input.setText(String.valueOf(currentScore));
         input.selectAll();
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle("Modifier le score")
                 .setView(input)
                 .setNegativeButton(android.R.string.cancel, null)
                 .setPositiveButton(android.R.string.ok, (dialog, which) -> {
                     try {
-                        nativeSetScore(id, Integer.parseInt(input.getText().toString().trim()));
+                        if (!nativeSetScore(id, Integer.parseInt(input.getText().toString().trim()))) {
+                            Toast.makeText(this, "Impossible de modifier le score", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         nativeSave();
                         refreshPlayers();
                         haptic();
@@ -299,10 +308,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void confirmReset() {
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.reset)
                 .setMessage("Réinitialiser tous les scores ?")
                 .setNegativeButton(android.R.string.cancel, null)
@@ -313,6 +323,7 @@ public class MainActivity extends AppCompatActivity {
                     haptic();
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     private void haptic() {
@@ -335,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
         name.setHint(R.string.player_name);
         name.setSingleLine(true);
 
-        new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this)
                 .setTitle(R.string.add_player)
                 .setView(name)
                 .setNegativeButton(android.R.string.cancel, null)
@@ -350,14 +361,15 @@ public class MainActivity extends AppCompatActivity {
                     refreshPlayers();
                 })
                 .show();
+        UiUtils.styleDialog(dialog);
     }
 
     public native void nativeInit(String filesDir);
     public native void nativeAddPlayer(String name, String color);
     public native boolean nativeRenamePlayer(String playerId, String name);
     public native boolean nativeRemovePlayer(String playerId);
-    public native void nativeAddScore(String playerId, int delta);
-    public native void nativeSetScore(String playerId, int score);
+    public native boolean nativeAddScore(String playerId, int delta);
+    public native boolean nativeSetScore(String playerId, int score);
     public native void nativeResetScores();
     public native boolean nativeUndo();
     public native boolean nativeRedo();
