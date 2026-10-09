@@ -37,9 +37,9 @@ jobs:
             -f "sha=${GITHUB_SHA}"
 
   android-build:
-    name: Build Android
+    name: Build Capacitor Android APK
     needs: create-tag
-    uses: ./.github/workflows/android-build.yml
+    uses: ./.github/workflows/android-capacitor.yml
     with:
       ref: ${{ inputs.version }}
 

@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   release:
-    name: Publish release
+    name: Publish Capacitor release
     runs-on: ubuntu-latest
     steps:
       - name: Verify release tag
@@ -26,28 +26,29 @@ jobs:
           test -n "$sha"
           echo "Release tag ${VERSION} points to ${sha}"
 
-      - name: Find APK artifact
+      - name: Find Capacitor APK artifact
         id: artifact
         env:
           GH_TOKEN: ${{ github.token }}
           RUN_ID: ${{ github.run_id }}
         run: |
           artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" \
-            --jq '.artifacts[] | select(.name == "keepscore-debug-apk" and .expired == false) | .id' | head -n 1)"
+            --jq '.artifacts[] | select(.name == "keepscore-capacitor-debug-apk" and .expired == false) | .id' | head -n 1)"
           test -n "$artifact_id"
           echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
 
-      - name: Download APK artifact
+      - name: Download Capacitor APK artifact
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_ID: ${{ steps.artifact.outputs.id }}
+          VERSION: ${{ inputs.version }}
         run: |
           mkdir -p dist
           gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/apk.zip
           unzip -o /tmp/apk.zip -d dist
           apk="$(find dist -maxdepth 1 -type f -name '*.apk' -print -quit)"
           test -n "$apk"
-          mv "$apk" "dist/KeepScore-${{ inputs.version }}.apk"
+          mv "$apk" "dist/KeepScore-${VERSION}.apk"
 
       - name: Create or update GitHub Release
         env:

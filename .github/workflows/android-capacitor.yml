@@ -1,7 +1,18 @@
 name: Android Capacitor
 
 on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
   workflow_dispatch:
+  workflow_call:
+    inputs:
+      ref:
+        description: "Git ref to build"
+        required: false
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -9,11 +20,13 @@ permissions:
 
 jobs:
   build:
-    name: Build React app and Capacitor APK
+    name: Capacitor Android APK
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref || github.ref }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
@@ -63,8 +76,8 @@ jobs:
         run: ./gradlew assembleDebug --no-daemon --stacktrace
         working-directory: capacitor/android
 
-      - name: Upload APK
-        id: apk
+      - name: Upload Capacitor APK artifact
+        id: capacitor-apk
         uses: actions/upload-artifact@v7
         with:
           name: keepscore-capacitor-debug-apk
@@ -72,17 +85,17 @@ jobs:
           if-no-files-found: error
           retention-days: 14
 
-      - name: Add APK link to pull request
-        if: github.event_name == "pull_request"
+      - name: Add Capacitor APK link to pull request
+        if: github.event_name == 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          ARTIFACT_ID: ${{ steps.apk.outputs.artifact-id }}
+          ARTIFACT_ID: ${{ steps.capacitor-apk.outputs.artifact-id }}
           RUN_ID: ${{ github.run_id }}
         run: |
           artifact_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts/$ARTIFACT_ID"
           marker="<!-- keepscore-capacitor-apk-artifact -->"
-          body=$(printf '%s\n\n📱 **Capacitor Android APK built successfully**\n\n[Download APK artifact](%s)' "$marker" "$artifact_url")
+          body=$(printf '%s\n\n📱 **Capacitor Android APK — POC**\n\nCet APK embarque l’application React via Capacitor.\n\n[Download Capacitor APK artifact](%s)' "$marker" "$artifact_url")
           comment_id="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
             --jq '.[] | select(.body | contains("<!-- keepscore-capacitor-apk-artifact -->")) | .id' | head -n 1)"
           if [ -n "$comment_id" ]; then

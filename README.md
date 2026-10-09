@@ -1,6 +1,6 @@
 # KeepScore
 
-A modern, mobile-first SPA/PWA inspired by [KeepScore](https://github.com/nolanlawson/KeepScore).
+A modern, mobile-first score keeper inspired by [KeepScore](https://github.com/nolanlawson/KeepScore).
 
 ## Status
 
@@ -20,6 +20,7 @@ A fast, offline-first score keeper designed for playing tabletop and card games 
 - **Fullscreen mode** — distraction-free card display
 - **i18n** — Français / English, switchable from the burger menu
 - **Installable PWA** — install it on your phone home screen
+- **Android app** — React UI packaged with Capacitor, sharing the same app code as the Web version
 - **Export/Import** — backup and restore your games as JSON
 
 ## Game flow
@@ -44,6 +45,10 @@ pnpm run test:e2e       # end-to-end tests (Playwright)
 pnpm run knip           # unused files/exports/deps + circular dependencies
 pnpm run format         # format with oxfmt
 ```
+
+## Android (Capacitor)
+
+The Android shell is generated from the isolated `capacitor/` configuration. The `Android Capacitor` GitHub Actions workflow builds a debug APK for pull requests and uploads it as an artifact. Releases use the same Capacitor APK pipeline.
 
 ## Architecture
 
