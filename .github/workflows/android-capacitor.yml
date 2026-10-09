@@ -1,30 +1,6 @@
 name: Android Capacitor
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "public/**"
-      - "capacitor/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "tsconfig*.json"
-      - "vite.config.*"
-      - "index.html"
-      - ".github/workflows/android-capacitor.yml"
-  push:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "public/**"
-      - "capacitor/**"
-      - "package.json"
-      - "pnpm-lock.yaml"
-      - "tsconfig*.json"
-      - "vite.config.*"
-      - "index.html"
-      - ".github/workflows/android-capacitor.yml"
   workflow_dispatch:
 
 permissions:
