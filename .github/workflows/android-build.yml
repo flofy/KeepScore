@@ -33,7 +33,31 @@ jobs:
         id: filter
         with:
           filters: |
+            rust:
+              - 'rust/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+            android:
+              - 'android/**'
+              - 'rust/**'
+              - 'Cargo.toml'
+              - 'Cargo.lock'
+              - '.github/workflows/android-build.yml'
+              - '.github/workflows/release.yml'
+              - '.github/workflows/create-tag.yml'
             capacitor:
+              - 'src/**'
+              - 'public/**'
+              - 'capacitor/**'
+              - 'package.json'
+              - 'pnpm-lock.yaml'
+              - 'tsconfig*.json'
+              - 'vite.config.*'
+              - 'index.html'
+              - '.github/workflows/android-capacitor.yml'
+              - '.github/workflows/android-build.yml'
+
+  capacitor:
     name: Capacitor Android APK
     needs: changes
     if: needs.changes.outputs.capacitor == 'true' || github.event_name == 'workflow_dispatch'
@@ -119,30 +143,6 @@ jobs:
           fi
 
   rust:
-              - 'rust/**'
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-            android:
-              - 'android/**'
-              - 'rust/**'
-              - 'Cargo.toml'
-              - 'Cargo.lock'
-              - '.github/workflows/android-build.yml'
-              - '.github/workflows/release.yml'
-              - '.github/workflows/create-tag.yml'
-            capacitor:
-              - 'src/**'
-              - 'public/**'
-              - 'capacitor/**'
-              - 'package.json'
-              - 'pnpm-lock.yaml'
-              - 'tsconfig*.json'
-              - 'vite.config.*'
-              - 'index.html'
-              - '.github/workflows/android-capacitor.yml'
-              - '.github/workflows/android-build.yml'
-
-  rust:
     name: Rust (fmt, test, build)
     needs: changes
     if: needs.changes.outputs.rust == 'true' || github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_call'
@@ -217,15 +217,15 @@ jobs:
         run: |
           artifact_url="https://github.com/$GITHUB_REPOSITORY/actions/runs/$RUN_ID/artifacts/$ARTIFACT_ID"
           marker="<!-- keepscore-apk-artifact -->"
-          body=$(printf '%s\n\n📱 **Android APK built successfully**\n\n[Download the APK artifact](%s)' "$marker" "$artifact_url")
+          body=$(printf '%s\\n\\n📱 **Android APK built successfully**\\n\\n[Download the APK artifact](%s)' "$marker" "$artifact_url")
 
-          comment_id="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \
+          comment_id="$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" --paginate \\
             --jq '.[] | select(.body | contains("<!-- keepscore-apk-artifact -->")) | .id' | head -n 1)"
 
           if [ -n "$comment_id" ]; then
-            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" \
+            gh api --method PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$comment_id" \\
               -f body="$body" >/dev/null
           else
-            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \
+            gh api --method POST "repos/$GITHUB_REPOSITORY/issues/$PR_NUMBER/comments" \\
               -f body="$body" >/dev/null
           fi
