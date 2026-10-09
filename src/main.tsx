@@ -13,10 +13,13 @@ import { App } from "./app/App";
 import { AppProviders } from "./app/providers";
 import { UpdateButton } from "./ui/UpdateButton";
 
-// The service worker powers the installed-PWA offline shell in production.
-// It must never register in development: its cache-first fetch handler would
-// serve stale Vite modules and hide every new change until the cache is cleared.
-if ("serviceWorker" in navigator && import.meta.env.PROD) {
+// Capacitor packages the web assets directly into the native app; the PWA
+// service worker and its update flow are only for browser-installed builds.
+if (
+  "serviceWorker" in navigator &&
+  import.meta.env.PROD &&
+  import.meta.env.VITE_CAPACITOR !== "true"
+) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register(`${import.meta.env.BASE_URL}sw.js`)
