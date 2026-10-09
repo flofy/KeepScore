@@ -13,6 +13,11 @@ import { App } from "./app/App";
 import { AppProviders } from "./app/providers";
 import { UpdateButton } from "./ui/UpdateButton";
 
+// Capacitor uses an edge-to-edge Android WebView; CSS applies native safe spacing.
+if (import.meta.env.VITE_CAPACITOR === "true") {
+  document.documentElement.classList.add("capacitor-native");
+}
+
 // Capacitor packages the web assets directly into the native app; the PWA
 // service worker and its update flow are only for browser-installed builds.
 if (

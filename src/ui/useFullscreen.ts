@@ -19,6 +19,11 @@ export function useFullscreen() {
   }, [fullscreen]);
 
   useEffect(() => {
+    // The Android WebView does not reliably dispatch fullscreenchange for the
+    // browser Fullscreen API. Capacitor fullscreen is therefore app-layout
+    // fullscreen, driven by React state and CSS instead.
+    if (import.meta.env.VITE_CAPACITOR === "true") return;
+
     const handleFullscreenChange = () => {
       setFullscreen(Boolean(document.fullscreenElement));
     };
@@ -28,6 +33,11 @@ export function useFullscreen() {
   }, []);
 
   const toggleFullscreen = async () => {
+    if (import.meta.env.VITE_CAPACITOR === "true") {
+      setFullscreen((current) => !current);
+      return;
+    }
+
     try {
       if (document.fullscreenElement) {
         await document.exitFullscreen();

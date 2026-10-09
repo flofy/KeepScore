@@ -61,6 +61,18 @@ body::after {
   padding-top: max(8px, env(safe-area-inset-top));
 }
 
+/* Capacitor's Android WebView can draw edge-to-edge while Android system bars
+   remain visible. Reserve physical space so the game never sits under them. */
+.capacitor-native .app-shell {
+  padding-top: max(32px, env(safe-area-inset-top));
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+}
+
+.capacitor-native .app-shell.fullscreen {
+  /* App fullscreen must not put controls behind the still-visible status bar. */
+  padding-top: max(32px, env(safe-area-inset-top));
+}
+
 .app-shell.munchkin-theme {
   background:
     linear-gradient(rgb(55 28 12 / 18%), rgb(55 28 12 / 18%)),
