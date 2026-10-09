@@ -41,8 +41,9 @@ function serviceWorkerVersion(): Plugin {
 }
 
 export default defineConfig(({ mode }) => ({
-  // GitHub Pages serves the app from /KeepScore/, while Netlify serves it from /
-  base: process.env.NETLIFY ? "/" : "/KeepScore/",
+  // Capacitor loads bundled assets from the app's local WebView, so paths must be relative.
+  // GitHub Pages serves the app from /KeepScore/, while Netlify serves it from /.
+  base: process.env.CAPACITOR ? "./" : process.env.NETLIFY ? "/" : "/KeepScore/",
   plugins: [
     react(),
     serviceWorkerVersion(),
