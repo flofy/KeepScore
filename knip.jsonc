@@ -3,7 +3,9 @@
 
   // Enregistre dynamiquement depuis main.tsx : knip ne peut pas suivre la
   // reference, le service worker est donc exclu de l'analyse.
-  "ignore": ["public/sw.js"],
+  // Idem pour le script de rasterisation CI : il est appele directement dans
+  // un "run:" du workflow Android, knip ne peut pas suivre cette reference.
+  "ignore": ["public/sw.js", ".github/scripts/**"],
 
   // Les dependances circulaires ne sont pas activees par defaut, et une fois
   // activees elles ne sont qu'un avertissement : sans "error" la CI resterait
