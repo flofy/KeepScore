@@ -54,6 +54,15 @@ jobs:
         run: npx cap add android
         working-directory: capacitor
 
+      - name: Rasterize icon and splash SVG sources
+        run: |
+          npm install --prefix .asset-tools sharp --no-package-lock --no-audit --no-fund
+          node .github/scripts/rasterize-native-assets.mjs
+
+      - name: Generate Android icons and splash screens
+        run: npx --yes @capacitor/assets generate --assetPath assets --android
+        working-directory: capacitor
+
       - name: Sync web assets into Android
         run: npx cap sync android
         working-directory: capacitor
