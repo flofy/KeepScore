@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
+import { QuixScoreScreen } from "../ui/QuixScoreScreen";
 import { SavedGames } from "../ui/SavedGames";
 import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
@@ -51,6 +52,7 @@ export function StartScreenRoute() {
     <StartScreen
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
+      onQuixScore={() => navigate("/quixscore")}
       onSavedGames={() => navigate("/saved")}
     />
   );
@@ -72,6 +74,12 @@ export function ChwatziRoute() {
   const navigate = useNavigate();
 
   return <ChwatziScreenV2 onBack={() => navigate(-1)} />;
+}
+
+export function QuixScoreRoute() {
+  const navigate = useNavigate();
+
+  return <QuixScoreScreen onBack={() => navigate(-1)} />;
 }
 
 export function GameRoute() {

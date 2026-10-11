@@ -15,6 +15,7 @@ A fast, offline-first score keeper designed for playing tabletop and card games 
 - **Fast score entry** — large touch-friendly +/− buttons, quick deltas (+5/+10/+15/+20), long-press shortcuts
 - **Multiple players and games** — from 2 to many, with per-player color and name
 - **Duo mode** — two-player landscape layout for face-to-face play, with flip/rotate support
+- **QuixScore** — Qwixx-style score sheets: cross numbers left to right, lock rows, -5 penalties, automatic totals with undo
 - **Undo/redo and complete score history** — edit or delete any move
 - **Local-first persistence** — games are saved in IndexedDB/localStorage, no account needed
 - **Fullscreen mode** — distraction-free card display
@@ -53,6 +54,7 @@ The Android shell is generated from the isolated `capacitor/` configuration. The
 ## Architecture
 
 - `src/domain/game` — pure domain logic (reducer, history, factory), independent from React
+- `src/domain/qwixx` — pure QuixScore (Qwixx-style) scoring logic (mark order, row locking, penalties, totals)
 - Shared domain types live in `src/domain/game/types.ts` (single source of truth)
 - `src/ui` — React components (App, GameSetup, SavedGames, i18n, etc.)
 - `src/infrastructure` — persistence (gameRepository) and portability (export/import)

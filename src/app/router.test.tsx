@@ -6,6 +6,7 @@ function createComponents() {
     home: <div>home</div>,
     setup: <div>setup</div>,
     chwatzi: <div>chwatzi</div>,
+    quixscore: <div>quixscore</div>,
     game: <div>game</div>,
     saved: <div>saved</div>,
   };
@@ -19,6 +20,7 @@ describe("application router", () => {
       "/",
       "/setup",
       "/chwatzi",
+      "/quixscore",
       "/game",
       "/saved",
     ]);

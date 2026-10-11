@@ -97,6 +97,20 @@ type TranslationKey =
   | "tryAgain"
   | "startNewGame"
   | "startChwatzi"
+  | "quixScore"
+  | "startQuixScore"
+  | "quixScoreTagline"
+  | "quixScorePenalties"
+  | "quixScoreAddPenalty"
+  | "quixScoreTotal"
+  | "quixScoreLocked"
+  | "quixScoreGameOver"
+  | "quixScoreWinner"
+  | "quixScoreHideScores"
+  | "quixScoreShowScores"
+  | "quixScoreCrossOff"
+  | "quixScoreInvalidMark"
+  | "quixScoreLockedHint"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -199,6 +213,23 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Try again",
     startNewGame: "Start a new game",
     startChwatzi: "Pick a random starter",
+    quixScore: "QuixScore",
+    startQuixScore: "Score a Qwixx game",
+    quixScoreTagline:
+      "Cross off numbers, lock rows and dodge -5 penalties.",
+    quixScorePenalties: "PENALTIES (-5)",
+    quixScoreAddPenalty: "Add a penalty to",
+    quixScoreTotal: "Total",
+    quixScoreLocked: "Row locked",
+    quixScoreGameOver: "Game over",
+    quixScoreWinner: "Winner",
+    quixScoreHideScores: "Hide scores",
+    quixScoreShowScores: "Show scores",
+    quixScoreCrossOff: "Cross off",
+    quixScoreInvalidMark:
+      "You can only cross off numbers to the right of your last cross; the last number of a row needs 5 crosses first.",
+    quixScoreLockedHint:
+      "A row locks for everyone once its last number is crossed; crossing the last number requires 5 crosses in that row.",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -302,6 +333,23 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Reessayer",
     startNewGame: "Demarrer une nouvelle partie",
     startChwatzi: "Lancer Chwatzi",
+    quixScore: "QuixScore",
+    startQuixScore: "Noter une partie de Qwixx",
+    quixScoreTagline:
+      "Cochez des nombres, fermez des lignes et evitez les penalites de -5.",
+    quixScorePenalties: "PENALITES (-5)",
+    quixScoreAddPenalty: "Ajouter une penalite a",
+    quixScoreTotal: "Total",
+    quixScoreLocked: "Ligne fermee",
+    quixScoreGameOver: "Partie terminee",
+    quixScoreWinner: "Vainqueur",
+    quixScoreHideScores: "Masquer les scores",
+    quixScoreShowScores: "Afficher les scores",
+    quixScoreCrossOff: "Cochez",
+    quixScoreInvalidMark:
+      "On ne peut cocher qu a droite de la derniere croix ; le dernier nombre d une ligne demande 5 croix au prealable.",
+    quixScoreLockedHint:
+      "Une ligne se ferme pour tous les joueurs des que son dernier nombre est coche ; cocher le dernier nombre demande 5 croix dans la ligne.",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:
