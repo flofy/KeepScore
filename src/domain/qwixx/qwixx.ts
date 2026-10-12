@@ -6,10 +6,17 @@ export type QwixxAction =
 
 export type QwixxPlayer = { id: string; name: string };
 
+export type QwixxDice = {
+  white1: number;
+  white2: number;
+  colored: Record<QwixxColor, number>;
+};
+
 export type QwixxState = {
   players: QwixxPlayer[];
   actions: QwixxAction[];
   createdAt: number;
+  lastRoll?: QwixxDice | null;
 };
 
 export type QwixxSheet = {
@@ -197,4 +204,60 @@ export function rankedScores(
       return { player, score: sheet ? sheetScore(sheet) : 0 };
     })
     .sort((a, b) => b.score - a.score);
+}
+
+/*
+ * Dice: two white dice shared by every player plus one die per row color.
+ * Randomness is injected so tests stay deterministic.
+ */
+export function rollQwixxDice(rng: () => number): QwixxDice {
+  const face = () => 1 + Math.floor(rng() * 6);
+  return {
+    white1: face(),
+    white2: face(),
+    colored: {
+      red: face(),
+      yellow: face(),
+      green: face(),
+      blue: face(),
+    },
+  };
+}
+
+type QwixxDiceSums = {
+  /** White1 + white2: playable on any color row. */
+  whiteSum: number;
+  /** Colored die + each white die: playable on that color's row only. */
+  coloredSums: Record<QwixxColor, number[]>;
+};
+
+export function diceCombinations(dice: QwixxDice): QwixxDiceSums {
+  return {
+    whiteSum: dice.white1 + dice.white2,
+    coloredSums: {
+      red: [dice.colored.red + dice.white1, dice.colored.red + dice.white2],
+      yellow: [
+        dice.colored.yellow + dice.white1,
+        dice.colored.yellow + dice.white2,
+      ],
+      green: [
+        dice.colored.green + dice.white1,
+        dice.colored.green + dice.white2,
+      ],
+      blue: [dice.colored.blue + dice.white1, dice.colored.blue + dice.white2],
+    },
+  };
+}
+
+/** Values playable on each row for a given roll (white sum applies to every row). */
+export function playableValues(
+  sums: QwixxDiceSums,
+): Record<QwixxColor, Set<number>> {
+  const values: Record<QwixxColor, Set<number>> = {
+    red: new Set([sums.whiteSum, ...sums.coloredSums.red]),
+    yellow: new Set([sums.whiteSum, ...sums.coloredSums.yellow]),
+    green: new Set([sums.whiteSum, ...sums.coloredSums.green]),
+    blue: new Set([sums.whiteSum, ...sums.coloredSums.blue]),
+  };
+  return values;
 }

@@ -11,13 +11,17 @@ import {
   canMark,
   createQwixxState,
   deriveQwixx,
+  diceCombinations,
+  playableValues,
   rankedScores,
+  rollQwixxDice,
   rowScore,
   sheetScore,
   undoLastAction,
   type QwixxAction,
   type QwixxColor,
   type QwixxDerived,
+  type QwixxDice,
   type QwixxSheet,
   type QwixxState,
 } from "./qwixx";
@@ -203,5 +207,42 @@ describe("QuixScore state", () => {
     const haunted: QwixxState = { ...state, actions: [ghostAction] };
     expect(deriveQwixx(haunted).sheets["ghost"]).toBeUndefined();
     expect(applyMark(state, "ghost", "red", 12)).toBeNull();
+  });
+
+  it("rolls six-sided dice in a deterministic order with the injected rng", () => {
+    const rolls = [0.1, 0.5, 0.99, 0, 0.5, 0.84];
+    let index = 0;
+    const dice = rollQwixxDice(() => rolls[index++]);
+    expect(dice).toEqual({
+      white1: 1,
+      white2: 4,
+      colored: { red: 6, yellow: 1, green: 4, blue: 6 },
+    });
+  });
+
+  it("computes the playable sums from a roll", () => {
+    const dice: QwixxDice = {
+      white1: 2,
+      white2: 5,
+      colored: { red: 3, yellow: 6, green: 1, blue: 4 },
+    };
+    const sums = diceCombinations(dice);
+    expect(sums.whiteSum).toBe(7);
+    expect(sums.coloredSums.red).toEqual([5, 8]);
+    expect(sums.coloredSums.yellow).toEqual([8, 11]);
+    expect(sums.coloredSums.green).toEqual([3, 6]);
+    expect(sums.coloredSums.blue).toEqual([6, 9]);
+  });
+
+  it("maps a roll to the playable values of each row", () => {
+    const dice: QwixxDice = {
+      white1: 2,
+      white2: 5,
+      colored: { red: 3, yellow: 6, green: 1, blue: 4 },
+    };
+    const values = playableValues(diceCombinations(dice));
+    expect(values.red).toEqual(new Set([7, 5, 8]));
+    expect(values.green).toEqual(new Set([7, 3, 6]));
+    expect(values.blue).toEqual(new Set([7, 6, 9]));
   });
 });
