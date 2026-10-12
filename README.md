@@ -15,7 +15,7 @@ A fast, offline-first score keeper designed for playing tabletop and card games 
 - **Fast score entry** — large touch-friendly +/− buttons, quick deltas (+5/+10/+15/+20), long-press shortcuts
 - **Multiple players and games** — from 2 to many, with per-player color and name
 - **Duo mode** — two-player landscape layout for face-to-face play, with flip/rotate support
-- **QuixScore** — Qwixx-style score sheets with a built-in dice roller: roll the six dice, cross matching numbers left to right, lock rows, -5 penalties, automatic totals with undo
+- **QuixScore** — Qwixx-style score sheets as a game preset, with an optional collapsible dice roller: cross numbers left to right, lock rows, -5 penalties, automatic totals with undo
 - **Undo/redo and complete score history** — edit or delete any move
 - **Local-first persistence** — games are saved in IndexedDB/localStorage, no account needed
 - **Fullscreen mode** — distraction-free card display

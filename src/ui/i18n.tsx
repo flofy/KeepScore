@@ -97,8 +97,6 @@ type TranslationKey =
   | "tryAgain"
   | "startNewGame"
   | "startChwatzi"
-  | "quixScore"
-  | "startQuixScore"
   | "quixScoreTagline"
   | "quixScorePenalties"
   | "quixScoreAddPenalty"
@@ -215,8 +213,6 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Try again",
     startNewGame: "Start a new game",
     startChwatzi: "Pick a random starter",
-    quixScore: "QuixScore",
-    startQuixScore: "Score a Qwixx game",
     quixScoreTagline:
       "Cross off numbers, lock rows and dodge -5 penalties.",
     quixScorePenalties: "PENALTIES (-5)",
@@ -337,8 +333,6 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Reessayer",
     startNewGame: "Demarrer une nouvelle partie",
     startChwatzi: "Lancer Chwatzi",
-    quixScore: "QuixScore",
-    startQuixScore: "Noter une partie de Qwixx",
     quixScoreTagline:
       "Cochez des nombres, fermez des lignes et evitez les penalites de -5.",
     quixScorePenalties: "PENALITES (-5)",

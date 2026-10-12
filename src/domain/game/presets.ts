@@ -32,6 +32,13 @@ export const GAME_PRESETS: GamePreset[] = [
     defaultHistoryGrouping: "player",
     workflowId: "munchkin",
   },
+  {
+    id: "quix-score",
+    name: "QuixScore",
+    emoji: "📝",
+    startingScore: 0,
+    defaultHistoryGrouping: "round",
+  },
 ];
 
 export function findPreset(id: string): GamePreset | undefined {
