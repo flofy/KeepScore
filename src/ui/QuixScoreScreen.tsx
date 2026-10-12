@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   MAX_PENALTIES,
+  MAX_ROLLS_PER_TURN,
   QWIXX_COLORS,
   QWIXX_ROWS,
   applyMark,
@@ -10,14 +11,23 @@ import {
   createQwixxState,
   deriveQwixx,
   diceCombinations,
+  emptyHeldDice,
   playableValues,
   rankedScores,
-  rollQwixxDice,
+  rerollDice,
+  resetDiceTurn,
   rowScore,
   sheetScore,
+  startDiceTurn,
+  toggleHeldDie,
   undoLastAction,
 } from "../domain/qwixx/qwixx";
-import type { QwixxColor, QwixxDerived, QwixxState } from "../domain/qwixx/qwixx";
+import type {
+  QwixxColor,
+  QwixxDerived,
+  QwixxDieKey,
+  QwixxState,
+} from "../domain/qwixx/qwixx";
 import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import { useI18n } from "./i18n";
 import { appToast } from "./toast";
@@ -150,7 +160,7 @@ export function QuixScoreScreen({
         return;
       }
       const next = applyMark(state, playerId, color, value);
-      if (next) setState(next);
+      if (next) setState(resetDiceTurn(next));
     },
     [derived, state, t],
   );
@@ -160,7 +170,7 @@ export function QuixScoreScreen({
       if (!state || !derived) return;
       if (!canAddPenalty(derived, playerId)) return;
       const next = applyPenalty(state, playerId);
-      if (next) setState(next);
+      if (next) setState(resetDiceTurn(next));
     },
     [derived, state],
   );
@@ -170,11 +180,18 @@ export function QuixScoreScreen({
   }, []);
 
   const handleRoll = useCallback(() => {
-    setState((current) =>
-      current && !deriveQwixx(current).finished
-        ? { ...current, lastRoll: rollQwixxDice(Math.random) }
-        : current,
-    );
+    setState((current) => {
+      if (!current || deriveQwixx(current).finished) return current;
+      const used = current.rollsUsed ?? 0;
+      if (!current.lastRoll || used === 0 || used >= MAX_ROLLS_PER_TURN) {
+        return startDiceTurn(current, Math.random);
+      }
+      return rerollDice(current, Math.random) ?? current;
+    });
+  }, []);
+
+  const handleToggleDie = useCallback((die: QwixxDieKey) => {
+    setState((current) => (current ? toggleHeldDie(current, die) : current));
   }, []);
 
   const handleNewGame = useCallback(() => {
@@ -260,6 +277,9 @@ export function QuixScoreScreen({
   const ranking = rankedScores(state, derived);
   const finished = derived.finished;
   const lastRoll = state.lastRoll ?? null;
+  const rollsUsed = state.rollsUsed ?? 0;
+  const held = state.held ?? emptyHeldDice();
+  const canHoldDice = !finished && rollsUsed > 0 && rollsUsed < MAX_ROLLS_PER_TURN;
   const selectedPlayer =
     state.players.find((player) => player.id === selectedPlayerId) ??
     state.players[0];
@@ -355,24 +375,59 @@ export function QuixScoreScreen({
           <div className="quixscore-dice-faces">
             {lastRoll ? (
               <>
-                <span className="quixscore-die quixscore-die--white">
+                <button
+                  type="button"
+                  className={
+                    held.white1
+                      ? "quixscore-die quixscore-die--white quixscore-die--held"
+                      : "quixscore-die quixscore-die--white"
+                  }
+                  onClick={() => handleToggleDie("white1")}
+                  disabled={!canHoldDice}
+                  aria-pressed={held.white1}
+                  aria-label={t("quixScoreKeepDie") + " " + lastRoll.white1}
+                >
                   {lastRoll.white1}
-                </span>
-                <span className="quixscore-die quixscore-die--white">
+                </button>
+                <button
+                  type="button"
+                  className={
+                    held.white2
+                      ? "quixscore-die quixscore-die--white quixscore-die--held"
+                      : "quixscore-die quixscore-die--white"
+                  }
+                  onClick={() => handleToggleDie("white2")}
+                  disabled={!canHoldDice}
+                  aria-pressed={held.white2}
+                  aria-label={t("quixScoreKeepDie") + " " + lastRoll.white2}
+                >
                   {lastRoll.white2}
-                </span>
-                {QWIXX_COLORS.map((color) => (
-                  <span
-                    key={color}
-                    className={
-                      derived.lockedRows[color]
-                        ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
-                        : `quixscore-die quixscore-die--${color}`
-                    }
-                  >
-                    {lastRoll.colored[color]}
-                  </span>
-                ))}
+                </button>
+                {QWIXX_COLORS.map((color) => {
+                  const locked = derived.lockedRows[color];
+                  const isHeld = held.colored[color];
+                  return (
+                    <button
+                      key={color}
+                      type="button"
+                      className={
+                        locked
+                          ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
+                          : isHeld
+                            ? `quixscore-die quixscore-die--${color} quixscore-die--held`
+                            : `quixscore-die quixscore-die--${color}`
+                      }
+                      onClick={() => handleToggleDie(color)}
+                      disabled={!canHoldDice}
+                      aria-pressed={isHeld}
+                      aria-label={
+                        t("quixScoreKeepDie") + " " + lastRoll.colored[color]
+                      }
+                    >
+                      {lastRoll.colored[color]}
+                    </button>
+                  );
+                })}
               </>
             ) : (
               <span className="quixscore-dice-empty">
@@ -386,8 +441,15 @@ export function QuixScoreScreen({
             onClick={handleRoll}
             disabled={finished}
           >
-            🎲 {t("quixScoreRoll")}
+            {rollsUsed >= MAX_ROLLS_PER_TURN
+              ? `🎲 ${t("quixScoreNewTurn")}`
+              : rollsUsed > 0
+                ? `🎲 ${t("quixScoreRoll")} (${rollsUsed}/${MAX_ROLLS_PER_TURN})`
+                : `🎲 ${t("quixScoreRoll")}`}
           </button>
+          {lastRoll && (
+            <p className="quixscore-dice-turn">{t("quixScoreRerollHint")}</p>
+          )}
           {lastRoll && (
             <div className="quixscore-dice-sums">
               <span className="quixscore-sum quixscore-sum--white">
