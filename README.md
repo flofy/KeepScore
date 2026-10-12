@@ -50,6 +50,8 @@ pnpm run format         # format with oxfmt
 
 The Android shell is generated from the isolated `capacitor/` configuration. The `Android Capacitor` GitHub Actions workflow builds a debug APK for pull requests and uploads it as an artifact. Releases use the same Capacitor APK pipeline.
 
+App icons and splash screens are generated during the Android build from the SVG sources in `capacitor/resources/` — they are rasterized with sharp, then processed by `@capacitor/assets` into all Android mipmap densities and splash images. The PWA uses the SVG icons in `public/` (`icon.svg`, `icon-maskable.svg`) directly in the web manifest.
+
 ## Architecture
 
 - `src/domain/game` — pure domain logic (reducer, history, factory), independent from React
