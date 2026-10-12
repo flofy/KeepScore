@@ -111,6 +111,9 @@ type TranslationKey =
   | "quixScoreLockedHint"
   | "quixScoreRoll"
   | "quixScoreDiceHint"
+  | "quixScoreRerollHint"
+  | "quixScoreKeepDie"
+  | "quixScoreNewTurn"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -230,6 +233,10 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "A row locks for everyone once its last number is crossed; crossing the last number requires 5 crosses in that row.",
     quixScoreRoll: "Roll the dice",
     quixScoreDiceHint: "Roll the dice to reveal the playable numbers.",
+    quixScoreRerollHint:
+      "Tap dice to keep them before rerolling; up to 3 rolls per turn.",
+    quixScoreKeepDie: "Keep die",
+    quixScoreNewTurn: "New turn",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -350,6 +357,10 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "Une ligne se ferme pour tous les joueurs des que son dernier nombre est coche ; cocher le dernier nombre demande 5 croix dans la ligne.",
     quixScoreRoll: "Lancer les des",
     quixScoreDiceHint: "Lancez les des pour voir les nombres jouables.",
+    quixScoreRerollHint:
+      "Touchez les des a conserver avant de relancer ; jusqu a 3 lancers par tour.",
+    quixScoreKeepDie: "Conserver le de",
+    quixScoreNewTurn: "Nouveau tour",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:
