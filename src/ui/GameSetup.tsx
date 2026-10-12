@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createGame } from "../domain/game/gameFactory";
 import { PLAYER_COLORS, colorForIndex } from "../domain/game/colors";
 import { GAME_PRESETS } from "../domain/game/presets";
+import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import type { Game } from "../domain/game/types";
 import { useI18n } from "./i18n";
 
@@ -17,7 +18,7 @@ export function GameSetup({
   onDetermineStartingPlayer,
 }: Props) {
   const { t } = useI18n();
-  const [names, setNames] = useState(["Alice", "Bob"]);
+  const [names, setNames] = useState<string[]>([...DEFAULT_PLAYER_NAMES]);
   const [colors, setColors] = useState<string[]>(() =>
     names.map((_, index) => colorForIndex(index)),
   );
@@ -31,7 +32,7 @@ export function GameSetup({
     );
   }
   function addPlayer() {
-    setNames((current) => [...current, "Player " + (current.length + 1)]);
+    setNames((current) => [...current, defaultPlayerName(current.length)]);
     setColors((current) => [...current, colorForIndex(current.length)]);
   }
   function removePlayer(index: number) {

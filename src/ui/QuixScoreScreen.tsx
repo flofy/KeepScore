@@ -18,6 +18,7 @@ import {
   undoLastAction,
 } from "../domain/qwixx/qwixx";
 import type { QwixxColor, QwixxDerived, QwixxState } from "../domain/qwixx/qwixx";
+import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import { useI18n } from "./i18n";
 import { appToast } from "./toast";
 import "./quixscore.css";
@@ -65,7 +66,9 @@ function emptyPlayableValues(): Record<QwixxColor, Set<number>> {
 export function QuixScoreScreen({ onBack }: Props) {
   const { t } = useI18n();
   const [state, setState] = useState<QwixxState | null>(loadSavedState);
-  const [draftNames, setDraftNames] = useState<string[]>(["", ""]);
+  const [draftNames, setDraftNames] = useState<string[]>(() => [
+    ...DEFAULT_PLAYER_NAMES,
+  ]);
   const [hideScores, setHideScores] = useState<boolean>(loadHideScores);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
@@ -98,7 +101,9 @@ export function QuixScoreScreen({ onBack }: Props) {
 
   const addDraftPlayer = useCallback(() => {
     setDraftNames((names) =>
-      names.length >= MAX_PLAYERS ? names : [...names, ""],
+      names.length >= MAX_PLAYERS
+        ? names
+        : [...names, defaultPlayerName(names.length)],
     );
   }, []);
 
@@ -116,7 +121,7 @@ export function QuixScoreScreen({ onBack }: Props) {
     const created = createQwixxState(names);
     setState(created);
     setSelectedPlayerId(created.players[0].id);
-    setDraftNames(["", ""]);
+    setDraftNames([...DEFAULT_PLAYER_NAMES]);
   }, [draftNames]);
 
   const handleMark = useCallback(
