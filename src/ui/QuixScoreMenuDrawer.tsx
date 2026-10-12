@@ -118,7 +118,7 @@ export function QuixScoreMenuDrawer({
           <p className="quixscore-menu-players-label">{t("players")}</p>
           <div className="quixscore-menu-players">
             {players.map((player, index) => {
-              const active = activePageIndex === index + 1;
+              const active = activePageIndex === index;
               return (
                 <button
                   key={player.id}

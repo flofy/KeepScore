@@ -100,7 +100,8 @@ export function QuixScoreScreen({
     ...DEFAULT_PLAYER_NAMES,
   ]);
   const [hideScores, setHideScores] = useState<boolean>(loadHideScores);
-  const [pageIndex, setPageIndex] = useState(1);
+  const [pageIndex, setPageIndex] = useState(0);
+  const [diceOpen, setDiceOpen] = useState(false);
   const [dragDelta, setDragDelta] = useState(0);
   const dragRef = useRef<{ x: number; y: number } | null>(null);
 
@@ -151,7 +152,8 @@ export function QuixScoreScreen({
       .filter((name) => name.length > 0);
     if (names.length === 0) return;
     setState(createQwixxState(names));
-    setPageIndex(1);
+    setPageIndex(0);
+    setDiceOpen(false);
     setDraftNames([...DEFAULT_PLAYER_NAMES]);
   }, [draftNames]);
 
@@ -197,7 +199,7 @@ export function QuixScoreScreen({
     setState((current) => (current ? toggleHeldDie(current, die) : current));
   }, []);
 
-  const pageCount = state ? state.players.length + 1 : 1;
+  const pageCount = state ? state.players.length : 1;
 
   const resetDrag = useCallback(() => {
     dragRef.current = null;
@@ -214,13 +216,13 @@ export function QuixScoreScreen({
   const handlePagerPointerMove = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
       const drag = dragRef.current;
-      if (!drag) return;
+      if (!drag || diceOpen) return;
       const dx = event.clientX - drag.x;
       const dy = event.clientY - drag.y;
       if (Math.abs(dx) <= Math.abs(dy)) return;
       setDragDelta(dx);
     },
-    [],
+    [diceOpen],
   );
 
   const handlePagerPointerUp = useCallback(
@@ -231,14 +233,18 @@ export function QuixScoreScreen({
       if (!drag) return;
       const dx = event.clientX - drag.x;
       const dy = event.clientY - drag.y;
-      if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= Math.abs(dy)) return;
+      if (Math.abs(dy) > Math.abs(dx)) {
+        if (Math.abs(dy) >= SWIPE_MIN_PX) setDiceOpen((open) => !open);
+        return;
+      }
+      if (diceOpen || Math.abs(dx) < SWIPE_MIN_PX) return;
       setPageIndex((current) => {
         const maxIndex = pageCount - 1;
         const next = current + (dx < 0 ? 1 : -1);
         return Math.max(0, Math.min(maxIndex, next));
       });
     },
-    [pageCount],
+    [diceOpen, pageCount],
   );
 
   const canStart = draftNames.some((name) => name.trim().length > 0);
@@ -615,25 +621,36 @@ export function QuixScoreScreen({
       <p className="quixscore-swipe-hint">{t("quixScoreSwipeHint")}</p>
 
       <div
-        className="quixscore-pager"
+        className="quixscore-stack"
         onPointerDown={handlePagerPointerDown}
         onPointerMove={handlePagerPointerMove}
         onPointerUp={handlePagerPointerUp}
         onPointerCancel={resetDrag}
         onPointerLeave={resetDrag}
       >
+        <div className="quixscore-pager">
+          <div
+            className={
+              dragDelta !== 0
+                ? "quixscore-pages quixscore-pages--dragging"
+                : "quixscore-pages"
+            }
+            style={{
+              transform: `translateX(calc(${-currentPageIndex * 100}% + ${dragDelta}px))`,
+            }}
+          >
+            {state.players.map((player) => renderPlayerPage(player))}
+          </div>
+        </div>
         <div
           className={
-            dragDelta !== 0
-              ? "quixscore-pages quixscore-pages--dragging"
-              : "quixscore-pages"
+            diceOpen
+              ? "quixscore-layer quixscore-layer--dice quixscore-layer--dice--open"
+              : "quixscore-layer quixscore-layer--dice"
           }
-          style={{
-            transform: `translateX(calc(${-currentPageIndex * 100}% + ${dragDelta}px))`,
-          }}
+          aria-hidden={!diceOpen}
         >
           {renderDicePage()}
-          {state.players.map((player) => renderPlayerPage(player))}
         </div>
       </div>
 
@@ -651,8 +668,11 @@ export function QuixScoreScreen({
         onLanguageChange={setLang}
         players={menuPlayers}
         activePageIndex={currentPageIndex}
-        onSelectPlayer={(index) => setPageIndex(index + 1)}
-        onSelectDice={() => setPageIndex(0)}
+        onSelectPlayer={(index) => {
+          setPageIndex(index);
+          setDiceOpen(false);
+        }}
+        onSelectDice={() => setDiceOpen(true)}
         hideScores={hideScores}
         onHideScoresToggle={() => setHideScores((hidden) => !hidden)}
       />

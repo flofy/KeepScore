@@ -241,7 +241,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     quixScoreNewTurn: "New turn",
     quixScoreDicePage: "Dice",
     quixScoreSwipeHint:
-      "Swipe to switch between the dice screen and player sheets.",
+      "Swipe left or right to change player, up or down for the dice.",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -368,7 +368,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     quixScoreNewTurn: "Nouveau tour",
     quixScoreDicePage: "Dés",
     quixScoreSwipeHint:
-      "Balayez pour passer de l écran des dés aux feuilles de score.",
+      "Balayez à gauche ou à droite pour changer de joueur, vers le haut ou le bas pour les dés.",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:

@@ -149,12 +149,16 @@
   background: #fde047;
 }
 
-/* Full-screen swipeable pager */
-.quixscore-pager {
+/* Full-screen swipeable pager + dice layer */
+.quixscore-stack {
+  position: relative;
   overflow: hidden;
-  touch-action: pan-y;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
+}
+.quixscore-pager {
+  overflow: hidden;
 }
 .quixscore-pages {
   display: flex;
@@ -171,6 +175,22 @@
 .quixscore-page-title {
   margin: 0 0 10px;
   font-size: 18px;
+}
+.quixscore-layer--dice {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow-y: auto;
+  background: #10182e;
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    visibility 0.25s;
+}
+.quixscore-layer--dice--open {
+  transform: translateY(0);
+  visibility: visible;
 }
 
 /* Dice page */
@@ -571,5 +591,45 @@
     width: 34px;
     height: 34px;
     font-size: 15px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 540px) {
+  .quixscore-screen {
+    padding-top: 8px;
+    padding-bottom: 10px;
+  }
+  .quixscore-swipe-hint {
+    margin-bottom: 6px;
+  }
+  .quixscore-sheet {
+    padding: 10px;
+    margin-bottom: 0;
+  }
+  .quixscore-sheet-header {
+    margin-bottom: 6px;
+  }
+  .quixscore-row {
+    gap: 3px;
+    margin-bottom: 4px;
+    padding: 4px;
+  }
+  .quixscore-cell {
+    min-height: clamp(24px, 6.5vh, 38px);
+    font-size: clamp(11px, 1.6vw, 14px);
+  }
+  .quixscore-penalties {
+    margin-top: 6px;
+    padding: 6px 8px;
+  }
+  .quixscore-penalty {
+    min-height: 28px;
+  }
+  .quixscore-page--dice .quixscore-dice {
+    align-items: center;
+  }
+  .quixscore-page--dice .quixscore-roll {
+    width: auto;
+    min-width: 240px;
   }
 }
