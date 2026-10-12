@@ -111,6 +111,8 @@ type TranslationKey =
   | "quixScoreCrossOff"
   | "quixScoreInvalidMark"
   | "quixScoreLockedHint"
+  | "quixScoreRoll"
+  | "quixScoreDiceHint"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -230,6 +232,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "You can only cross off numbers to the right of your last cross; the last number of a row needs 5 crosses first.",
     quixScoreLockedHint:
       "A row locks for everyone once its last number is crossed; crossing the last number requires 5 crosses in that row.",
+    quixScoreRoll: "Roll the dice",
+    quixScoreDiceHint: "Roll the dice to reveal the playable numbers.",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -350,6 +354,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "On ne peut cocher qu a droite de la derniere croix ; le dernier nombre d une ligne demande 5 croix au prealable.",
     quixScoreLockedHint:
       "Une ligne se ferme pour tous les joueurs des que son dernier nombre est coche ; cocher le dernier nombre demande 5 croix dans la ligne.",
+    quixScoreRoll: "Lancer les des",
+    quixScoreDiceHint: "Lancez les des pour voir les nombres jouables.",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:
