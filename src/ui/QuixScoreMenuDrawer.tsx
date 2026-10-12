@@ -1,6 +1,12 @@
 import { InstallButton } from "./InstallButton";
 import { useI18n, type Lang } from "./i18n";
 
+export type QuixScoreMenuPlayer = {
+  id: string;
+  name: string;
+  score: number;
+};
+
 type Props = {
   open: boolean;
   onClose: () => void;
@@ -13,6 +19,12 @@ type Props = {
   onFullscreenToggle: () => void;
   lang: Lang;
   onLanguageChange: (lang: Lang) => void;
+  players: QuixScoreMenuPlayer[];
+  activePageIndex: number;
+  onSelectPlayer: (index: number) => void;
+  onSelectDice: () => void;
+  hideScores: boolean;
+  onHideScoresToggle: () => void;
 };
 
 export function QuixScoreMenuDrawer({
@@ -27,6 +39,12 @@ export function QuixScoreMenuDrawer({
   onFullscreenToggle,
   lang,
   onLanguageChange,
+  players,
+  activePageIndex,
+  onSelectPlayer,
+  onSelectDice,
+  hideScores,
+  onHideScoresToggle,
 }: Props) {
   const { t } = useI18n();
 
@@ -66,12 +84,68 @@ export function QuixScoreMenuDrawer({
           <button
             className="menu-item"
             type="button"
+            onClick={() => {
+              onClose();
+              onSelectDice();
+            }}
+          >
+            <span className="menu-icon">🎲</span>
+            {t("quixScoreDicePage")}
+          </button>
+
+          <button
+            className="menu-item"
+            type="button"
             onClick={onUndo}
             disabled={!canUndo}
           >
             <span className="menu-icon">↩</span>
             {t("undo")}
           </button>
+
+          <button
+            className="menu-item"
+            type="button"
+            onClick={onHideScoresToggle}
+            aria-pressed={hideScores}
+          >
+            <span className="menu-icon">{hideScores ? "👁" : "🙈"}</span>
+            {hideScores ? t("quixScoreShowScores") : t("quixScoreHideScores")}
+          </button>
+
+          <div className="menu-separator" />
+
+          <p className="quixscore-menu-players-label">{t("players")}</p>
+          <div className="quixscore-menu-players">
+            {players.map((player, index) => {
+              const active = activePageIndex === index + 1;
+              return (
+                <button
+                  key={player.id}
+                  type="button"
+                  className={
+                    active
+                      ? "quixscore-player-chip quixscore-player-chip--active"
+                      : "quixscore-player-chip"
+                  }
+                  aria-pressed={active}
+                  onClick={() => {
+                    onSelectPlayer(index);
+                    onClose();
+                  }}
+                >
+                  <span className="quixscore-player-chip-name">
+                    {player.name}
+                  </span>
+                  <span className="quixscore-player-chip-score">
+                    {hideScores ? "•••" : player.score}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="menu-separator" />
 
           {onNewGame && (
             <button

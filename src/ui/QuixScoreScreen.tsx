@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import type { PointerEvent as ReactPointerEvent } from "react";
 import {
   MAX_PENALTIES,
   MAX_ROLLS_PER_TURN,
@@ -31,7 +32,7 @@ import type {
 import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import { useI18n } from "./i18n";
 import { appToast } from "./toast";
-import { QuixScoreMenuDrawer } from "./QuixScoreMenuDrawer";
+import { QuixScoreMenuDrawer, type QuixScoreMenuPlayer } from "./QuixScoreMenuDrawer";
 import { useFullscreen } from "./useFullscreen";
 import "./quixscore.css";
 
@@ -46,6 +47,7 @@ type Props = {
 const STORAGE_KEY = "keepscore.quixscore.v1";
 const HIDE_SCORES_KEY = "keepscore.quixscore.hide-scores";
 const MAX_PLAYERS = 5;
+const SWIPE_MIN_PX = 48;
 
 function loadSavedState(): QwixxState | null {
   if (typeof localStorage === "undefined") return null;
@@ -98,7 +100,9 @@ export function QuixScoreScreen({
     ...DEFAULT_PLAYER_NAMES,
   ]);
   const [hideScores, setHideScores] = useState<boolean>(loadHideScores);
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [pageIndex, setPageIndex] = useState(1);
+  const [dragDelta, setDragDelta] = useState(0);
+  const dragRef = useRef<{ x: number; y: number } | null>(null);
 
   const derived: QwixxDerived | null = useMemo(
     () => (state ? deriveQwixx(state) : null),
@@ -146,9 +150,8 @@ export function QuixScoreScreen({
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
     if (names.length === 0) return;
-    const created = createQwixxState(names);
-    setState(created);
-    setSelectedPlayerId(created.players[0].id);
+    setState(createQwixxState(names));
+    setPageIndex(1);
     setDraftNames([...DEFAULT_PLAYER_NAMES]);
   }, [draftNames]);
 
@@ -194,10 +197,49 @@ export function QuixScoreScreen({
     setState((current) => (current ? toggleHeldDie(current, die) : current));
   }, []);
 
-  const handleNewGame = useCallback(() => {
-    setState(null);
-    setSelectedPlayerId(null);
+  const pageCount = state ? state.players.length + 1 : 1;
+
+  const resetDrag = useCallback(() => {
+    dragRef.current = null;
+    setDragDelta(0);
   }, []);
+
+  const handlePagerPointerDown = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      dragRef.current = { x: event.clientX, y: event.clientY };
+    },
+    [],
+  );
+
+  const handlePagerPointerMove = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const drag = dragRef.current;
+      if (!drag) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (Math.abs(dx) <= Math.abs(dy)) return;
+      setDragDelta(dx);
+    },
+    [],
+  );
+
+  const handlePagerPointerUp = useCallback(
+    (event: ReactPointerEvent<HTMLDivElement>) => {
+      const drag = dragRef.current;
+      dragRef.current = null;
+      setDragDelta(0);
+      if (!drag) return;
+      const dx = event.clientX - drag.x;
+      const dy = event.clientY - drag.y;
+      if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) <= Math.abs(dy)) return;
+      setPageIndex((current) => {
+        const maxIndex = pageCount - 1;
+        const next = current + (dx < 0 ? 1 : -1);
+        return Math.max(0, Math.min(maxIndex, next));
+      });
+    },
+    [pageCount],
+  );
 
   const canStart = draftNames.some((name) => name.trim().length > 0);
 
@@ -274,80 +316,28 @@ export function QuixScoreScreen({
     );
   }
 
-  const ranking = rankedScores(state, derived);
+  const currentPageIndex = Math.min(pageIndex, pageCount - 1);
   const finished = derived.finished;
   const lastRoll = state.lastRoll ?? null;
   const rollsUsed = state.rollsUsed ?? 0;
   const held = state.held ?? emptyHeldDice();
   const canHoldDice = !finished && rollsUsed > 0 && rollsUsed < MAX_ROLLS_PER_TURN;
-  const selectedPlayer =
-    state.players.find((player) => player.id === selectedPlayerId) ??
-    state.players[0];
-  const sheet = derived.sheets[selectedPlayer.id];
+  const ranking = rankedScores(state, derived);
+  const menuPlayers: QuixScoreMenuPlayer[] = state.players.map((player) => {
+    const sheet = derived.sheets[player.id];
+    return {
+      id: player.id,
+      name: player.name,
+      score: sheet ? sheetScore(sheet) : 0,
+    };
+  });
 
-  return (
-    <main className="quixscore-screen">
-      {onBack && (
-        <button
-          type="button"
-          className="quixscore-close"
-          onClick={onBack}
-          aria-label={t("close")}
-        >
-          ✕
-        </button>
-      )}
-      <header className="quixscore-header">
-        <div>
-          <p className="eyebrow">KEEP SCORE</p>
-          <h1>📝 QuixScore</h1>
-        </div>
-        <div className="quixscore-actions">
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={handleUndo}
-            disabled={state.actions.length === 0}
-          >
-            ↩ {t("undo")}
-          </button>
-          <button
-            type="button"
-            className="secondary-button"
-            aria-pressed={hideScores}
-            onClick={() => setHideScores((hidden) => !hidden)}
-          >
-            {hideScores
-              ? `👁 ${t("quixScoreShowScores")}`
-              : `🙈 ${t("quixScoreHideScores")}`}
-          </button>
-          <button
-            type="button"
-            className="secondary-button danger"
-            onClick={handleNewGame}
-          >
-            {t("newGame")}
-          </button>
-          <button
-            type="button"
-            className="burger-button quixscore-burger"
-            onClick={() => setMenuOpen(true)}
-            aria-label={t("menu")}
-          >
-            <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M4 6h16M4 12h16M4 18h16"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                fill="none"
-              />
-            </svg>
-          </button>
-        </div>
-      </header>
-      <p className="muted quixscore-hint">{t("quixScoreLockedHint")}</p>
-
+  const renderDicePage = () => (
+    <section
+      className="quixscore-page quixscore-page--dice"
+      aria-label={t("quixScoreDicePage")}
+    >
+      <h2 className="quixscore-page-title">🎲 {t("quixScoreDicePage")}</h2>
       {finished && (
         <div className="quixscore-banner" role="status">
           <strong>🏁 {t("quixScoreGameOver")}</strong>
@@ -361,154 +351,121 @@ export function QuixScoreScreen({
           </ol>
         </div>
       )}
-
-      <details className="quixscore-dice-panel">
-        <summary className="quixscore-dice-summary">
-          <span className="quixscore-dice-summary-label">
-            🎲 {t("quixScoreRoll")}
-          </span>
-          <span className="quixscore-dice-chevron" aria-hidden="true">
-            ▾
-          </span>
-        </summary>
-        <section className="quixscore-dice">
-          <div className="quixscore-dice-faces">
-            {lastRoll ? (
-              <>
-                <button
-                  type="button"
-                  className={
-                    held.white1
-                      ? "quixscore-die quixscore-die--white quixscore-die--held"
-                      : "quixscore-die quixscore-die--white"
-                  }
-                  onClick={() => handleToggleDie("white1")}
-                  disabled={!canHoldDice}
-                  aria-pressed={held.white1}
-                  aria-label={t("quixScoreKeepDie") + " " + lastRoll.white1}
-                >
-                  {lastRoll.white1}
-                </button>
-                <button
-                  type="button"
-                  className={
-                    held.white2
-                      ? "quixscore-die quixscore-die--white quixscore-die--held"
-                      : "quixscore-die quixscore-die--white"
-                  }
-                  onClick={() => handleToggleDie("white2")}
-                  disabled={!canHoldDice}
-                  aria-pressed={held.white2}
-                  aria-label={t("quixScoreKeepDie") + " " + lastRoll.white2}
-                >
-                  {lastRoll.white2}
-                </button>
-                {QWIXX_COLORS.map((color) => {
-                  const locked = derived.lockedRows[color];
-                  const isHeld = held.colored[color];
-                  return (
-                    <button
-                      key={color}
-                      type="button"
-                      className={
-                        locked
-                          ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
-                          : isHeld
-                            ? `quixscore-die quixscore-die--${color} quixscore-die--held`
-                            : `quixscore-die quixscore-die--${color}`
-                      }
-                      onClick={() => handleToggleDie(color)}
-                      disabled={!canHoldDice}
-                      aria-pressed={isHeld}
-                      aria-label={
-                        t("quixScoreKeepDie") + " " + lastRoll.colored[color]
-                      }
-                    >
-                      {lastRoll.colored[color]}
-                    </button>
-                  );
-                })}
-              </>
-            ) : (
-              <span className="quixscore-dice-empty">
-                {t("quixScoreDiceHint")}
-              </span>
+      <section className="quixscore-dice">
+        <div className="quixscore-dice-faces">
+          {lastRoll ? (
+            <>
+              <button
+                type="button"
+                className={
+                  held.white1
+                    ? "quixscore-die quixscore-die--white quixscore-die--held"
+                    : "quixscore-die quixscore-die--white"
+                }
+                onClick={() => handleToggleDie("white1")}
+                disabled={!canHoldDice}
+                aria-pressed={held.white1}
+                aria-label={t("quixScoreKeepDie") + " " + lastRoll.white1}
+              >
+                {lastRoll.white1}
+              </button>
+              <button
+                type="button"
+                className={
+                  held.white2
+                    ? "quixscore-die quixscore-die--white quixscore-die--held"
+                    : "quixscore-die quixscore-die--white"
+                }
+                onClick={() => handleToggleDie("white2")}
+                disabled={!canHoldDice}
+                aria-pressed={held.white2}
+                aria-label={t("quixScoreKeepDie") + " " + lastRoll.white2}
+              >
+                {lastRoll.white2}
+              </button>
+              {QWIXX_COLORS.map((color) => {
+                const locked = derived.lockedRows[color];
+                const isHeld = held.colored[color];
+                return (
+                  <button
+                    key={color}
+                    type="button"
+                    className={
+                      locked
+                        ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
+                        : isHeld
+                          ? `quixscore-die quixscore-die--${color} quixscore-die--held`
+                          : `quixscore-die quixscore-die--${color}`
+                    }
+                    onClick={() => handleToggleDie(color)}
+                    disabled={!canHoldDice}
+                    aria-pressed={isHeld}
+                    aria-label={
+                      t("quixScoreKeepDie") + " " + lastRoll.colored[color]
+                    }
+                  >
+                    {lastRoll.colored[color]}
+                  </button>
+                );
+              })}
+            </>
+          ) : (
+            <span className="quixscore-dice-empty">
+              {t("quixScoreDiceHint")}
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          className="quixscore-roll"
+          onClick={handleRoll}
+          disabled={finished}
+        >
+          {rollsUsed >= MAX_ROLLS_PER_TURN
+            ? `🎲 ${t("quixScoreNewTurn")}`
+            : rollsUsed > 0
+              ? `🎲 ${t("quixScoreRoll")} (${rollsUsed}/${MAX_ROLLS_PER_TURN})`
+              : `🎲 ${t("quixScoreRoll")}`}
+        </button>
+        {lastRoll && (
+          <p className="quixscore-dice-turn">{t("quixScoreRerollHint")}</p>
+        )}
+        {lastRoll && (
+          <div className="quixscore-dice-sums">
+            <span className="quixscore-sum quixscore-sum--white">
+              {lastRoll.white1 + lastRoll.white2}
+            </span>
+            {QWIXX_COLORS.map((color) =>
+              derived.lockedRows[color] ? null : (
+                <span key={color} className="quixscore-sum-group">
+                  {[...new Set([lastRoll.white1, lastRoll.white2])]
+                    .map((white) => lastRoll.colored[color] + white)
+                    .map((sum) => (
+                      <span
+                        key={sum}
+                        className={`quixscore-sum quixscore-sum--${color}`}
+                      >
+                        {sum}
+                      </span>
+                    ))}
+                </span>
+              ),
             )}
           </div>
-          <button
-            type="button"
-            className="quixscore-roll"
-            onClick={handleRoll}
-            disabled={finished}
-          >
-            {rollsUsed >= MAX_ROLLS_PER_TURN
-              ? `🎲 ${t("quixScoreNewTurn")}`
-              : rollsUsed > 0
-                ? `🎲 ${t("quixScoreRoll")} (${rollsUsed}/${MAX_ROLLS_PER_TURN})`
-                : `🎲 ${t("quixScoreRoll")}`}
-          </button>
-          {lastRoll && (
-            <p className="quixscore-dice-turn">{t("quixScoreRerollHint")}</p>
-          )}
-          {lastRoll && (
-            <div className="quixscore-dice-sums">
-              <span className="quixscore-sum quixscore-sum--white">
-                {lastRoll.white1 + lastRoll.white2}
-              </span>
-              {QWIXX_COLORS.map((color) =>
-                derived.lockedRows[color] ? null : (
-                  <span key={color} className="quixscore-sum-group">
-                    {[...new Set([lastRoll.white1, lastRoll.white2])]
-                      .map((white) => lastRoll.colored[color] + white)
-                      .map((sum) => (
-                        <span
-                          key={sum}
-                          className={`quixscore-sum quixscore-sum--${color}`}
-                        >
-                          {sum}
-                        </span>
-                      ))}
-                  </span>
-                ),
-              )}
-            </div>
-          )}
-        </section>
-      </details>
+        )}
+      </section>
+      <p className="muted quixscore-hint">{t("quixScoreLockedHint")}</p>
+    </section>
+  );
 
-      <nav className="quixscore-players" aria-label={t("players")}>
-        {state.players.map((player) => {
-          const playerSheet = derived.sheets[player.id];
-          const total = playerSheet ? sheetScore(playerSheet) : 0;
-          const active = player.id === selectedPlayer.id;
-          return (
-            <button
-              key={player.id}
-              type="button"
-              className={
-                active
-                  ? "quixscore-player-chip quixscore-player-chip--active"
-                  : "quixscore-player-chip"
-              }
-              aria-pressed={active}
-              onClick={() => setSelectedPlayerId(player.id)}
-            >
-              <span className="quixscore-player-chip-name">{player.name}</span>
-              <span className="quixscore-player-chip-score">
-                {hideScores ? "•••" : total}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
-
-      {sheet && (
-        <section
-          className="quixscore-sheet"
-          aria-label={selectedPlayer.name}
-        >
+  const renderPlayerPage = (player: QwixxState["players"][number]) => {
+    const sheet = derived.sheets[player.id];
+    if (!sheet) return null;
+    return (
+      <section className="quixscore-page" key={player.id} aria-label={player.name}>
+        <div className="quixscore-sheet">
           <header className="quixscore-sheet-header">
-            <h2 className="quixscore-player-name">{selectedPlayer.name}</h2>
+            <h2 className="quixscore-player-name">{player.name}</h2>
             <span className="quixscore-player-total">
               {t("quixScoreTotal")}:{" "}
               {hideScores ? "•••" : sheetScore(sheet)}
@@ -532,7 +489,7 @@ export function QuixScoreScreen({
                   const enabled =
                     !finished &&
                     !marked &&
-                    canMark(derived, selectedPlayer.id, color, value);
+                    canMark(derived, player.id, color, value);
                   const blocked =
                     !marked &&
                     lastMarkIndex >= 0 &&
@@ -558,9 +515,7 @@ export function QuixScoreScreen({
                       disabled={!enabled}
                       aria-pressed={marked}
                       aria-label={t("quixScoreCrossOff") + " " + value}
-                      onClick={() =>
-                        handleMark(selectedPlayer.id, color, value)
-                      }
+                      onClick={() => handleMark(player.id, color, value)}
                     >
                       {value}
                     </button>
@@ -596,13 +551,13 @@ export function QuixScoreScreen({
                         : "quixscore-penalty"
                     }
                     disabled={
-                      crossed || !canAddPenalty(derived, selectedPlayer.id)
+                      crossed || !canAddPenalty(derived, player.id)
                     }
                     aria-pressed={crossed}
                     aria-label={
-                      t("quixScoreAddPenalty") + " " + selectedPlayer.name
+                      t("quixScoreAddPenalty") + " " + player.name
                     }
-                    onClick={() => handlePenalty(selectedPlayer.id)}
+                    onClick={() => handlePenalty(player.id)}
                   >
                     -5
                   </button>
@@ -610,8 +565,78 @@ export function QuixScoreScreen({
               })}
             </div>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    );
+  };
+
+  return (
+    <main className="quixscore-screen">
+      <div className="quixscore-gamebar">
+        <button
+          type="button"
+          className="burger-button quixscore-burger"
+          onClick={() => setMenuOpen(true)}
+          aria-label={t("menu")}
+        >
+          <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path
+              d="M4 6h16M4 12h16M4 18h16"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+            />
+          </svg>
+        </button>
+        <div className="quixscore-dots" aria-hidden="true">
+          {Array.from({ length: pageCount }, (_, index) => (
+            <span
+              key={index}
+              className={
+                index === currentPageIndex
+                  ? "quixscore-dot quixscore-dot--active"
+                  : "quixscore-dot"
+              }
+            />
+          ))}
+        </div>
+        {onBack && (
+          <button
+            type="button"
+            className="quixscore-close"
+            onClick={onBack}
+            aria-label={t("close")}
+          >
+            ✕
+          </button>
+        )}
+      </div>
+      <p className="quixscore-swipe-hint">{t("quixScoreSwipeHint")}</p>
+
+      <div
+        className="quixscore-pager"
+        onPointerDown={handlePagerPointerDown}
+        onPointerMove={handlePagerPointerMove}
+        onPointerUp={handlePagerPointerUp}
+        onPointerCancel={resetDrag}
+        onPointerLeave={resetDrag}
+      >
+        <div
+          className={
+            dragDelta !== 0
+              ? "quixscore-pages quixscore-pages--dragging"
+              : "quixscore-pages"
+          }
+          style={{
+            transform: `translateX(calc(${-currentPageIndex * 100}% + ${dragDelta}px))`,
+          }}
+        >
+          {renderDicePage()}
+          {state.players.map((player) => renderPlayerPage(player))}
+        </div>
+      </div>
+
       <QuixScoreMenuDrawer
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
@@ -624,6 +649,12 @@ export function QuixScoreScreen({
         onFullscreenToggle={toggleFullscreen}
         lang={lang}
         onLanguageChange={setLang}
+        players={menuPlayers}
+        activePageIndex={currentPageIndex}
+        onSelectPlayer={(index) => setPageIndex(index + 1)}
+        onSelectDice={() => setPageIndex(0)}
+        hideScores={hideScores}
+        onHideScoresToggle={() => setHideScores((hidden) => !hidden)}
       />
     </main>
   );

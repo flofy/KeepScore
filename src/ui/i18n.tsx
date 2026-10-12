@@ -114,6 +114,8 @@ type TranslationKey =
   | "quixScoreRerollHint"
   | "quixScoreKeepDie"
   | "quixScoreNewTurn"
+  | "quixScoreDicePage"
+  | "quixScoreSwipeHint"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -237,6 +239,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "Tap dice to keep them before rerolling; up to 3 rolls per turn.",
     quixScoreKeepDie: "Keep die",
     quixScoreNewTurn: "New turn",
+    quixScoreDicePage: "Dice",
+    quixScoreSwipeHint:
+      "Swipe to switch between the dice screen and player sheets.",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -361,6 +366,9 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "Touchez les des a conserver avant de relancer ; jusqu a 3 lancers par tour.",
     quixScoreKeepDie: "Conserver le de",
     quixScoreNewTurn: "Nouveau tour",
+    quixScoreDicePage: "Dés",
+    quixScoreSwipeHint:
+      "Balayez pour passer de l écran des dés aux feuilles de score.",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:
