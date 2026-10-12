@@ -12,11 +12,24 @@ export type QwixxDice = {
   colored: Record<QwixxColor, number>;
 };
 
+export type QwixxDieKey = "white1" | "white2" | QwixxColor;
+
+/** Dice kept for the next reroll (keep/reroll variant). */
+export type QwixxHeldDice = {
+  white1: boolean;
+  white2: boolean;
+  colored: Record<QwixxColor, boolean>;
+};
+
 export type QwixxState = {
   players: QwixxPlayer[];
   actions: QwixxAction[];
   createdAt: number;
   lastRoll?: QwixxDice | null;
+  /** Rolls already used in the current dice turn (keep/reroll variant). */
+  rollsUsed?: number;
+  /** Dice kept for the next reroll. */
+  held?: QwixxHeldDice;
 };
 
 export type QwixxSheet = {
@@ -48,6 +61,7 @@ export const MAX_PENALTIES = 4;
 export const PENALTY_SCORE = -5;
 export const MIN_MARKS_TO_LOCK = 5;
 export const ROWS_LOCKED_ENDING_GAME = 2;
+export const MAX_ROLLS_PER_TURN = 3;
 
 function emptySheet(): QwixxSheet {
   return {
@@ -222,6 +236,83 @@ export function rollQwixxDice(rng: () => number): QwixxDice {
       blue: face(),
     },
   };
+}
+
+export function emptyHeldDice(): QwixxHeldDice {
+  return {
+    white1: false,
+    white2: false,
+    colored: { red: false, yellow: false, green: false, blue: false },
+  };
+}
+
+/** First roll of a turn: rolls every die and clears the held selection. */
+export function startDiceTurn(state: QwixxState, rng: () => number): QwixxState {
+  return {
+    ...state,
+    lastRoll: rollQwixxDice(rng),
+    rollsUsed: 1,
+    held: emptyHeldDice(),
+  };
+}
+
+/** Rerolls every die that is not held. Null once the turn's rolls are used up. */
+export function rerollDice(
+  state: QwixxState,
+  rng: () => number,
+): QwixxState | null {
+  if (!state.lastRoll) return null;
+  const used = state.rollsUsed ?? 0;
+  if (used < 1 || used >= MAX_ROLLS_PER_TURN) return null;
+
+  const held = state.held ?? emptyHeldDice();
+  const fresh = rollQwixxDice(rng);
+  return {
+    ...state,
+    lastRoll: {
+      white1: held.white1 ? state.lastRoll.white1 : fresh.white1,
+      white2: held.white2 ? state.lastRoll.white2 : fresh.white2,
+      colored: {
+        red: held.colored.red ? state.lastRoll.colored.red : fresh.colored.red,
+        yellow: held.colored.yellow
+          ? state.lastRoll.colored.yellow
+          : fresh.colored.yellow,
+        green: held.colored.green
+          ? state.lastRoll.colored.green
+          : fresh.colored.green,
+        blue: held.colored.blue ? state.lastRoll.colored.blue : fresh.colored.blue,
+      },
+    },
+    rollsUsed: used + 1,
+    held,
+  };
+}
+
+/** Toggles a die between kept and rerolled for the next roll of the turn. */
+export function toggleHeldDie(state: QwixxState, die: QwixxDieKey): QwixxState {
+  if (!state.lastRoll) return state;
+  const used = state.rollsUsed ?? 0;
+  if (used < 1 || used >= MAX_ROLLS_PER_TURN) return state;
+
+  const held = state.held ?? emptyHeldDice();
+  if (die === "white1") {
+    return { ...state, held: { ...held, white1: !held.white1 } };
+  }
+  if (die === "white2") {
+    return { ...state, held: { ...held, white2: !held.white2 } };
+  }
+  return {
+    ...state,
+    held: {
+      ...held,
+      colored: { ...held.colored, [die]: !held.colored[die] },
+    },
+  };
+}
+
+/** Ends the dice turn: the next roll starts from a full set of dice. */
+export function resetDiceTurn(state: QwixxState): QwixxState {
+  return { ...state, rollsUsed: 0, held: emptyHeldDice() };
 }
 
 type QwixxDiceSums = {

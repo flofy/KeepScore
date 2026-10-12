@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_PENALTIES,
+  MAX_ROLLS_PER_TURN,
   MIN_MARKS_TO_LOCK,
   PENALTY_SCORE,
   QWIXX_COLORS,
@@ -12,11 +13,16 @@ import {
   createQwixxState,
   deriveQwixx,
   diceCombinations,
+  emptyHeldDice,
   playableValues,
   rankedScores,
+  rerollDice,
+  resetDiceTurn,
   rollQwixxDice,
   rowScore,
   sheetScore,
+  startDiceTurn,
+  toggleHeldDie,
   undoLastAction,
   type QwixxAction,
   type QwixxColor,
@@ -244,5 +250,116 @@ describe("QuixScore state", () => {
     expect(values.red).toEqual(new Set([7, 5, 8]));
     expect(values.green).toEqual(new Set([7, 3, 6]));
     expect(values.blue).toEqual(new Set([7, 6, 9]));
+  });
+});
+
+describe("QuixScore dice turns (keep/reroll variant)", () => {
+  it("starts a turn with a full roll and clears the held selection", () => {
+    const state: QwixxState = {
+      ...createQwixxState(["Alice"]),
+      rollsUsed: 0,
+      held: { ...emptyHeldDice(), white1: true },
+    };
+    const rolls = [0.1, 0.5, 0.99, 0, 0.5, 0.84];
+    let index = 0;
+    const turned = startDiceTurn(state, () => rolls[index++]);
+
+    expect(turned.lastRoll).toEqual({
+      white1: 1,
+      white2: 4,
+      colored: { red: 6, yellow: 1, green: 4, blue: 6 },
+    });
+    expect(turned.rollsUsed).toBe(1);
+    expect(turned.held).toEqual(emptyHeldDice());
+  });
+
+  it("rerolls only the dice that are not held", () => {
+    const base: QwixxState = {
+      ...createQwixxState(["Alice"]),
+      lastRoll: {
+        white1: 2,
+        white2: 5,
+        colored: { red: 3, yellow: 6, green: 1, blue: 4 },
+      },
+      rollsUsed: 1,
+      held: {
+        white1: true,
+        white2: false,
+        colored: { red: false, yellow: true, green: false, blue: false },
+      },
+    };
+    const rolls = [0.1, 0.5, 0.99, 0, 0.5, 0.84];
+    let index = 0;
+    const rerolled = rerollDice(base, () => rolls[index++]);
+
+    expect(rerolled?.rollsUsed).toBe(2);
+    expect(rerolled?.lastRoll).toEqual({
+      white1: 2,
+      white2: 4,
+      colored: { red: 6, yellow: 6, green: 4, blue: 6 },
+    });
+  });
+
+  it("refuses to reroll without a roll or once the turn is exhausted", () => {
+    const state = createQwixxState(["Alice"]);
+    expect(rerollDice(state, () => 0.5)).toBeNull();
+
+    const exhausted: QwixxState = {
+      ...state,
+      lastRoll: {
+        white1: 1,
+        white2: 1,
+        colored: { red: 1, yellow: 1, green: 1, blue: 1 },
+      },
+      rollsUsed: MAX_ROLLS_PER_TURN,
+    };
+    expect(rerollDice(exhausted, () => 0.5)).toBeNull();
+  });
+
+  it("toggles held dice only in the middle of a turn", () => {
+    const base: QwixxState = {
+      ...createQwixxState(["Alice"]),
+      lastRoll: {
+        white1: 1,
+        white2: 1,
+        colored: { red: 1, yellow: 1, green: 1, blue: 1 },
+      },
+      rollsUsed: 1,
+    };
+
+    const heldWhite = toggleHeldDie(base, "white1");
+    expect(heldWhite.held?.white1).toBe(true);
+    const heldRed = toggleHeldDie(heldWhite, "red");
+    expect(heldRed.held?.colored.red).toBe(true);
+    expect(heldRed.held?.white1).toBe(true);
+
+    const beforeRoll = toggleHeldDie({ ...base, rollsUsed: 0 }, "white1");
+    expect(beforeRoll.held).toBeUndefined();
+    const exhausted = toggleHeldDie(
+      { ...base, rollsUsed: MAX_ROLLS_PER_TURN },
+      "white1",
+    );
+    expect(exhausted.held).toBeUndefined();
+  });
+
+  it("resets the turn counter and the held dice", () => {
+    const base: QwixxState = {
+      ...createQwixxState(["Alice"]),
+      lastRoll: {
+        white1: 1,
+        white2: 1,
+        colored: { red: 1, yellow: 1, green: 1, blue: 1 },
+      },
+      rollsUsed: 2,
+      held: {
+        white1: true,
+        white2: false,
+        colored: { red: false, yellow: false, green: false, blue: false },
+      },
+    };
+    const reset = resetDiceTurn(base);
+    expect(reset.rollsUsed).toBe(0);
+    expect(reset.held).toEqual(emptyHeldDice());
+    expect(reset.lastRoll).toBe(base.lastRoll);
   });
 });
