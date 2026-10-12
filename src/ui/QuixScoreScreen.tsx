@@ -21,11 +21,16 @@ import type { QwixxColor, QwixxDerived, QwixxState } from "../domain/qwixx/qwixx
 import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import { useI18n } from "./i18n";
 import { appToast } from "./toast";
+import { QuixScoreMenuDrawer } from "./QuixScoreMenuDrawer";
+import { useFullscreen } from "./useFullscreen";
 import "./quixscore.css";
 
 type Props = {
   initialPlayerNames?: string[];
   onBack?: () => void;
+  onHome?: () => void;
+  onSavedGames?: () => void;
+  onSetup?: () => void;
 };
 
 const STORAGE_KEY = "keepscore.quixscore.v1";
@@ -64,8 +69,16 @@ function emptyPlayableValues(): Record<QwixxColor, Set<number>> {
   };
 }
 
-export function QuixScoreScreen({ initialPlayerNames, onBack }: Props) {
-  const { t } = useI18n();
+export function QuixScoreScreen({
+  initialPlayerNames,
+  onBack,
+  onHome,
+  onSavedGames,
+  onSetup,
+}: Props) {
+  const { t, lang, setLang } = useI18n();
+  const { fullscreen, toggleFullscreen } = useFullscreen();
+  const [menuOpen, setMenuOpen] = useState(false);
   const [state, setState] = useState<QwixxState | null>(() =>
     initialPlayerNames && initialPlayerNames.length > 0
       ? createQwixxState(initialPlayerNames)
@@ -295,6 +308,22 @@ export function QuixScoreScreen({ initialPlayerNames, onBack }: Props) {
           >
             {t("newGame")}
           </button>
+          <button
+            type="button"
+            className="burger-button quixscore-burger"
+            onClick={() => setMenuOpen(true)}
+            aria-label={t("menu")}
+          >
+            <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
+          </button>
         </div>
       </header>
       <p className="muted quixscore-hint">{t("quixScoreLockedHint")}</p>
@@ -521,6 +550,19 @@ export function QuixScoreScreen({ initialPlayerNames, onBack }: Props) {
           </div>
         </section>
       )}
+      <QuixScoreMenuDrawer
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        onHome={onHome}
+        onUndo={handleUndo}
+        canUndo={state.actions.length > 0}
+        onNewGame={onSetup}
+        onSavedGames={onSavedGames}
+        fullscreen={fullscreen}
+        onFullscreenToggle={toggleFullscreen}
+        lang={lang}
+        onLanguageChange={setLang}
+      />
     </main>
   );
 }

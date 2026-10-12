@@ -92,6 +92,9 @@ export function QuixScoreRoute() {
     <QuixScoreScreen
       initialPlayerNames={playerNames}
       onBack={() => navigate(-1)}
+      onHome={() => navigate("/")}
+      onSavedGames={() => navigate("/saved")}
+      onSetup={() => navigate("/setup")}
     />
   );
 }
