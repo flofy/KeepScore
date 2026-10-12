@@ -24,6 +24,7 @@ import { appToast } from "./toast";
 import "./quixscore.css";
 
 type Props = {
+  initialPlayerNames?: string[];
   onBack?: () => void;
 };
 
@@ -63,9 +64,13 @@ function emptyPlayableValues(): Record<QwixxColor, Set<number>> {
   };
 }
 
-export function QuixScoreScreen({ onBack }: Props) {
+export function QuixScoreScreen({ initialPlayerNames, onBack }: Props) {
   const { t } = useI18n();
-  const [state, setState] = useState<QwixxState | null>(loadSavedState);
+  const [state, setState] = useState<QwixxState | null>(() =>
+    initialPlayerNames && initialPlayerNames.length > 0
+      ? createQwixxState(initialPlayerNames)
+      : loadSavedState(),
+  );
   const [draftNames, setDraftNames] = useState<string[]>(() => [
     ...DEFAULT_PLAYER_NAMES,
   ]);
@@ -308,67 +313,77 @@ export function QuixScoreScreen({ onBack }: Props) {
         </div>
       )}
 
-      <section className="quixscore-dice">
-        <div className="quixscore-dice-faces">
-          {lastRoll ? (
-            <>
-              <span className="quixscore-die quixscore-die--white">
-                {lastRoll.white1}
-              </span>
-              <span className="quixscore-die quixscore-die--white">
-                {lastRoll.white2}
-              </span>
-              {QWIXX_COLORS.map((color) => (
-                <span
-                  key={color}
-                  className={
-                    derived.lockedRows[color]
-                      ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
-                      : `quixscore-die quixscore-die--${color}`
-                  }
-                >
-                  {lastRoll.colored[color]}
+      <details className="quixscore-dice-panel">
+        <summary className="quixscore-dice-summary">
+          <span className="quixscore-dice-summary-label">
+            🎲 {t("quixScoreRoll")}
+          </span>
+          <span className="quixscore-dice-chevron" aria-hidden="true">
+            ▾
+          </span>
+        </summary>
+        <section className="quixscore-dice">
+          <div className="quixscore-dice-faces">
+            {lastRoll ? (
+              <>
+                <span className="quixscore-die quixscore-die--white">
+                  {lastRoll.white1}
                 </span>
-              ))}
-            </>
-          ) : (
-            <span className="quixscore-dice-empty">
-              {t("quixScoreDiceHint")}
-            </span>
-          )}
-        </div>
-        <button
-          type="button"
-          className="quixscore-roll"
-          onClick={handleRoll}
-          disabled={finished}
-        >
-          🎲 {t("quixScoreRoll")}
-        </button>
-        {lastRoll && (
-          <div className="quixscore-dice-sums">
-            <span className="quixscore-sum quixscore-sum--white">
-              {lastRoll.white1 + lastRoll.white2}
-            </span>
-            {QWIXX_COLORS.map((color) =>
-              derived.lockedRows[color] ? null : (
-                <span key={color} className="quixscore-sum-group">
-                  {[...new Set([lastRoll.white1, lastRoll.white2])]
-                    .map((white) => lastRoll.colored[color] + white)
-                    .map((sum) => (
-                      <span
-                        key={sum}
-                        className={`quixscore-sum quixscore-sum--${color}`}
-                      >
-                        {sum}
-                      </span>
-                    ))}
+                <span className="quixscore-die quixscore-die--white">
+                  {lastRoll.white2}
                 </span>
-              ),
+                {QWIXX_COLORS.map((color) => (
+                  <span
+                    key={color}
+                    className={
+                      derived.lockedRows[color]
+                        ? `quixscore-die quixscore-die--${color} quixscore-die--locked`
+                        : `quixscore-die quixscore-die--${color}`
+                    }
+                  >
+                    {lastRoll.colored[color]}
+                  </span>
+                ))}
+              </>
+            ) : (
+              <span className="quixscore-dice-empty">
+                {t("quixScoreDiceHint")}
+              </span>
             )}
           </div>
-        )}
-      </section>
+          <button
+            type="button"
+            className="quixscore-roll"
+            onClick={handleRoll}
+            disabled={finished}
+          >
+            🎲 {t("quixScoreRoll")}
+          </button>
+          {lastRoll && (
+            <div className="quixscore-dice-sums">
+              <span className="quixscore-sum quixscore-sum--white">
+                {lastRoll.white1 + lastRoll.white2}
+              </span>
+              {QWIXX_COLORS.map((color) =>
+                derived.lockedRows[color] ? null : (
+                  <span key={color} className="quixscore-sum-group">
+                    {[...new Set([lastRoll.white1, lastRoll.white2])]
+                      .map((white) => lastRoll.colored[color] + white)
+                      .map((sum) => (
+                        <span
+                          key={sum}
+                          className={`quixscore-sum quixscore-sum--${color}`}
+                        >
+                          {sum}
+                        </span>
+                      ))}
+                  </span>
+                ),
+              )}
+            </div>
+          )}
+        </section>
+      </details>
 
       <nav className="quixscore-players" aria-label={t("players")}>
         {state.players.map((player) => {

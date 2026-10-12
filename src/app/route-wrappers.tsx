@@ -52,7 +52,6 @@ export function StartScreenRoute() {
     <StartScreen
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
-      onQuixScore={() => navigate("/quixscore")}
       onSavedGames={() => navigate("/saved")}
     />
   );
@@ -63,6 +62,12 @@ export function GameSetupRoute() {
   return (
     <GameSetup
       onCreate={(game) => {
+        if (game.presetId === "quix-score") {
+          navigate("/quixscore", {
+            state: { playerNames: game.players.map((player) => player.name) },
+          });
+          return;
+        }
         localGameRepository.save(game);
         navigate("/game?gameId=" + game.id);
       }}
@@ -78,8 +83,17 @@ export function ChwatziRoute() {
 
 export function QuixScoreRoute() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const playerNames =
+    (location.state as { playerNames?: string[] } | null)?.playerNames ??
+    undefined;
 
-  return <QuixScoreScreen onBack={() => navigate(-1)} />;
+  return (
+    <QuixScoreScreen
+      initialPlayerNames={playerNames}
+      onBack={() => navigate(-1)}
+    />
+  );
 }
 
 export function GameRoute() {

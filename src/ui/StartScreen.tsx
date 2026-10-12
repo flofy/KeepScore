@@ -4,16 +4,10 @@ import { useI18n } from "./i18n";
 type Props = {
   onNewGame: () => void;
   onChwatzi: () => void;
-  onQuixScore: () => void;
   onSavedGames: () => void;
 };
 
-export function StartScreen({
-  onNewGame,
-  onChwatzi,
-  onQuixScore,
-  onSavedGames,
-}: Props) {
+export function StartScreen({ onNewGame, onChwatzi, onSavedGames }: Props) {
   const { t } = useI18n();
 
   const handleChwatzi = useCallback(() => {
@@ -57,15 +51,6 @@ export function StartScreen({
               <span className="option-icon">🎲</span>
               <span className="option-label">{t("whoStarts")}</span>
               <span className="option-desc">{t("startChwatzi")}</span>
-            </button>
-            <button
-              type="button"
-              className="start-option-btn primary quixscore-btn"
-              onClick={onQuixScore}
-            >
-              <span className="option-icon">📝</span>
-              <span className="option-label">{t("quixScore")}</span>
-              <span className="option-desc">{t("startQuixScore")}</span>
             </button>
           </div>
 
