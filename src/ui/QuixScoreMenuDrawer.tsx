@@ -235,6 +235,20 @@ export function QuixScoreMenuDrawer({
 
           <div className="menu-separator" />
 
+          <p className="quixscore-menu-players-label">
+            {t("quixScoreHowTo")}
+          </p>
+          <ul className="quixscore-menu-help">
+            <li>{t("quixScoreSwipeHint")}</li>
+            <li>{t("quixScoreTurnRestricted")}</li>
+            <li>{t("quixScoreLockedHint")}</li>
+            {options.allowReroll && !options.physicalDice && (
+              <li>{t("quixScoreRerollHint")}</li>
+            )}
+          </ul>
+
+          <div className="menu-separator" />
+
           <InstallButton variant="menu" />
           <div className="menu-row lang-row">
             <button

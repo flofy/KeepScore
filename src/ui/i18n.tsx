@@ -124,6 +124,7 @@ type TranslationKey =
   | "quixScoreOptionPhysicalDice"
   | "quixScoreTurnRestricted"
   | "quixScoreSwipeHint"
+  | "quixScoreHowTo"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -259,6 +260,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "Everyone may cross the white dice sum once; only the active player may also cross a combo.",
     quixScoreSwipeHint:
       "Swipe left or right to change player, up or down for the dice.",
+    quixScoreHowTo: "HOW TO PLAY",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -395,6 +397,7 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
       "Chacun peut cocher la somme des dés blancs une fois ; seul le joueur actif peut aussi cocher un couple.",
     quixScoreSwipeHint:
       "Balayez à gauche ou à droite pour changer de joueur, vers le haut ou le bas pour les dés.",
+    quixScoreHowTo: "COMMENT JOUER",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:

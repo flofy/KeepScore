@@ -583,9 +583,6 @@ export function QuixScoreScreen({
               ? `🎲 ${t("quixScoreRoll")} (${rollsUsed}/${MAX_ROLLS_PER_TURN})`
               : `🎲 ${t("quixScoreRoll")}`}
         </button>
-        {lastRoll && allowReroll && (
-          <p className="quixscore-dice-turn">{t("quixScoreRerollHint")}</p>
-        )}
         {lastRoll && (
           <div className="quixscore-dice-sums">
             <span className="quixscore-sum quixscore-sum--white">
@@ -610,7 +607,6 @@ export function QuixScoreScreen({
           </div>
         )}
       </section>
-      <p className="muted quixscore-hint">{t("quixScoreLockedHint")}</p>
     </section>
   );
 
@@ -771,16 +767,6 @@ export function QuixScoreScreen({
               />
             ))}
           </div>
-          {onBack && (
-            <button
-              type="button"
-              className="quixscore-close"
-              onClick={onBack}
-              aria-label={t("close")}
-            >
-              ✕
-            </button>
-          )}
         </div>
         <div className="quixscore-turnbar">
           {activePlayer && (
@@ -797,9 +783,6 @@ export function QuixScoreScreen({
             {t("quixScoreNextTurn")} →
           </button>
         </div>
-        {!physicalDice && (
-          <p className="quixscore-swipe-hint">{t("quixScoreSwipeHint")}</p>
-        )}
 
         <div
           className="quixscore-stack"
