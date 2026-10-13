@@ -1,5 +1,6 @@
 import { InstallButton } from "./InstallButton";
 import { useI18n, type Lang } from "./i18n";
+import type { QwixxOptions } from "../domain/qwixx/qwixx";
 
 export type QuixScoreMenuPlayer = {
   id: string;
@@ -21,8 +22,12 @@ type Props = {
   onLanguageChange: (lang: Lang) => void;
   players: QuixScoreMenuPlayer[];
   activePageIndex: number;
+  turnPlayerId: string;
   onSelectPlayer: (index: number) => void;
   onSelectDice: () => void;
+  showDice: boolean;
+  options: QwixxOptions;
+  onToggleOption: (key: "allowReroll" | "physicalDice") => void;
   hideScores: boolean;
   onHideScoresToggle: () => void;
 };
@@ -41,8 +46,12 @@ export function QuixScoreMenuDrawer({
   onLanguageChange,
   players,
   activePageIndex,
+  turnPlayerId,
   onSelectPlayer,
   onSelectDice,
+  showDice,
+  options,
+  onToggleOption,
   hideScores,
   onHideScoresToggle,
 }: Props) {
@@ -81,17 +90,19 @@ export function QuixScoreMenuDrawer({
             </button>
           )}
 
-          <button
-            className="menu-item"
-            type="button"
-            onClick={() => {
-              onClose();
-              onSelectDice();
-            }}
-          >
-            <span className="menu-icon">🎲</span>
-            {t("quixScoreDicePage")}
-          </button>
+          {showDice && (
+            <button
+              className="menu-item"
+              type="button"
+              onClick={() => {
+                onClose();
+                onSelectDice();
+              }}
+            >
+              <span className="menu-icon">🎲</span>
+              {t("quixScoreDicePage")}
+            </button>
+          )}
 
           <button
             className="menu-item"
@@ -119,15 +130,19 @@ export function QuixScoreMenuDrawer({
           <div className="quixscore-menu-players">
             {players.map((player, index) => {
               const active = activePageIndex === index;
+              const isTurn = player.id === turnPlayerId;
+              const classes = [
+                "quixscore-player-chip",
+                active ? "quixscore-player-chip--active" : null,
+                isTurn ? "quixscore-player-chip--turn" : null,
+              ]
+                .filter(Boolean)
+                .join(" ");
               return (
                 <button
                   key={player.id}
                   type="button"
-                  className={
-                    active
-                      ? "quixscore-player-chip quixscore-player-chip--active"
-                      : "quixscore-player-chip"
-                  }
+                  className={classes}
                   aria-pressed={active}
                   onClick={() => {
                     onSelectPlayer(index);
@@ -135,6 +150,7 @@ export function QuixScoreMenuDrawer({
                   }}
                 >
                   <span className="quixscore-player-chip-name">
+                    {isTurn ? "🎯 " : ""}
                     {player.name}
                   </span>
                   <span className="quixscore-player-chip-score">
@@ -143,6 +159,36 @@ export function QuixScoreMenuDrawer({
                 </button>
               );
             })}
+          </div>
+
+          <div className="menu-separator" />
+
+          <p className="quixscore-menu-players-label">
+            {t("quixScoreGameOptions")}
+          </p>
+          <div className="quixscore-menu-options">
+            <button
+              className="quixscore-menu-option"
+              type="button"
+              aria-pressed={options.allowReroll}
+              onClick={() => onToggleOption("allowReroll")}
+            >
+              <span>{t("quixScoreOptionReroll")}</span>
+              <span className="quixscore-option-check">
+                {options.allowReroll ? "✓" : ""}
+              </span>
+            </button>
+            <button
+              className="quixscore-menu-option"
+              type="button"
+              aria-pressed={options.physicalDice}
+              onClick={() => onToggleOption("physicalDice")}
+            >
+              <span>{t("quixScoreOptionPhysicalDice")}</span>
+              <span className="quixscore-option-check">
+                {options.physicalDice ? "✓" : ""}
+              </span>
+            </button>
           </div>
 
           <div className="menu-separator" />

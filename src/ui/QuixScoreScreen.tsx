@@ -5,18 +5,21 @@ import {
   MAX_ROLLS_PER_TURN,
   QWIXX_COLORS,
   QWIXX_ROWS,
+  activePlayerIndex,
   applyMark,
   applyPenalty,
   canAddPenalty,
   canMark,
+  canMarkNow,
   createQwixxState,
   deriveQwixx,
   diceCombinations,
   emptyHeldDice,
+  nextTurn,
   playableValues,
+  qwixxOptions,
   rankedScores,
   rerollDice,
-  resetDiceTurn,
   rowScore,
   sheetScore,
   startDiceTurn,
@@ -27,6 +30,7 @@ import type {
   QwixxColor,
   QwixxDerived,
   QwixxDieKey,
+  QwixxOptions,
   QwixxState,
 } from "../domain/qwixx/qwixx";
 import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
@@ -81,6 +85,21 @@ function emptyPlayableValues(): Record<QwixxColor, Set<number>> {
   };
 }
 
+function useMatchMedia(query: string): boolean {
+  const [matches, setMatches] = useState(() =>
+    typeof window === "undefined" ? false : window.matchMedia(query).matches,
+  );
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const media = window.matchMedia(query);
+    const onChange = () => setMatches(media.matches);
+    onChange();
+    media.addEventListener("change", onChange);
+    return () => media.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
 export function QuixScoreScreen({
   initialPlayerNames,
   onBack,
@@ -99,16 +118,33 @@ export function QuixScoreScreen({
   const [draftNames, setDraftNames] = useState<string[]>(() => [
     ...DEFAULT_PLAYER_NAMES,
   ]);
+  const [draftOptions, setDraftOptions] = useState<QwixxOptions>({
+    allowReroll: true,
+    physicalDice: false,
+  });
   const [hideScores, setHideScores] = useState<boolean>(loadHideScores);
   const [pageIndex, setPageIndex] = useState(0);
   const [diceOpen, setDiceOpen] = useState(false);
   const [dragDelta, setDragDelta] = useState(0);
   const dragRef = useRef<{ x: number; y: number } | null>(null);
+  const portraitPhone = useMatchMedia(
+    "(orientation: portrait) and (max-width: 900px)",
+  );
+  const shortLandscape = useMatchMedia(
+    "(orientation: landscape) and (max-height: 540px)",
+  );
 
   const derived: QwixxDerived | null = useMemo(
     () => (state ? deriveQwixx(state) : null),
     [state],
   );
+
+  const options = state ? qwixxOptions(state) : null;
+  const physicalDice = options?.physicalDice ?? false;
+  const allowReroll = options?.allowReroll ?? true;
+  const inGame = state !== null && derived !== null;
+  const rotated = inGame && portraitPhone;
+  const compact = inGame && (rotated || shortLandscape);
 
   const playable = useMemo(() => {
     if (!state?.lastRoll) return emptyPlayableValues();
@@ -146,16 +182,24 @@ export function QuixScoreScreen({
     );
   }, []);
 
+  const toggleDraftOption = useCallback((key: "allowReroll" | "physicalDice") => {
+    setDraftOptions((current) =>
+      key === "allowReroll"
+        ? { ...current, allowReroll: !current.allowReroll }
+        : { ...current, physicalDice: !current.physicalDice },
+    );
+  }, []);
+
   const startGame = useCallback(() => {
     const names = draftNames
       .map((name) => name.trim())
       .filter((name) => name.length > 0);
     if (names.length === 0) return;
-    setState(createQwixxState(names));
+    setState(createQwixxState(names, draftOptions));
     setPageIndex(0);
     setDiceOpen(false);
     setDraftNames([...DEFAULT_PLAYER_NAMES]);
-  }, [draftNames]);
+  }, [draftNames, draftOptions]);
 
   const handleMark = useCallback(
     (playerId: string, color: QwixxColor, value: number) => {
@@ -164,8 +208,12 @@ export function QuixScoreScreen({
         appToast.warning(t("quixScoreInvalidMark"));
         return;
       }
+      if (!canMarkNow(state, playerId, color, value)) {
+        appToast.warning(t("quixScoreTurnRestricted"));
+        return;
+      }
       const next = applyMark(state, playerId, color, value);
-      if (next) setState(resetDiceTurn(next));
+      if (next) setState(next);
     },
     [derived, state, t],
   );
@@ -175,18 +223,44 @@ export function QuixScoreScreen({
       if (!state || !derived) return;
       if (!canAddPenalty(derived, playerId)) return;
       const next = applyPenalty(state, playerId);
-      if (next) setState(resetDiceTurn(next));
+      if (next) setState(next);
     },
     [derived, state],
   );
 
   const handleUndo = useCallback(() => {
-    setState((current) => (current ? undoLastAction(current) : current));
+    setState((current) => {
+      if (!current) return current;
+      const last = current.actions[current.actions.length - 1];
+      const next = undoLastAction(current);
+      if (
+        !last ||
+        last.type !== "mark" ||
+        !current.lastRoll ||
+        !current.turnMarks ||
+        qwixxOptions(current).physicalDice
+      ) {
+        return next;
+      }
+      const marks = { ...current.turnMarks };
+      const player = marks[last.playerId] ?? { white: false, combo: false };
+      const sums = diceCombinations(current.lastRoll);
+      if (last.value === sums.whiteSum) {
+        marks[last.playerId] =
+          player.combo && !player.white
+            ? { ...player, combo: false }
+            : { ...player, white: false };
+      } else {
+        marks[last.playerId] = { ...player, combo: false };
+      }
+      return { ...next, turnMarks: marks };
+    });
   }, []);
 
   const handleRoll = useCallback(() => {
     setState((current) => {
       if (!current || deriveQwixx(current).finished) return current;
+      if (qwixxOptions(current).physicalDice) return current;
       const used = current.rollsUsed ?? 0;
       if (!current.lastRoll || used === 0 || used >= MAX_ROLLS_PER_TURN) {
         return startDiceTurn(current, Math.random);
@@ -198,6 +272,45 @@ export function QuixScoreScreen({
   const handleToggleDie = useCallback((die: QwixxDieKey) => {
     setState((current) => (current ? toggleHeldDie(current, die) : current));
   }, []);
+
+  const handleNextTurn = useCallback(() => {
+    setState((current) => {
+      if (!current || deriveQwixx(current).finished) return current;
+      const next = nextTurn(current);
+      setPageIndex(next.activePlayerIndex ?? 0);
+      return next;
+    });
+    setDiceOpen(false);
+  }, []);
+
+  const handleToggleOption = useCallback(
+    (key: "allowReroll" | "physicalDice") => {
+      setState((current) => {
+        if (!current) return current;
+        const currentOptions = qwixxOptions(current);
+        const nextOptions =
+          key === "allowReroll"
+            ? { ...currentOptions, allowReroll: !currentOptions.allowReroll }
+            : {
+                ...currentOptions,
+                physicalDice: !currentOptions.physicalDice,
+              };
+        if (key === "physicalDice") {
+          return {
+            ...current,
+            options: nextOptions,
+            lastRoll: null,
+            rollsUsed: 0,
+            held: emptyHeldDice(),
+            turnMarks: {},
+          };
+        }
+        return { ...current, options: nextOptions };
+      });
+      if (key === "physicalDice") setDiceOpen(false);
+    },
+    [],
+  );
 
   const pageCount = state ? state.players.length : 1;
 
@@ -217,12 +330,14 @@ export function QuixScoreScreen({
     (event: ReactPointerEvent<HTMLDivElement>) => {
       const drag = dragRef.current;
       if (!drag || diceOpen) return;
-      const dx = event.clientX - drag.x;
-      const dy = event.clientY - drag.y;
+      const sdx = event.clientX - drag.x;
+      const sdy = event.clientY - drag.y;
+      const dx = rotated ? sdy : sdx;
+      const dy = rotated ? -sdx : sdy;
       if (Math.abs(dx) <= Math.abs(dy)) return;
       setDragDelta(dx);
     },
-    [diceOpen],
+    [diceOpen, rotated],
   );
 
   const handlePagerPointerUp = useCallback(
@@ -231,10 +346,14 @@ export function QuixScoreScreen({
       dragRef.current = null;
       setDragDelta(0);
       if (!drag) return;
-      const dx = event.clientX - drag.x;
-      const dy = event.clientY - drag.y;
+      const sdx = event.clientX - drag.x;
+      const sdy = event.clientY - drag.y;
+      const dx = rotated ? sdy : sdx;
+      const dy = rotated ? -sdx : sdy;
       if (Math.abs(dy) > Math.abs(dx)) {
-        if (Math.abs(dy) >= SWIPE_MIN_PX) setDiceOpen((open) => !open);
+        if (!physicalDice && Math.abs(dy) >= SWIPE_MIN_PX) {
+          setDiceOpen((open) => !open);
+        }
         return;
       }
       if (diceOpen || Math.abs(dx) < SWIPE_MIN_PX) return;
@@ -244,7 +363,7 @@ export function QuixScoreScreen({
         return Math.max(0, Math.min(maxIndex, next));
       });
     },
-    [diceOpen, pageCount],
+    [diceOpen, pageCount, physicalDice, rotated],
   );
 
   const canStart = draftNames.some((name) => name.trim().length > 0);
@@ -309,6 +428,31 @@ export function QuixScoreScreen({
           >
             {t("addPlayer")}
           </button>
+          <p className="field-kicker">{t("quixScoreGameOptions")}</p>
+          <div className="quixscore-options">
+            <button
+              type="button"
+              className="quixscore-option"
+              aria-pressed={draftOptions.allowReroll}
+              onClick={() => toggleDraftOption("allowReroll")}
+            >
+              <span>{t("quixScoreOptionReroll")}</span>
+              <span className="quixscore-option-check">
+                {draftOptions.allowReroll ? "✓" : ""}
+              </span>
+            </button>
+            <button
+              type="button"
+              className="quixscore-option"
+              aria-pressed={draftOptions.physicalDice}
+              onClick={() => toggleDraftOption("physicalDice")}
+            >
+              <span>{t("quixScoreOptionPhysicalDice")}</span>
+              <span className="quixscore-option-check">
+                {draftOptions.physicalDice ? "✓" : ""}
+              </span>
+            </button>
+          </div>
           <button
             type="button"
             className="primary-button quixscore-start"
@@ -327,7 +471,13 @@ export function QuixScoreScreen({
   const lastRoll = state.lastRoll ?? null;
   const rollsUsed = state.rollsUsed ?? 0;
   const held = state.held ?? emptyHeldDice();
-  const canHoldDice = !finished && rollsUsed > 0 && rollsUsed < MAX_ROLLS_PER_TURN;
+  const activeIndex = activePlayerIndex(state);
+  const activePlayer = state.players[activeIndex] ?? null;
+  const canHoldDice =
+    allowReroll && !finished && rollsUsed > 0 && rollsUsed < MAX_ROLLS_PER_TURN;
+  const rollBlocked =
+    finished ||
+    (rollsUsed >= 1 && (!allowReroll || rollsUsed >= MAX_ROLLS_PER_TURN));
   const ranking = rankedScores(state, derived);
   const menuPlayers: QuixScoreMenuPlayer[] = state.players.map((player) => {
     const sheet = derived.sheets[player.id];
@@ -425,15 +575,15 @@ export function QuixScoreScreen({
           type="button"
           className="quixscore-roll"
           onClick={handleRoll}
-          disabled={finished}
+          disabled={rollBlocked}
         >
-          {rollsUsed >= MAX_ROLLS_PER_TURN
-            ? `🎲 ${t("quixScoreNewTurn")}`
+          {rollBlocked && rollsUsed >= 1
+            ? `🎲 ${t("quixScoreRolled")}`
             : rollsUsed > 0
               ? `🎲 ${t("quixScoreRoll")} (${rollsUsed}/${MAX_ROLLS_PER_TURN})`
               : `🎲 ${t("quixScoreRoll")}`}
         </button>
-        {lastRoll && (
+        {lastRoll && allowReroll && (
           <p className="quixscore-dice-turn">{t("quixScoreRerollHint")}</p>
         )}
         {lastRoll && (
@@ -472,6 +622,11 @@ export function QuixScoreScreen({
         <div className="quixscore-sheet">
           <header className="quixscore-sheet-header">
             <h2 className="quixscore-player-name">{player.name}</h2>
+            {activePlayer?.id === player.id && (
+              <span className="quixscore-turn-badge quixscore-turn-badge--sheet">
+                🎯 {t("quixScoreYourTurn")}
+              </span>
+            )}
             <span className="quixscore-player-total">
               {t("quixScoreTotal")}:{" "}
               {hideScores ? "•••" : sheetScore(sheet)}
@@ -495,7 +650,7 @@ export function QuixScoreScreen({
                   const enabled =
                     !finished &&
                     !marked &&
-                    canMark(derived, player.id, color, value);
+                    canMarkNow(state, player.id, color, value);
                   const blocked =
                     !marked &&
                     lastMarkIndex >= 0 &&
@@ -576,106 +731,139 @@ export function QuixScoreScreen({
     );
   };
 
+  const viewportClasses = [
+    "quixscore-viewport",
+    rotated ? "quixscore-viewport--rotated" : null,
+    compact ? "quixscore-viewport--compact" : null,
+  ]
+    .filter(Boolean)
+    .join(" ");
+
   return (
-    <main className="quixscore-screen">
-      <div className="quixscore-gamebar">
-        <button
-          type="button"
-          className="burger-button quixscore-burger"
-          onClick={() => setMenuOpen(true)}
-          aria-label={t("menu")}
-        >
-          <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
-            <path
-              d="M4 6h16M4 12h16M4 18h16"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </svg>
-        </button>
-        <div className="quixscore-dots" aria-hidden="true">
-          {Array.from({ length: pageCount }, (_, index) => (
-            <span
-              key={index}
-              className={
-                index === currentPageIndex
-                  ? "quixscore-dot quixscore-dot--active"
-                  : "quixscore-dot"
-              }
-            />
-          ))}
-        </div>
-        {onBack && (
+    <div className={viewportClasses}>
+      <main className="quixscore-screen">
+        <div className="quixscore-gamebar">
           <button
             type="button"
-            className="quixscore-close"
-            onClick={onBack}
-            aria-label={t("close")}
+            className="burger-button quixscore-burger"
+            onClick={() => setMenuOpen(true)}
+            aria-label={t("menu")}
           >
-            ✕
+            <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 6h16M4 12h16M4 18h16"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+            </svg>
           </button>
-        )}
-      </div>
-      <p className="quixscore-swipe-hint">{t("quixScoreSwipeHint")}</p>
-
-      <div
-        className="quixscore-stack"
-        onPointerDown={handlePagerPointerDown}
-        onPointerMove={handlePagerPointerMove}
-        onPointerUp={handlePagerPointerUp}
-        onPointerCancel={resetDrag}
-        onPointerLeave={resetDrag}
-      >
-        <div className="quixscore-pager">
-          <div
-            className={
-              dragDelta !== 0
-                ? "quixscore-pages quixscore-pages--dragging"
-                : "quixscore-pages"
-            }
-            style={{
-              transform: `translateX(calc(${-currentPageIndex * 100}% + ${dragDelta}px))`,
-            }}
-          >
-            {state.players.map((player) => renderPlayerPage(player))}
+          <div className="quixscore-dots" aria-hidden="true">
+            {Array.from({ length: pageCount }, (_, index) => (
+              <span
+                key={index}
+                className={
+                  index === currentPageIndex
+                    ? "quixscore-dot quixscore-dot--active"
+                    : "quixscore-dot"
+                }
+              />
+            ))}
           </div>
+          {onBack && (
+            <button
+              type="button"
+              className="quixscore-close"
+              onClick={onBack}
+              aria-label={t("close")}
+            >
+              ✕
+            </button>
+          )}
         </div>
-        <div
-          className={
-            diceOpen
-              ? "quixscore-layer quixscore-layer--dice quixscore-layer--dice--open"
-              : "quixscore-layer quixscore-layer--dice"
-          }
-          aria-hidden={!diceOpen}
-        >
-          {renderDicePage()}
+        <div className="quixscore-turnbar">
+          {activePlayer && (
+            <span className="quixscore-turn-badge">
+              🎯 {t("quixScoreActivePlayer")}: {activePlayer.name}
+            </span>
+          )}
+          <button
+            type="button"
+            className="quixscore-roll"
+            onClick={handleNextTurn}
+            disabled={finished}
+          >
+            {t("quixScoreNextTurn")} →
+          </button>
         </div>
-      </div>
+        {!physicalDice && (
+          <p className="quixscore-swipe-hint">{t("quixScoreSwipeHint")}</p>
+        )}
 
-      <QuixScoreMenuDrawer
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        onHome={onHome}
-        onUndo={handleUndo}
-        canUndo={state.actions.length > 0}
-        onNewGame={onSetup}
-        onSavedGames={onSavedGames}
-        fullscreen={fullscreen}
-        onFullscreenToggle={toggleFullscreen}
-        lang={lang}
-        onLanguageChange={setLang}
-        players={menuPlayers}
-        activePageIndex={currentPageIndex}
-        onSelectPlayer={(index) => {
-          setPageIndex(index);
-          setDiceOpen(false);
-        }}
-        onSelectDice={() => setDiceOpen(true)}
-        hideScores={hideScores}
-        onHideScoresToggle={() => setHideScores((hidden) => !hidden)}
-      />
-    </main>
+        <div
+          className="quixscore-stack"
+          onPointerDown={handlePagerPointerDown}
+          onPointerMove={handlePagerPointerMove}
+          onPointerUp={handlePagerPointerUp}
+          onPointerCancel={resetDrag}
+          onPointerLeave={resetDrag}
+        >
+          <div className="quixscore-pager">
+            <div
+              className={
+                dragDelta !== 0
+                  ? "quixscore-pages quixscore-pages--dragging"
+                  : "quixscore-pages"
+              }
+              style={{
+                transform: `translateX(calc(${-currentPageIndex * 100}% + ${dragDelta}px))`,
+              }}
+            >
+              {state.players.map((player) => renderPlayerPage(player))}
+            </div>
+          </div>
+          {!physicalDice && (
+            <div
+              className={
+                diceOpen
+                  ? "quixscore-layer quixscore-layer--dice quixscore-layer--dice--open"
+                  : "quixscore-layer quixscore-layer--dice"
+              }
+              aria-hidden={!diceOpen}
+            >
+              {renderDicePage()}
+            </div>
+          )}
+        </div>
+
+        <QuixScoreMenuDrawer
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+          onHome={onHome}
+          onUndo={handleUndo}
+          canUndo={state.actions.length > 0}
+          onNewGame={onSetup}
+          onSavedGames={onSavedGames}
+          fullscreen={fullscreen}
+          onFullscreenToggle={toggleFullscreen}
+          lang={lang}
+          onLanguageChange={setLang}
+          players={menuPlayers}
+          activePageIndex={currentPageIndex}
+          turnPlayerId={activePlayer?.id ?? ""}
+          onSelectPlayer={(index) => {
+            setPageIndex(index);
+            setDiceOpen(false);
+          }}
+          onSelectDice={() => setDiceOpen(true)}
+          showDice={!physicalDice}
+          options={options ?? { allowReroll: true, physicalDice: false }}
+          onToggleOption={handleToggleOption}
+          hideScores={hideScores}
+          onHideScoresToggle={() => setHideScores((hidden) => !hidden)}
+        />
+      </main>
+    </div>
   );
 }

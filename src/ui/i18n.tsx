@@ -115,6 +115,14 @@ type TranslationKey =
   | "quixScoreKeepDie"
   | "quixScoreNewTurn"
   | "quixScoreDicePage"
+  | "quixScoreRolled"
+  | "quixScoreNextTurn"
+  | "quixScoreActivePlayer"
+  | "quixScoreYourTurn"
+  | "quixScoreGameOptions"
+  | "quixScoreOptionReroll"
+  | "quixScoreOptionPhysicalDice"
+  | "quixScoreTurnRestricted"
   | "quixScoreSwipeHint"
   | "or"
   | "errorTitle"
@@ -240,6 +248,15 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     quixScoreKeepDie: "Keep die",
     quixScoreNewTurn: "New turn",
     quixScoreDicePage: "Dice",
+    quixScoreRolled: "Dice rolled",
+    quixScoreNextTurn: "Next turn",
+    quixScoreActivePlayer: "Active player",
+    quixScoreYourTurn: "Your turn",
+    quixScoreGameOptions: "GAME OPTIONS",
+    quixScoreOptionReroll: "Allow rerolls",
+    quixScoreOptionPhysicalDice: "Play with real dice",
+    quixScoreTurnRestricted:
+      "Everyone may cross the white dice sum once; only the active player may also cross a combo.",
     quixScoreSwipeHint:
       "Swipe left or right to change player, up or down for the dice.",
     or: "or",
@@ -367,6 +384,15 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     quixScoreKeepDie: "Conserver le de",
     quixScoreNewTurn: "Nouveau tour",
     quixScoreDicePage: "Dés",
+    quixScoreRolled: "Dés lancés",
+    quixScoreNextTurn: "Tour suivant",
+    quixScoreActivePlayer: "Joueur actif",
+    quixScoreYourTurn: "À toi de jouer",
+    quixScoreGameOptions: "OPTIONS DE PARTIE",
+    quixScoreOptionReroll: "Autoriser les relances",
+    quixScoreOptionPhysicalDice: "Jouer avec des dés réels",
+    quixScoreTurnRestricted:
+      "Chacun peut cocher la somme des dés blancs une fois ; seul le joueur actif peut aussi cocher un couple.",
     quixScoreSwipeHint:
       "Balayez à gauche ou à droite pour changer de joueur, vers le haut ou le bas pour les dés.",
     or: "ou",

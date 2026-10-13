@@ -21,6 +21,20 @@ export type QwixxHeldDice = {
   colored: Record<QwixxColor, boolean>;
 };
 
+/** Game options, chosen at setup and adjustable mid-game from the menu. */
+export type QwixxOptions = {
+  /** Allow rerolling dice (keep/reroll variant, up to 3 rolls per turn). */
+  allowReroll: boolean;
+  /** Play beside real dice: no virtual dice, only the line rules apply. */
+  physicalDice: boolean;
+};
+
+/** Marks already consumed during the current dice turn, per player. */
+export type QwixxTurnMarks = Record<
+  string,
+  { white: boolean; combo: boolean }
+>;
+
 export type QwixxState = {
   players: QwixxPlayer[];
   actions: QwixxAction[];
@@ -30,6 +44,12 @@ export type QwixxState = {
   rollsUsed?: number;
   /** Dice kept for the next reroll. */
   held?: QwixxHeldDice;
+  /** Game options (legacy saved games have none and keep legacy behaviour). */
+  options?: QwixxOptions;
+  /** Index of the player whose turn it is. */
+  activePlayerIndex?: number;
+  /** Marks consumed during the current dice turn. */
+  turnMarks?: QwixxTurnMarks;
 };
 
 export type QwixxSheet = {
@@ -70,7 +90,10 @@ function emptySheet(): QwixxSheet {
   };
 }
 
-export function createQwixxState(playerNames: string[]): QwixxState {
+export function createQwixxState(
+  playerNames: string[],
+  options?: QwixxOptions,
+): QwixxState {
   const players: QwixxPlayer[] = playerNames.map((rawName, index) => ({
     id: crypto.randomUUID(),
     name: rawName.trim() || "Player " + (index + 1),
@@ -80,7 +103,24 @@ export function createQwixxState(playerNames: string[]): QwixxState {
     throw new Error("A QuixScore game requires at least one player");
   }
 
-  return { players, actions: [], createdAt: Date.now() };
+  return {
+    players,
+    actions: [],
+    createdAt: Date.now(),
+    ...(options ? { options, activePlayerIndex: 0, turnMarks: {} } : {}),
+  };
+}
+
+/** Options with defaults for legacy saved games without stored options. */
+export function qwixxOptions(state: QwixxState): QwixxOptions {
+  return state.options ?? { allowReroll: true, physicalDice: false };
+}
+
+/** Index of the player whose turn it is (legacy games: first player). */
+export function activePlayerIndex(state: QwixxState): number {
+  const index = state.activePlayerIndex ?? 0;
+  if (index < 0 || index >= state.players.length) return 0;
+  return index;
 }
 
 /*
@@ -160,17 +200,71 @@ export function canMark(
   return isMarkAllowed(sheet, color, value);
 }
 
+/*
+ * Turn-aware marking rules (Qwixx): every player may cross the white dice
+ * sum once; the active player may additionally cross one combo (a colored die
+ * paired with a white die on that row, or the white pair on any row).
+ * Real-dice games only enforce the line rules, and legacy games without
+ * stored options keep the fully permissive behaviour.
+ */
+export function canMarkNow(
+  state: QwixxState,
+  playerId: string,
+  color: QwixxColor,
+  value: number,
+): boolean {
+  const derived = deriveQwixx(state);
+  if (!canMark(derived, playerId, color, value)) return false;
+  if (state.options === undefined) return true;
+
+  if (qwixxOptions(state).physicalDice) return true;
+
+  const roll = state.lastRoll;
+  if (!roll) return false;
+
+  const sums = diceCombinations(roll);
+  const marks = state.turnMarks ?? {};
+  const player = marks[playerId] ?? { white: false, combo: false };
+  const active = state.players[activePlayerIndex(state)];
+  const isActive = active !== undefined && active.id === playerId;
+
+  if (value === sums.whiteSum) {
+    if (!player.white) return true;
+    return isActive && !player.combo;
+  }
+  if (!isActive) return false;
+  return !player.combo && sums.coloredSums[color].includes(value);
+}
+
 export function applyMark(
   state: QwixxState,
   playerId: string,
   color: QwixxColor,
   value: number,
 ): QwixxState | null {
-  if (!canMark(deriveQwixx(state), playerId, color, value)) return null;
-  return {
+  if (!canMarkNow(state, playerId, color, value)) return null;
+  const next: QwixxState = {
     ...state,
     actions: [...state.actions, { type: "mark", playerId, color, value }],
   };
+
+  const roll = state.lastRoll;
+  if (state.options === undefined || qwixxOptions(state).physicalDice) {
+    return next;
+  }
+  if (!roll) return next;
+
+  const sums = diceCombinations(roll);
+  const marks: QwixxTurnMarks = { ...(state.turnMarks ?? {}) };
+  const player = marks[playerId] ?? { white: false, combo: false };
+  if (value === sums.whiteSum) {
+    marks[playerId] = player.white
+      ? { ...player, combo: true }
+      : { ...player, white: true };
+  } else {
+    marks[playerId] = { ...player, combo: true };
+  }
+  return { ...next, turnMarks: marks };
 }
 
 export function canAddPenalty(derived: QwixxDerived, playerId: string) {
@@ -193,6 +287,20 @@ export function applyPenalty(
 export function undoLastAction(state: QwixxState): QwixxState {
   if (state.actions.length === 0) return state;
   return { ...state, actions: state.actions.slice(0, -1) };
+}
+
+/** Ends the turn: next player in list order, roll and marks quotas reset. */
+export function nextTurn(state: QwixxState): QwixxState {
+  const count = state.players.length;
+  const current = activePlayerIndex(state);
+  return {
+    ...state,
+    activePlayerIndex: count > 0 ? (current + 1) % count : 0,
+    lastRoll: null,
+    rollsUsed: 0,
+    held: emptyHeldDice(),
+    turnMarks: {},
+  };
 }
 
 export function rowScore(sheet: QwixxSheet, color: QwixxColor): number {
@@ -261,6 +369,7 @@ export function rerollDice(
   state: QwixxState,
   rng: () => number,
 ): QwixxState | null {
+  if (!qwixxOptions(state).allowReroll) return null;
   if (!state.lastRoll) return null;
   const used = state.rollsUsed ?? 0;
   if (used < 1 || used >= MAX_ROLLS_PER_TURN) return null;
