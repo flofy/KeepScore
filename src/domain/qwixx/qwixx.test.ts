@@ -6,15 +6,19 @@ import {
   PENALTY_SCORE,
   QWIXX_COLORS,
   ROWS_LOCKED_ENDING_GAME,
+  activePlayerIndex,
   applyMark,
   applyPenalty,
   canAddPenalty,
   canMark,
+  canMarkNow,
   createQwixxState,
   deriveQwixx,
   diceCombinations,
   emptyHeldDice,
+  nextTurn,
   playableValues,
+  qwixxOptions,
   rankedScores,
   rerollDice,
   resetDiceTurn,
@@ -28,8 +32,10 @@ import {
   type QwixxColor,
   type QwixxDerived,
   type QwixxDice,
+  type QwixxOptions,
   type QwixxSheet,
   type QwixxState,
+  type QwixxTurnMarks,
 } from "./qwixx";
 
 function sheetOf(
@@ -361,5 +367,138 @@ describe("QuixScore dice turns (keep/reroll variant)", () => {
     expect(reset.rollsUsed).toBe(0);
     expect(reset.held).toEqual(emptyHeldDice());
     expect(reset.lastRoll).toBe(base.lastRoll);
+  });
+});
+
+describe("QuixScore turn flow and options", () => {
+  const options: QwixxOptions = { allowReroll: true, physicalDice: false };
+
+  function rolledTwoPlayerState(): QwixxState {
+    // white1=1, white2=4, red=6, yellow=1, green=4, blue=6 → white sum 5.
+    const rolls = [0.1, 0.5, 0.99, 0, 0.5, 0.84];
+    let index = 0;
+    const base = createQwixxState(["Alice", "Bob"], options);
+    return startDiceTurn(base, () => rolls[index++]);
+  }
+
+  it("stores the options and the first active player at creation", () => {
+    const state = createQwixxState(["Alice", "Bob"], options);
+    expect(state.options).toEqual(options);
+    expect(state.activePlayerIndex).toBe(0);
+    expect(state.turnMarks).toEqual({});
+  });
+
+  it("falls back to default options and first player for legacy games", () => {
+    const legacy = createQwixxState(["Alice"]);
+    expect(qwixxOptions(legacy)).toEqual({
+      allowReroll: true,
+      physicalDice: false,
+    });
+    expect(activePlayerIndex(legacy)).toBe(0);
+  });
+
+  it("clamps an out-of-range active player index", () => {
+    const state = createQwixxState(["Alice", "Bob"], options);
+    const broken: QwixxState = { ...state, activePlayerIndex: 42 };
+    expect(activePlayerIndex(broken)).toBe(0);
+  });
+
+  it("keeps legacy games without options fully permissive", () => {
+    const legacy = createQwixxState(["Alice"]);
+    const playerId = legacy.players[0].id;
+    expect(canMarkNow(legacy, playerId, "red", 5)).toBe(true);
+    const marked = applyMark(legacy, playerId, "red", 5);
+    expect(marked).not.toBeNull();
+    expect(marked?.turnMarks).toBeUndefined();
+  });
+
+  it("only enforces the line rules when playing with real dice", () => {
+    const state = createQwixxState(["Alice", "Bob"], {
+      allowReroll: true,
+      physicalDice: true,
+    });
+    const bob = state.players[1].id;
+    expect(canMarkNow(state, bob, "red", 5)).toBe(true);
+    const marked = applyMark(state, bob, "red", 5);
+    expect(marked).not.toBeNull();
+    expect(marked?.turnMarks).toEqual({});
+  });
+
+  it("forbids marking before the first roll of a turn", () => {
+    const state = createQwixxState(["Alice", "Bob"], options);
+    const alice = state.players[0].id;
+    expect(canMarkNow(state, alice, "red", 5)).toBe(false);
+  });
+
+  it("offers the white sum to every player once", () => {
+    const state = rolledTwoPlayerState();
+    const alice = state.players[0].id;
+    const bob = state.players[1].id;
+    expect(canMarkNow(state, alice, "red", 5)).toBe(true);
+    expect(canMarkNow(state, bob, "green", 5)).toBe(true);
+
+    const marked = applyMark(state, alice, "red", 5) ?? state;
+    expect(canMarkNow(marked, bob, "green", 5)).toBe(true);
+    const bobMarked = applyMark(marked, bob, "green", 5) ?? marked;
+    expect(canMarkNow(bobMarked, bob, "yellow", 5)).toBe(false);
+    // The active player may still cross the white pair once as a combo.
+    expect(canMarkNow(bobMarked, alice, "green", 5)).toBe(true);
+  });
+
+  it("restricts the colored combos to the active player", () => {
+    const state = rolledTwoPlayerState();
+    const alice = state.players[0].id;
+    const bob = state.players[1].id;
+    // red=6 with white 1/4 → combos 7 and 10 on the red row.
+    expect(canMarkNow(state, alice, "red", 7)).toBe(true);
+    expect(canMarkNow(state, bob, "red", 7)).toBe(false);
+  });
+
+  it("consumes the white and combo quotas of the active player", () => {
+    const state = rolledTwoPlayerState();
+    const alice = state.players[0].id;
+    const white = applyMark(state, alice, "red", 5) ?? state;
+    const afterWhite: QwixxTurnMarks | undefined = white.turnMarks;
+    expect(afterWhite?.[alice]).toEqual({ white: true, combo: false });
+
+    expect(canMarkNow(white, alice, "green", 5)).toBe(true);
+    const combo = applyMark(white, alice, "green", 5) ?? white;
+    expect(combo.turnMarks?.[alice]).toEqual({ white: true, combo: true });
+    expect(canMarkNow(combo, alice, "yellow", 5)).toBe(false);
+    // Colored combos are exhausted too.
+    expect(canMarkNow(combo, alice, "yellow", 2)).toBe(false);
+  });
+
+  it("refuses rerolls once the option is disabled", () => {
+    const state: QwixxState = {
+      ...createQwixxState(["Alice"], {
+        allowReroll: false,
+        physicalDice: false,
+      }),
+      lastRoll: {
+        white1: 1,
+        white2: 1,
+        colored: { red: 1, yellow: 1, green: 1, blue: 1 },
+      },
+      rollsUsed: 1,
+    };
+    expect(rerollDice(state, () => 0.5)).toBeNull();
+  });
+
+  it("advances the active player and resets the turn", () => {
+    const state = rolledTwoPlayerState();
+    const alice = state.players[0].id;
+    const marked = applyMark(state, alice, "red", 5) ?? state;
+    expect(marked.turnMarks?.[alice]).toEqual({ white: true, combo: false });
+
+    const next = nextTurn(marked);
+    expect(activePlayerIndex(next)).toBe(1);
+    expect(next.lastRoll).toBeNull();
+    expect(next.rollsUsed).toBe(0);
+    expect(next.held).toEqual(emptyHeldDice());
+    expect(next.turnMarks).toEqual({});
+
+    const cycled = nextTurn(next);
+    expect(activePlayerIndex(cycled)).toBe(0);
   });
 });
