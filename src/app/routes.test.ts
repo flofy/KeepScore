@@ -12,6 +12,10 @@ describe("application routes", () => {
     expect(routes.chwatzi()).toBe("/chwatzi");
   });
 
+  it("builds QuixScore route", () => {
+    expect(routes.quixscore()).toBe("/quixscore");
+  });
+
   it("encodes game ids safely", () => {
     expect(routes.game("game/42?draft=true")).toBe(
       "/game?gameId=game%2F42%3Fdraft%3Dtrue",

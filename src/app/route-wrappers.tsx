@@ -4,6 +4,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
+import { QuixScoreScreen } from "../ui/QuixScoreScreen";
 import { SavedGames } from "../ui/SavedGames";
 import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
@@ -61,6 +62,12 @@ export function GameSetupRoute() {
   return (
     <GameSetup
       onCreate={(game) => {
+        if (game.presetId === "quix-score") {
+          navigate("/quixscore", {
+            state: { playerNames: game.players.map((player) => player.name) },
+          });
+          return;
+        }
         localGameRepository.save(game);
         navigate("/game?gameId=" + game.id);
       }}
@@ -72,6 +79,24 @@ export function ChwatziRoute() {
   const navigate = useNavigate();
 
   return <ChwatziScreenV2 onBack={() => navigate(-1)} />;
+}
+
+export function QuixScoreRoute() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const playerNames =
+    (location.state as { playerNames?: string[] } | null)?.playerNames ??
+    undefined;
+
+  return (
+    <QuixScoreScreen
+      initialPlayerNames={playerNames}
+      onBack={() => navigate(-1)}
+      onHome={() => navigate("/")}
+      onSavedGames={() => navigate("/saved")}
+      onSetup={() => navigate("/setup")}
+    />
+  );
 }
 
 export function GameRoute() {

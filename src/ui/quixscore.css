@@ -1,0 +1,810 @@
+/* QuixScore (Qwixx-style) screen */
+
+.quixscore-screen {
+  position: relative;
+  width: min(720px, 100%);
+  margin: 0 auto;
+  padding: max(20px, env(safe-area-inset-top)) 16px
+    max(40px, env(safe-area-inset-bottom));
+}
+
+.quixscore-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 14px;
+  background: rgb(15 23 42 / 88%);
+  color: #e2e8f0;
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.quixscore-close:hover {
+  background: rgb(30 41 59 / 96%);
+}
+
+/* Landscape-first: the game UI rotates to landscape when the phone is portrait */
+.quixscore-viewport {
+  position: relative;
+}
+.quixscore-viewport--rotated {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vh;
+  height: 100vw;
+  transform-origin: 0 0;
+  transform: rotate(90deg) translateY(-100%);
+  z-index: 10;
+  background: inherit;
+}
+
+.quixscore-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.quixscore-header h1 {
+  margin: 0;
+  font-size: clamp(24px, 6vw, 34px);
+}
+.quixscore-tagline {
+  margin: 0 0 16px;
+  font-size: 14px;
+}
+.quixscore-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quixscore-setup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 18px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 20px;
+  background: rgb(15 23 42 / 72%);
+}
+.quixscore-setup .field-kicker {
+  margin: 0;
+}
+.quixscore-player-list {
+  display: grid;
+  gap: 8px;
+}
+.quixscore-player-editor {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+}
+.quixscore-player-editor input {
+  min-height: 44px;
+  border: 1px solid rgb(148 163 184 / 25%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 8%);
+  color: #f8fafc;
+  padding: 0 12px;
+}
+.quixscore-player-editor input:focus {
+  outline: none;
+  border-color: #7dd3fc;
+}
+.quixscore-remove-player,
+.quixscore-add-player {
+  min-height: 44px;
+  border: 1px solid rgb(148 163 184 / 25%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 6%);
+  color: #e2e8f0;
+  font-weight: 700;
+  cursor: pointer;
+}
+.quixscore-remove-player {
+  width: 44px;
+  padding: 0;
+}
+.quixscore-add-player {
+  padding: 0 16px;
+}
+.quixscore-remove-player:disabled,
+.quixscore-add-player:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.quixscore-start {
+  margin-top: 4px;
+  width: 100%;
+}
+
+/* Game options (setup screen and burger menu) */
+.quixscore-options {
+  display: grid;
+  gap: 10px;
+}
+.quixscore-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid rgb(148 163 184 / 25%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 6%);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+.quixscore-option .quixscore-option-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex: 0 0 22px;
+  border: 1px solid rgb(148 163 184 / 45%);
+  border-radius: 7px;
+  color: #fde047;
+  font-size: 14px;
+  font-weight: 900;
+}
+.quixscore-option[aria-pressed="true"] .quixscore-option-check {
+  border-color: #fde047;
+  background: rgb(250 204 21 / 18%);
+}
+.quixscore-menu-options {
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.quixscore-menu-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 40px;
+  padding: 4px 14px;
+  border: 1px solid rgb(148 163 184 / 25%);
+  border-radius: 999px;
+  background: rgb(15 23 42 / 72%);
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.quixscore-menu-option .quixscore-option-check {
+  color: #94a3b8;
+  font-weight: 900;
+}
+.quixscore-menu-option[aria-pressed="true"] {
+  border-color: #fde047;
+  background: rgb(250 204 21 / 12%);
+}
+.quixscore-menu-option[aria-pressed="true"] .quixscore-option-check {
+  color: #fde047;
+}
+
+/* Game bar (burger, page dots) */
+.quixscore-gamebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.quixscore-dots {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.quixscore-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: rgb(148 163 184 / 40%);
+  transition: background 0.12s ease;
+}
+.quixscore-dot--active {
+  background: #fde047;
+}
+
+/* Turn bar: active player + next-turn button */
+.quixscore-turnbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.quixscore-turnbar .quixscore-roll {
+  min-height: 38px;
+  font-size: 13px;
+}
+.quixscore-turn-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 4px 12px;
+  border: 1px solid rgb(253 224 71 / 55%);
+  border-radius: 999px;
+  background: rgb(250 204 21 / 12%);
+  color: #fde047;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.quixscore-turn-badge--sheet {
+  border-color: rgb(253 224 71 / 35%);
+  background: rgb(250 204 21 / 8%);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+
+/* Full-screen swipeable pager + dice layer */
+.quixscore-stack {
+  position: relative;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+.quixscore-pager {
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
+}
+.quixscore-pages {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.22s ease;
+}
+.quixscore-pages--dragging {
+  transition: none;
+}
+.quixscore-page {
+  flex: 0 0 100%;
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.quixscore-page-title {
+  margin: 0 0 10px;
+  font-size: 18px;
+}
+.quixscore-layer--dice {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow-y: auto;
+  background: #10182e;
+  transform: translateY(100%);
+  visibility: hidden;
+  transition:
+    transform 0.25s ease,
+    visibility 0.25s;
+}
+.quixscore-layer--dice--open {
+  transform: translateY(0);
+  visibility: visible;
+}
+
+/* Dice page */
+.quixscore-page--dice .quixscore-dice {
+  flex-direction: column;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+.quixscore-page--dice .quixscore-dice-faces {
+  justify-content: center;
+}
+.quixscore-page--dice .quixscore-roll {
+  width: 100%;
+}
+.quixscore-page--dice .quixscore-dice-sums {
+  margin-left: 0;
+  justify-content: center;
+}
+
+.quixscore-dice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+}
+.quixscore-dice-faces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+.quixscore-dice-empty {
+  color: #94a3b8;
+  font-size: 13px;
+}
+.quixscore-die {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border-radius: 9px;
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.quixscore-die:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.quixscore-die:disabled {
+  cursor: default;
+}
+.quixscore-die--white {
+  border: 1px solid rgb(248 250 252 / 60%);
+  background: #f8fafc;
+  color: #0b1020;
+}
+.quixscore-die--red {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: #dc2626;
+  color: #fff;
+}
+.quixscore-die--yellow {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: #d97706;
+  color: #fff;
+}
+.quixscore-die--green {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: #16a34a;
+  color: #fff;
+}
+.quixscore-die--blue {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: #2563eb;
+  color: #fff;
+}
+.quixscore-die--locked {
+  opacity: 0.35;
+  text-decoration: line-through;
+}
+.quixscore-die--held {
+  outline: 2px solid #fde047;
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgb(253 224 71 / 30%);
+}
+
+.quixscore-roll {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid rgb(250 204 21 / 45%);
+  border-radius: 12px;
+  background: rgb(250 204 21 / 14%);
+  color: #fde047;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.quixscore-roll:hover:not(:disabled) {
+  background: rgb(250 204 21 / 24%);
+}
+.quixscore-roll:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.quixscore-roll:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.quixscore-dice-sums {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+.quixscore-sum-group {
+  display: flex;
+  gap: 4px;
+}
+.quixscore-sum {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  height: 30px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 800;
+}
+.quixscore-sum--white {
+  border: 1px solid rgb(248 250 252 / 60%);
+  background: #f8fafc;
+  color: #0b1020;
+}
+.quixscore-sum--red {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: rgb(220 38 38 / 85%);
+  color: #fff;
+}
+.quixscore-sum--yellow {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: rgb(217 119 6 / 85%);
+  color: #fff;
+}
+.quixscore-sum--green {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: rgb(22 163 74 / 85%);
+  color: #fff;
+}
+.quixscore-sum--blue {
+  border: 1px solid rgb(255 255 255 / 30%);
+  background: rgb(37 99 235 / 85%);
+  color: #fff;
+}
+
+/* Player chips (burger menu list) */
+.quixscore-menu-players-label {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+.quixscore-menu-players {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+.quixscore-menu-help {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.quixscore-menu-help li {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.quixscore-player-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-height: 48px;
+  padding: 6px 14px;
+  border: 1px solid rgb(148 163 184 / 25%);
+  border-radius: 14px;
+  background: rgb(15 23 42 / 72%);
+  color: #e2e8f0;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.quixscore-player-chip:hover {
+  border-color: rgb(148 163 184 / 50%);
+}
+.quixscore-player-chip--active {
+  border-color: #7dd3fc;
+  background: rgb(125 211 252 / 12%);
+}
+.quixscore-player-chip--turn {
+  border-color: #fde047;
+  background: rgb(250 204 21 / 12%);
+}
+.quixscore-player-chip-name {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+}
+.quixscore-player-chip-score {
+  color: #7dd3fc;
+  font-size: 12px;
+  font-weight: 800;
+}
+.quixscore-player-chip--active .quixscore-player-chip-score,
+.quixscore-player-chip--turn .quixscore-player-chip-score {
+  color: #fde047;
+}
+
+.quixscore-banner {
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid rgb(74 222 128 / 40%);
+  border-radius: 18px;
+  background: rgb(74 222 128 / 10%);
+}
+.quixscore-ranking {
+  margin: 8px 0 0;
+  padding-left: 20px;
+  display: grid;
+  gap: 4px;
+  font-weight: 700;
+}
+
+.quixscore-sheet {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 18px;
+  padding: 14px;
+  border: 1px solid rgb(148 163 184 / 22%);
+  border-radius: 20px;
+  background: rgb(15 23 42 / 72%);
+}
+.quixscore-sheet-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.quixscore-sheet-header h2 {
+  margin: 0;
+  font-size: 18px;
+}
+.quixscore-player-total {
+  color: #7dd3fc;
+  font-weight: 800;
+}
+
+.quixscore-row {
+  display: grid;
+  grid-template-columns: repeat(11, minmax(0, 1fr)) auto auto;
+  align-items: stretch;
+  gap: 4px;
+  margin-bottom: 6px;
+  padding: 5px;
+  border-radius: 12px;
+  flex: 1;
+  min-height: 0;
+}
+.quixscore-row--red {
+  background: rgb(239 68 68 / 30%);
+}
+.quixscore-row--yellow {
+  background: rgb(245 158 11 / 30%);
+}
+.quixscore-row--green {
+  background: rgb(34 197 94 / 30%);
+}
+.quixscore-row--blue {
+  background: rgb(59 130 246 / 30%);
+}
+.quixscore-row--locked {
+  opacity: 0.65;
+}
+
+.quixscore-cell {
+  min-width: 0;
+  min-height: clamp(34px, 8.5vw, 44px);
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 8px;
+  background: rgb(10 14 28 / 45%);
+  color: #f8fafc;
+  font-weight: 800;
+  font-size: clamp(12px, 3.2vw, 15px);
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background 0.12s ease,
+    transform 0.08s ease;
+}
+.quixscore-cell:hover:not(:disabled) {
+  background: rgb(255 255 255 / 25%);
+}
+.quixscore-cell:active:not(:disabled) {
+  transform: scale(0.92);
+}
+.quixscore-cell:disabled {
+  cursor: default;
+}
+.quixscore-cell--blocked {
+  opacity: 0.35;
+}
+.quixscore-cell--last {
+  border-style: dashed;
+}
+.quixscore-cell--marked {
+  background: #f1f5f9;
+  border-color: #f1f5f9;
+  color: #0b1020;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 1;
+}
+.quixscore-cell--hot {
+  border-color: #fde047;
+  box-shadow: 0 0 0 2px rgb(253 224 71 / 45%);
+}
+
+.quixscore-row-lock {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  font-size: 15px;
+}
+.quixscore-row-score {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: 34px;
+  padding-left: 2px;
+  color: #f8fafc;
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.quixscore-penalties {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgb(148 163 184 / 8%);
+}
+.quixscore-penalties-label {
+  color: #fca5a5;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.quixscore-penalty-cells {
+  display: flex;
+  gap: 6px;
+}
+.quixscore-penalty {
+  min-width: 44px;
+  min-height: 34px;
+  border: 1px dashed rgb(248 113 113 / 55%);
+  border-radius: 8px;
+  background: transparent;
+  color: #fca5a5;
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+}
+.quixscore-penalty:hover:not(:disabled) {
+  background: rgb(248 113 113 / 15%);
+}
+.quixscore-penalty:disabled {
+  cursor: default;
+}
+.quixscore-penalty--crossed {
+  border-style: solid;
+  background: rgb(248 113 113 / 28%);
+  color: #fecaca;
+}
+
+@media (max-width: 480px) {
+  .quixscore-row-score {
+    font-size: 11px;
+  }
+  .quixscore-penalty {
+    min-width: 38px;
+  }
+  .quixscore-dice-sums {
+    margin-left: 0;
+    width: 100%;
+  }
+  .quixscore-die {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+}
+
+/*
+ * Compact layout, applied by JS whenever the game UI is landscape
+ * (naturally, or because the UI is rotated on a portrait phone).
+ */
+.quixscore-viewport--compact .quixscore-screen {
+  padding-top: 8px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+.quixscore-viewport--compact .quixscore-sheet {
+  padding: 10px;
+  margin-bottom: 0;
+}
+.quixscore-viewport--compact .quixscore-sheet-header {
+  margin-bottom: 6px;
+}
+.quixscore-viewport--compact .quixscore-row {
+  gap: 3px;
+  margin-bottom: 4px;
+  padding: 4px;
+}
+.quixscore-viewport--compact .quixscore-cell {
+  min-height: clamp(22px, 6vh, 36px);
+  font-size: clamp(11px, 1.6vw, 14px);
+}
+.quixscore-viewport--compact .quixscore-penalties {
+  margin-top: 6px;
+  padding: 6px 8px;
+}
+.quixscore-viewport--compact .quixscore-penalty {
+  min-height: 28px;
+}
+.quixscore-viewport--compact .quixscore-page--dice .quixscore-dice {
+  align-items: center;
+}
+.quixscore-viewport--compact .quixscore-page--dice .quixscore-roll {
+  width: auto;
+  min-width: 240px;
+}
+
+/*
+ * Fill the screen: drop the 720px cap and stretch the sheet to the full
+ * height (rotated portrait phones and short native landscape screens).
+ */
+.quixscore-viewport--rotated {
+  display: flex;
+}
+.quixscore-viewport--rotated .quixscore-screen {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.quixscore-viewport--compact:not(.quixscore-viewport--rotated) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.quixscore-viewport--compact:not(.quixscore-viewport--rotated)
+  .quixscore-screen {
+  box-sizing: border-box;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.quixscore-viewport--rotated .quixscore-stack,
+.quixscore-viewport--compact:not(.quixscore-viewport--rotated)
+  .quixscore-stack {
+  flex: 1;
+  min-height: 0;
+}

@@ -97,6 +97,34 @@ type TranslationKey =
   | "tryAgain"
   | "startNewGame"
   | "startChwatzi"
+  | "quixScoreTagline"
+  | "quixScorePenalties"
+  | "quixScoreAddPenalty"
+  | "quixScoreTotal"
+  | "quixScoreLocked"
+  | "quixScoreGameOver"
+  | "quixScoreWinner"
+  | "quixScoreHideScores"
+  | "quixScoreShowScores"
+  | "quixScoreCrossOff"
+  | "quixScoreInvalidMark"
+  | "quixScoreLockedHint"
+  | "quixScoreRoll"
+  | "quixScoreDiceHint"
+  | "quixScoreRerollHint"
+  | "quixScoreKeepDie"
+  | "quixScoreNewTurn"
+  | "quixScoreDicePage"
+  | "quixScoreRolled"
+  | "quixScoreNextTurn"
+  | "quixScoreActivePlayer"
+  | "quixScoreYourTurn"
+  | "quixScoreGameOptions"
+  | "quixScoreOptionReroll"
+  | "quixScoreOptionPhysicalDice"
+  | "quixScoreTurnRestricted"
+  | "quixScoreSwipeHint"
+  | "quixScoreHowTo"
   | "or"
   | "errorTitle"
   | "errorMessage"
@@ -199,6 +227,40 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Try again",
     startNewGame: "Start a new game",
     startChwatzi: "Pick a random starter",
+    quixScoreTagline:
+      "Cross off numbers, lock rows and dodge -5 penalties.",
+    quixScorePenalties: "PENALTIES (-5)",
+    quixScoreAddPenalty: "Add a penalty to",
+    quixScoreTotal: "Total",
+    quixScoreLocked: "Row locked",
+    quixScoreGameOver: "Game over",
+    quixScoreWinner: "Winner",
+    quixScoreHideScores: "Hide scores",
+    quixScoreShowScores: "Show scores",
+    quixScoreCrossOff: "Cross off",
+    quixScoreInvalidMark:
+      "You can only cross off numbers to the right of your last cross; the last number of a row needs 5 crosses first.",
+    quixScoreLockedHint:
+      "A row locks for everyone once its last number is crossed; crossing the last number requires 5 crosses in that row.",
+    quixScoreRoll: "Roll the dice",
+    quixScoreDiceHint: "Roll the dice to reveal the playable numbers.",
+    quixScoreRerollHint:
+      "Tap dice to keep them before rerolling; up to 3 rolls per turn.",
+    quixScoreKeepDie: "Keep die",
+    quixScoreNewTurn: "New turn",
+    quixScoreDicePage: "Dice",
+    quixScoreRolled: "Dice rolled",
+    quixScoreNextTurn: "Next turn",
+    quixScoreActivePlayer: "Active player",
+    quixScoreYourTurn: "Your turn",
+    quixScoreGameOptions: "GAME OPTIONS",
+    quixScoreOptionReroll: "Allow rerolls",
+    quixScoreOptionPhysicalDice: "Play with real dice",
+    quixScoreTurnRestricted:
+      "Everyone may cross the white dice sum once; only the active player may also cross a combo.",
+    quixScoreSwipeHint:
+      "Swipe left or right to change player, up or down for the dice.",
+    quixScoreHowTo: "HOW TO PLAY",
     or: "or",
     errorTitle: "Something went wrong",
     errorMessage:
@@ -302,6 +364,40 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     tryAgain: "Reessayer",
     startNewGame: "Demarrer une nouvelle partie",
     startChwatzi: "Lancer Chwatzi",
+    quixScoreTagline:
+      "Cochez des nombres, fermez des lignes et evitez les penalites de -5.",
+    quixScorePenalties: "PENALITES (-5)",
+    quixScoreAddPenalty: "Ajouter une penalite a",
+    quixScoreTotal: "Total",
+    quixScoreLocked: "Ligne fermee",
+    quixScoreGameOver: "Partie terminee",
+    quixScoreWinner: "Vainqueur",
+    quixScoreHideScores: "Masquer les scores",
+    quixScoreShowScores: "Afficher les scores",
+    quixScoreCrossOff: "Cochez",
+    quixScoreInvalidMark:
+      "On ne peut cocher qu a droite de la derniere croix ; le dernier nombre d une ligne demande 5 croix au prealable.",
+    quixScoreLockedHint:
+      "Une ligne se ferme pour tous les joueurs des que son dernier nombre est coche ; cocher le dernier nombre demande 5 croix dans la ligne.",
+    quixScoreRoll: "Lancer les des",
+    quixScoreDiceHint: "Lancez les des pour voir les nombres jouables.",
+    quixScoreRerollHint:
+      "Touchez les des a conserver avant de relancer ; jusqu a 3 lancers par tour.",
+    quixScoreKeepDie: "Conserver le de",
+    quixScoreNewTurn: "Nouveau tour",
+    quixScoreDicePage: "Dés",
+    quixScoreRolled: "Dés lancés",
+    quixScoreNextTurn: "Tour suivant",
+    quixScoreActivePlayer: "Joueur actif",
+    quixScoreYourTurn: "À toi de jouer",
+    quixScoreGameOptions: "OPTIONS DE PARTIE",
+    quixScoreOptionReroll: "Autoriser les relances",
+    quixScoreOptionPhysicalDice: "Jouer avec des dés réels",
+    quixScoreTurnRestricted:
+      "Chacun peut cocher la somme des dés blancs une fois ; seul le joueur actif peut aussi cocher un couple.",
+    quixScoreSwipeHint:
+      "Balayez à gauche ou à droite pour changer de joueur, vers le haut ou le bas pour les dés.",
+    quixScoreHowTo: "COMMENT JOUER",
     or: "ou",
     errorTitle: "Une erreur est survenue",
     errorMessage:
