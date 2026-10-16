@@ -12,7 +12,14 @@ export function UpdateButton() {
   const [updateAvailable, setLocalUpdateAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
 
-  useEffect(() => subscribeToUpdateAvailable(setLocalUpdateAvailable), []);
+  useEffect(() => {
+    const unsubscribeUpdate = subscribeToUpdateAvailable(
+      setLocalUpdateAvailable,
+    );
+    return () => {
+      unsubscribeUpdate();
+    };
+  }, []);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
