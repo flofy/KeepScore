@@ -28,6 +28,44 @@
   pointer-events: none;
 }
 
+.chwatzi-v2-finger-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112px;
+  height: 112px;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.chwatzi-v2-finger-ring circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 320.44;
+  stroke-dashoffset: 320.44;
+  transform: rotate(-90deg);
+  transform-origin: 56px 56px;
+}
+
+.chwatzi-v2-finger--settling .chwatzi-v2-finger-ring circle {
+  animation: chwatzi-finger-ring-build 2s linear forwards;
+}
+
+@keyframes chwatzi-finger-ring-build {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chwatzi-v2-finger--settling .chwatzi-v2-finger-ring circle {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
 .chwatzi-v2-finger--selected {
   z-index: 35;
 }
