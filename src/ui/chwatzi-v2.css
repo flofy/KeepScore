@@ -189,7 +189,13 @@
 }
 
 /* Keep the close control in the top-right corner in fullscreen and installed PWAs too. */
-html:fullscreen .chwatzi-v2-close,
+html:fullscreen .chwatzi-v2-close {
+  top: calc(18px + env(safe-area-inset-top));
+  right: 18px;
+  left: auto;
+  transform: none;
+}
+
 @media (display-mode: fullscreen) {
   .chwatzi-v2-close {
     top: calc(18px + env(safe-area-inset-top));
