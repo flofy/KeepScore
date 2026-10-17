@@ -170,6 +170,7 @@
   position: absolute;
   top: calc(18px + env(safe-area-inset-top));
   right: 18px;
+  left: auto;
   z-index: 60;
   width: 44px;
   height: 44px;
@@ -187,21 +188,19 @@
   color: #f8fafc;
 }
 
-/* In fullscreen / installed-PWA fullscreen, recenter the controls around the middle of the screen. */
+/* Keep the close control in the top-right corner in fullscreen and installed PWAs too. */
 html:fullscreen .chwatzi-v2-close {
-  top: auto;
-  right: auto;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: calc(18px + env(safe-area-inset-top));
+  right: 18px;
+  left: auto;
+  transform: none;
 }
 
 @media (display-mode: fullscreen) {
   .chwatzi-v2-close {
-    top: auto;
-    right: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: calc(18px + env(safe-area-inset-top));
+    right: 18px;
+    left: auto;
+    transform: none;
   }
 }
