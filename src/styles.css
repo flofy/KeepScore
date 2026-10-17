@@ -619,6 +619,22 @@ h2 {
 .icon-fab:active {
   transform: scale(0.93);
 }
+.burger-button {
+  position: relative;
+}
+.burger-button.status-dot::after {
+  content: "";
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid rgb(15 23 42);
+  border-radius: 50%;
+  background: #fbbf24;
+  box-shadow: 0 0 8px rgb(251 191 36 / 55%);
+  pointer-events: none;
+}
 .fab-icon,
 .burger-icon,
 .lang-flag svg {

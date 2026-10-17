@@ -1,5 +1,8 @@
+import { useEffect, useState } from "react";
 import { InstallButton } from "../../ui/InstallButton";
 import { useI18n } from "../../ui/i18n";
+import { subscribeToInstallPrompt } from "../../ui/installPrompt";
+import { subscribeToUpdateAvailable } from "../../ui/updateAvailable";
 import type { Game } from "../../domain/game/types";
 
 type Props = {
@@ -23,6 +26,19 @@ export function GameToolbar({
 }: Props) {
   const { t } = useI18n();
   const isDuo = game.players.length === 2;
+  const [installReady, setInstallReady] = useState(false);
+  const [updateReady, setUpdateReady] = useState(false);
+
+  useEffect(() => {
+    const unsubscribeInstall = subscribeToInstallPrompt((event) =>
+      setInstallReady(event !== null),
+    );
+    const unsubscribeUpdate = subscribeToUpdateAvailable(setUpdateReady);
+    return () => {
+      unsubscribeInstall();
+      unsubscribeUpdate();
+    };
+  }, []);
 
   return (
     <>
@@ -91,7 +107,11 @@ export function GameToolbar({
               )}
             </button>
             <button
-              className="burger-button"
+              className={
+                installReady || updateReady
+                  ? "burger-button status-dot"
+                  : "burger-button"
+              }
               type="button"
               onClick={onMenuOpen}
               aria-label={t("menu")}

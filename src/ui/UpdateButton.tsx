@@ -1,12 +1,25 @@
 import { useEffect, useState } from "react";
 import { useI18n } from "./i18n";
+import {
+  setUpdateAvailable,
+  subscribeToUpdateAvailable,
+} from "./updateAvailable";
 
 export function UpdateButton() {
   const { t } = useI18n();
   const [registration, setRegistration] =
     useState<ServiceWorkerRegistration | null>(null);
-  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [updateAvailable, setLocalUpdateAvailable] = useState(false);
   const [updating, setUpdating] = useState(false);
+
+  useEffect(() => {
+    const unsubscribeUpdate = subscribeToUpdateAvailable(
+      setLocalUpdateAvailable,
+    );
+    return () => {
+      unsubscribeUpdate();
+    };
+  }, []);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator)) return;
