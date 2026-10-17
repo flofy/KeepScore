@@ -28,6 +28,44 @@
   pointer-events: none;
 }
 
+.chwatzi-v2-finger-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 112px;
+  height: 112px;
+  overflow: visible;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.chwatzi-v2-finger-ring circle {
+  fill: none;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 320.44;
+  stroke-dashoffset: 320.44;
+  transform: rotate(-90deg);
+  transform-origin: 56px 56px;
+}
+
+.chwatzi-v2-finger--settling .chwatzi-v2-finger-ring circle {
+  animation: chwatzi-finger-ring-build 2s linear forwards;
+}
+
+@keyframes chwatzi-finger-ring-build {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chwatzi-v2-finger--settling .chwatzi-v2-finger-ring circle {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
 .chwatzi-v2-finger--selected {
   z-index: 35;
 }
@@ -170,6 +208,7 @@
   position: absolute;
   top: calc(18px + env(safe-area-inset-top));
   right: 18px;
+  left: auto;
   z-index: 60;
   width: 44px;
   height: 44px;
@@ -187,21 +226,19 @@
   color: #f8fafc;
 }
 
-/* In fullscreen / installed-PWA fullscreen, recenter the controls around the middle of the screen. */
+/* Keep the close control in the top-right corner in fullscreen and installed PWAs too. */
 html:fullscreen .chwatzi-v2-close {
-  top: auto;
-  right: auto;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  top: calc(18px + env(safe-area-inset-top));
+  right: 18px;
+  left: auto;
+  transform: none;
 }
 
 @media (display-mode: fullscreen) {
   .chwatzi-v2-close {
-    top: auto;
-    right: auto;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
+    top: calc(18px + env(safe-area-inset-top));
+    right: 18px;
+    left: auto;
+    transform: none;
   }
 }

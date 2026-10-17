@@ -24,6 +24,8 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(false);
+  const [isSettling, setIsSettling] = useState(false);
+  const [settleCycle, setSettleCycle] = useState(0);
   const fingersRef = useRef<Finger[]>([]);
   const fingerColorsRef = useRef(new Map<number, string>());
   const selectedFingerRef = useRef<Finger | null>(null);
@@ -87,6 +89,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
       countdownTimerRef.current = null;
     }
 
+    setIsSettling(false);
     setPhase("counting");
     setCountdown(3);
     let remaining = 3;
@@ -144,8 +147,11 @@ export function ChwatziScreenV2({ onBack }: Props) {
 
     setPhase("idle");
     setCountdown(3);
+    setSettleCycle((cycle) => cycle + 1);
+    setIsSettling(true);
     settleTimerRef.current = window.setTimeout(() => {
       settleTimerRef.current = null;
+      setIsSettling(false);
       startCountdown();
     }, FINGER_SETTLE_MS);
   }, [startCountdown]);
@@ -156,6 +162,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
     fingerColorsRef.current.clear();
     selectedFingerRef.current = null;
     setFingers([]);
+    setIsSettling(false);
     setPhase("idle");
     setCountdown(3);
     setSelectedFingerId(null);
@@ -228,6 +235,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
           window.clearInterval(countdownTimerRef.current);
           countdownTimerRef.current = null;
         }
+        setIsSettling(false);
         setCountdown(3);
         setPhase("idle");
       }
@@ -293,10 +301,19 @@ export function ChwatziScreenV2({ onBack }: Props) {
           fingers.map((finger) => {
             const isSelected = finger.pointerId === selectedFingerId;
             if (phase === "wiping" && !isSelected) return null;
+            const fingerClassName = [
+              "chwatzi-v2-finger",
+              isSelected && "chwatzi-v2-finger--selected",
+              isSettling &&
+                fingers.length >= 2 &&
+                "chwatzi-v2-finger--settling",
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <div
                 key={finger.pointerId}
-                className={`chwatzi-v2-finger${isSelected ? " chwatzi-v2-finger--selected" : ""}`}
+                className={fingerClassName}
                 style={{
                   left: finger.x,
                   top: finger.y,
@@ -304,7 +321,23 @@ export function ChwatziScreenV2({ onBack }: Props) {
                   borderColor: finger.color,
                 }}
                 aria-hidden="true"
-              />
+              >
+                {isSettling && fingers.length >= 2 && (
+                  <svg
+                    key={settleCycle}
+                    className="chwatzi-v2-finger-ring"
+                    viewBox="0 0 112 112"
+                    aria-hidden="true"
+                  >
+                    <circle
+                      cx="56"
+                      cy="56"
+                      r="51"
+                      stroke={finger.color}
+                    />
+                  </svg>
+                )}
+              </div>
             );
           })}
         {phase === "wiping" && selectedColor && (

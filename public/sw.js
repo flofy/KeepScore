@@ -1,4 +1,5 @@
 const CACHE = "keepscore-__BUILD_ID__";
+const CACHE_PREFIX = "keepscore-";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -33,7 +34,9 @@ self.addEventListener("activate", (event) => {
       .keys()
       .then((keys) =>
         Promise.all(
-          keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)),
+          keys
+            .filter((key) => key.startsWith(CACHE_PREFIX) && key !== CACHE)
+            .map((key) => caches.delete(key)),
         ),
       )
       .then(() => self.clients.claim()),
