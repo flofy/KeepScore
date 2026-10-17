@@ -301,10 +301,19 @@ export function ChwatziScreenV2({ onBack }: Props) {
           fingers.map((finger) => {
             const isSelected = finger.pointerId === selectedFingerId;
             if (phase === "wiping" && !isSelected) return null;
+            const fingerClassName = [
+              "chwatzi-v2-finger",
+              isSelected && "chwatzi-v2-finger--selected",
+              isSettling &&
+                fingers.length >= 2 &&
+                "chwatzi-v2-finger--settling",
+            ]
+              .filter(Boolean)
+              .join(" ");
             return (
               <div
                 key={finger.pointerId}
-                className={`chwatzi-v2-finger${isSelected ? " chwatzi-v2-finger--selected" : ""}${isSettling && fingers.length >= 2 ? " chwatzi-v2-finger--settling" : ""}`}
+                className={fingerClassName}
                 style={{
                   left: finger.x,
                   top: finger.y,
