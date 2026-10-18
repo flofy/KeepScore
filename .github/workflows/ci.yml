@@ -5,6 +5,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   changes:
     name: Detect changes
@@ -32,25 +35,11 @@ jobs:
     name: React quality
     needs: changes
     if: needs.changes.outputs.react == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v6
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: "pnpm"
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run Knip (unused code and circular dependencies)
-        run: pnpm run knip
-
-      - name: Run tests with coverage
-        run: pnpm run test:coverage
+    uses: flofy/pwa-kit/.github/workflows/quality-checks.yml@301fdeae8ca5ba4e0acc4114e901433336489286
+    with:
+      node-version: "24"
+      pnpm-version: "10.15.1"
+      install-command: pnpm install --frozen-lockfile
+      checks-command: |
+        pnpm run knip
+        pnpm run test:coverage
