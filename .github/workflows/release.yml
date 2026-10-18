@@ -28,6 +28,8 @@ jobs:
       asset-path: assets
       generate-capacitor-assets: true
       gradle-task: assembleRelease
+      android-version-code: ${{ github.run_number }}
+      android-version-name: ${{ inputs.version }}
       apk-path: app/build/outputs/apk/release/app-release.apk
       artifact-name: keepscore-capacitor-release-apk
       release-tag: ${{ inputs.version }}
