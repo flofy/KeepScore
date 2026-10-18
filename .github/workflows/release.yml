@@ -14,7 +14,7 @@ permissions:
 jobs:
   release:
     name: Build and publish signed Android release
-    uses: flofy/pwa-kit/.github/workflows/android-apk.yml@feat/reusable-android-workflows
+    uses: flofy/pwa-kit/.github/workflows/android-apk.yml@6b42e1254019e451a7cb829e0efb8b5063eb4b5b
     with:
       checkout-ref: ${{ inputs.version }}
       capacitor-directory: capacitor
