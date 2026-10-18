@@ -20,6 +20,7 @@ jobs:
       capacitor-directory: capacitor
       android-directory: capacitor/android
       install-command: pnpm install --frozen-lockfile
+      pnpm-version: 10.15.1
       web-build-command: pnpm run build
       native-assets-command: |
         npm install --prefix .asset-tools sharp --no-package-lock --no-audit --no-fund
