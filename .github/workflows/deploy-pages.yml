@@ -10,10 +10,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: false
-
 jobs:
   changes:
     name: Detect web changes
@@ -38,22 +34,10 @@ jobs:
   deploy:
     needs: changes
     if: needs.changes.outputs.react == 'true'
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v6
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 24
-          cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run build
-      - uses: actions/configure-pages@v6
-      - uses: actions/upload-pages-artifact@v4
-        with:
-          path: dist
-      - id: deployment
-        uses: actions/deploy-pages@v5
+    uses: flofy/pwa-kit/.github/workflows/deploy-pages.yml@301fdeae8ca5ba4e0acc4114e901433336489286
+    with:
+      node-version: "24"
+      pnpm-version: "10.15.1"
+      install-command: pnpm install --frozen-lockfile
+      build-command: pnpm run build
+      artifact-path: dist
