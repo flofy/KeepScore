@@ -37,16 +37,9 @@ jobs:
             -f "ref=refs/tags/${VERSION}" \
             -f "sha=${GITHUB_SHA}"
 
-  android-build:
-    name: Build Capacitor Android APK
-    needs: create-tag
-    uses: ./.github/workflows/android-capacitor.yml
-    with:
-      ref: ${{ inputs.version }}
-
   release:
-    name: Publish release
-    needs: android-build
+    name: Publish signed Android release
+    needs: create-tag
     uses: ./.github/workflows/release.yml
     with:
       version: ${{ inputs.version }}
