@@ -9,54 +9,30 @@ on:
         type: string
 
 permissions:
-  actions: read
   contents: write
+  pull-requests: write
 
 jobs:
   release:
-    name: Publish Capacitor release
-    runs-on: ubuntu-latest
-    steps:
-      - name: Verify release tag
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
-        run: |
-          sha="$(gh api "repos/${GITHUB_REPOSITORY}/git/ref/tags/${VERSION}" --jq '.object.sha')"
-          test -n "$sha"
-          echo "Release tag ${VERSION} points to ${sha}"
-
-      - name: Find Capacitor APK artifact
-        id: artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ github.run_id }}
-        run: |
-          artifact_id="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/artifacts" \
-            --jq '.artifacts[] | select(.name == "keepscore-capacitor-debug-apk" and .expired == false) | .id' | head -n 1)"
-          test -n "$artifact_id"
-          echo "id=$artifact_id" >> "$GITHUB_OUTPUT"
-
-      - name: Download Capacitor APK artifact
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ARTIFACT_ID: ${{ steps.artifact.outputs.id }}
-          VERSION: ${{ inputs.version }}
-        run: |
-          mkdir -p dist
-          gh api "repos/${GITHUB_REPOSITORY}/actions/artifacts/${ARTIFACT_ID}/zip" > /tmp/apk.zip
-          unzip -o /tmp/apk.zip -d dist
-          apk="$(find dist -maxdepth 1 -type f -name '*.apk' -print -quit)"
-          test -n "$apk"
-          mv "$apk" "dist/KeepScore-${VERSION}.apk"
-
-      - name: Create or update GitHub Release
-        env:
-          GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ inputs.version }}
-        run: |
-          if gh release view "$VERSION" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            gh release upload "$VERSION" "dist/KeepScore-$VERSION.apk" --repo "$GITHUB_REPOSITORY" --clobber
-          else
-            gh release create "$VERSION" "dist/KeepScore-$VERSION.apk" --repo "$GITHUB_REPOSITORY" --generate-notes
-          fi
+    name: Build and publish signed Android release
+    uses: flofy/pwa-kit/.github/workflows/android-apk.yml@5d0232e177994532c19b312e7209557b646e95d4
+    with:
+      checkout-ref: ${{ inputs.version }}
+      capacitor-directory: capacitor
+      android-directory: capacitor/android
+      install-command: pnpm install --frozen-lockfile
+      pnpm-version: 10.15.1
+      web-build-command: pnpm run build
+      native-assets-command: |
+        npm install --prefix .asset-tools sharp --no-package-lock --no-audit --no-fund
+        node .github/scripts/rasterize-native-assets.mjs
+      asset-path: assets
+      generate-capacitor-assets: true
+      gradle-task: assembleRelease
+      android-version-code: ${{ github.run_number }}
+      android-version-name: ${{ inputs.version }}
+      apk-path: app/build/outputs/apk/release/app-release.apk
+      artifact-name: keepscore-capacitor-release-apk
+      release-tag: ${{ inputs.version }}
+      release-asset-name: KeepScore-${{ inputs.version }}.apk
+    secrets: inherit
