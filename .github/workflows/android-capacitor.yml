@@ -21,7 +21,7 @@ permissions:
 jobs:
   build:
     name: Capacitor Android APK
-    uses: flofy/pwa-kit/.github/workflows/android-apk.yml@6b42e1254019e451a7cb829e0efb8b5063eb4b5b
+    uses: flofy/pwa-kit/.github/workflows/android-apk.yml@5d0232e177994532c19b312e7209557b646e95d4
     with:
       checkout-ref: ${{ inputs.ref || github.sha }}
       capacitor-directory: capacitor
