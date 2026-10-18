@@ -26,6 +26,8 @@ export function UpdateButton() {
 
     let active = true;
     let installing: ServiceWorker | null = null;
+    let currentRegistration: ServiceWorkerRegistration | null = null;
+    const stateChangeHandlers = new Map<ServiceWorker, () => void>();
 
     const onControllerChange = () => {
       if (!active || !updating) return;
@@ -35,14 +37,23 @@ export function UpdateButton() {
     const watchInstalling = (worker: ServiceWorker | null) => {
       if (!worker || worker === installing) return;
       installing = worker;
-      worker.addEventListener("statechange", () => {
+
+      const onStateChange = () => {
         if (
+          active &&
           worker.state === "installed" &&
           navigator.serviceWorker.controller
         ) {
           setUpdateAvailable(true);
         }
-      });
+      };
+
+      stateChangeHandlers.set(worker, onStateChange);
+      worker.addEventListener("statechange", onStateChange);
+    };
+
+    const onUpdateFound = () => {
+      watchInstalling(currentRegistration?.installing ?? null);
     };
 
     navigator.serviceWorker.addEventListener(
@@ -52,15 +63,14 @@ export function UpdateButton() {
 
     navigator.serviceWorker
       .getRegistration()
-      .then((currentRegistration) => {
-        if (!active || !currentRegistration) return;
-        setRegistration(currentRegistration);
-        if (currentRegistration.waiting) setUpdateAvailable(true);
-        watchInstalling(currentRegistration.installing);
-        currentRegistration.addEventListener("updatefound", () => {
-          watchInstalling(currentRegistration.installing);
-        });
-        return currentRegistration.update();
+      .then((registrationResult) => {
+        if (!active || !registrationResult) return;
+        currentRegistration = registrationResult;
+        setRegistration(registrationResult);
+        if (registrationResult.waiting) setUpdateAvailable(true);
+        watchInstalling(registrationResult.installing);
+        registrationResult.addEventListener("updatefound", onUpdateFound);
+        return registrationResult.update();
       })
       .catch(() => {
         // Service worker support is optional; the app remains fully usable.
@@ -72,6 +82,11 @@ export function UpdateButton() {
         "controllerchange",
         onControllerChange,
       );
+      currentRegistration?.removeEventListener("updatefound", onUpdateFound);
+      for (const [worker, handler] of stateChangeHandlers) {
+        worker.removeEventListener("statechange", handler);
+      }
+      stateChangeHandlers.clear();
     };
   }, [updating]);
 
