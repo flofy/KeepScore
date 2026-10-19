@@ -329,12 +329,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
                     viewBox="0 0 112 112"
                     aria-hidden="true"
                   >
-                    <circle
-                      cx="56"
-                      cy="56"
-                      r="51"
-                      stroke={finger.color}
-                    />
+                    <circle cx="56" cy="56" r="51" stroke={finger.color} />
                   </svg>
                 )}
               </div>

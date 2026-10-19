@@ -1,7 +1,7 @@
 {
   "name": "keepscore-capacitor",
-  "private": true,
   "version": "0.1.0",
+  "private": true,
   "description": "Capacitor Android shell for the KeepScore React application",
   "dependencies": {
     "@capacitor/android": "8.5.3",
