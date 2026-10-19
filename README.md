@@ -59,3 +59,5 @@ App icons and splash screens are generated during the Android build from the SVG
 - `src/ui` — React components (App, GameSetup, SavedGames, i18n, etc.)
 - `src/infrastructure` — persistence (gameRepository) and portability (export/import)
 - A game is a list of **players** plus an **append-only score history**; every non-zero move creates a history entry
+
+<!-- Keep the repository documentation in sync with the current workflow setup. -->

@@ -9,7 +9,7 @@ type Props = {
   onBack?: () => void;
 };
 
-type Phase = "idle" | "counting" | "wiping" | "done";
+type Phase = "idle" | "wiping" | "done";
 type Finger = { pointerId: number; x: number; y: number; color: string };
 
 const FINGER_SETTLE_MS = 2000;
@@ -19,7 +19,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const { t, lang } = useI18n();
   const [fingers, setFingers] = useState<Finger[]>([]);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [countdown, setCountdown] = useState(3);
   const [selectedFingerId, setSelectedFingerId] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
@@ -30,7 +29,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
   const fingerColorsRef = useRef(new Map<number, string>());
   const selectedFingerRef = useRef<Finger | null>(null);
   const settleTimerRef = useRef<number | null>(null);
-  const countdownTimerRef = useRef<number | null>(null);
   const wipeTimerRef = useRef<number | null>(null);
 
   useEffect(() => {
@@ -58,10 +56,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
       window.clearTimeout(settleTimerRef.current);
       settleTimerRef.current = null;
     }
-    if (countdownTimerRef.current !== null) {
-      window.clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
     if (wipeTimerRef.current !== null) {
       window.clearTimeout(wipeTimerRef.current);
       wipeTimerRef.current = null;
@@ -77,84 +71,42 @@ export function ChwatziScreenV2({ onBack }: Props) {
     wipeTimerRef.current = null;
   }, [clearTimers]);
 
-  const startCountdown = useCallback(() => {
-    if (fingersRef.current.length < 2) return;
-
-    if (settleTimerRef.current !== null) {
-      window.clearTimeout(settleTimerRef.current);
-      settleTimerRef.current = null;
-    }
-    if (countdownTimerRef.current !== null) {
-      window.clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
+  const chooseFinger = useCallback(() => {
+    if (fingersRef.current.length < 2) {
+      setPhase("idle");
+      return;
     }
 
+    const currentFingers = fingersRef.current;
+    const winner =
+      currentFingers[Math.floor(Math.random() * currentFingers.length)];
+    if (!winner) {
+      setPhase("idle");
+      return;
+    }
+
+    selectedFingerRef.current = winner;
+    setSelectedFingerId(winner.pointerId);
+    setSelectedColor(winner.color);
     setIsSettling(false);
-    setPhase("counting");
-    setCountdown(3);
-    let remaining = 3;
-
-    countdownTimerRef.current = window.setInterval(() => {
-      if (fingersRef.current.length < 2) {
-        if (countdownTimerRef.current !== null) {
-          window.clearInterval(countdownTimerRef.current);
-          countdownTimerRef.current = null;
-        }
-        setCountdown(3);
-        setPhase("idle");
-        return;
-      }
-
-      remaining -= 1;
-      if (remaining > 0) {
-        setCountdown(remaining);
-        if ("vibrate" in navigator) navigator.vibrate(35);
-        return;
-      }
-
-      if (countdownTimerRef.current !== null) {
-        window.clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
-      }
-
-      const currentFingers = fingersRef.current;
-      const winner =
-        currentFingers[Math.floor(Math.random() * currentFingers.length)];
-      if (!winner) {
-        setPhase("idle");
-        return;
-      }
-
-      selectedFingerRef.current = winner;
-      setSelectedFingerId(winner.pointerId);
-      setSelectedColor(winner.color);
-      setPhase("wiping");
-      if ("vibrate" in navigator) navigator.vibrate([80, 50, 180]);
-
-      wipeTimerRef.current = window.setTimeout(finish, WATER_FILL_MS);
-    }, 1000);
+    setPhase("wiping");
+    // A short confirmation pulse replaces the old per-number countdown.
+    if ("vibrate" in navigator) navigator.vibrate([45, 30, 80]);
+    wipeTimerRef.current = window.setTimeout(finish, WATER_FILL_MS);
   }, [finish]);
 
-  const scheduleCountdown = useCallback(() => {
+  const scheduleSelection = useCallback(() => {
     if (fingersRef.current.length < 2) return;
-
     if (settleTimerRef.current !== null)
       window.clearTimeout(settleTimerRef.current);
-    if (countdownTimerRef.current !== null) {
-      window.clearInterval(countdownTimerRef.current);
-      countdownTimerRef.current = null;
-    }
 
-    setPhase("idle");
-    setCountdown(3);
     setSettleCycle((cycle) => cycle + 1);
     setIsSettling(true);
     settleTimerRef.current = window.setTimeout(() => {
       settleTimerRef.current = null;
-      setIsSettling(false);
-      startCountdown();
+      chooseFinger();
     }, FINGER_SETTLE_MS);
-  }, [startCountdown]);
+  }, [chooseFinger]);
 
   const reset = useCallback(() => {
     clearTimers();
@@ -164,7 +116,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
     setFingers([]);
     setIsSettling(false);
     setPhase("idle");
-    setCountdown(3);
     setSelectedFingerId(null);
     setSelectedColor(null);
     setShowResult(false);
@@ -172,7 +123,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
 
   const handlePointerDown = useCallback(
     (event: ReactPointerEvent<HTMLDivElement>) => {
-      if (phase !== "idle" && phase !== "counting") return;
+      if (phase !== "idle") return;
       event.preventDefault();
       event.currentTarget.setPointerCapture(event.pointerId);
       const next = updateFingers((current) => {
@@ -193,9 +144,9 @@ export function ChwatziScreenV2({ onBack }: Props) {
         ];
       });
       if ("vibrate" in navigator) navigator.vibrate(25);
-      if (next.length >= 2) scheduleCountdown();
+      if (next.length >= 2) scheduleSelection();
     },
-    [phase, scheduleCountdown, updateFingers],
+    [phase, scheduleSelection, updateFingers],
   );
 
   const handlePointerMove = useCallback(
@@ -231,12 +182,7 @@ export function ChwatziScreenV2({ onBack }: Props) {
           window.clearTimeout(settleTimerRef.current);
           settleTimerRef.current = null;
         }
-        if (countdownTimerRef.current !== null) {
-          window.clearInterval(countdownTimerRef.current);
-          countdownTimerRef.current = null;
-        }
         setIsSettling(false);
-        setCountdown(3);
         setPhase("idle");
       }
       if (phase === "wiping" && next.length === 0) finish();
@@ -290,11 +236,6 @@ export function ChwatziScreenV2({ onBack }: Props) {
             {lang === "fr"
               ? "Animations réduites par les réglages de votre appareil."
               : "Animations are reduced by your device settings."}
-          </div>
-        )}
-        {phase === "counting" && (
-          <div className="chwatzi-v2-countdown" aria-live="assertive">
-            {countdown}
           </div>
         )}
         {phase !== "done" &&
