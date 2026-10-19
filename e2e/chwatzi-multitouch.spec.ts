@@ -12,15 +12,10 @@ import { expect, test } from "@playwright/test";
  * in ChwatziScreenV2 can run without aborting on the second finger.
  *
  * Timeline in ChwatziScreenV2:
- *   1. Two fingers placed  → scheduleCountdown (3s settle)
- *   2. After 3s           → counting phase (3 → 2 → 1, 1s ticks)
- *   3. Countdown reaches 0 → picking phase: 1s setTimeout then result
- *   4. Water fill animation: 5s (WATER_FILL_MS)
- *   5. finish() → done phase + result dialog
- *
- * Total expected ~12s worst case. We assert on the water element during the
- * "wiping" phase (after settle + countdown + 1s pick delay ≈ 7s) and on the
- * result dialog at the end (~12s).
+ *   1. Two fingers placed → a 2s circular hold-progress animation
+ *   2. Progress completes → a short confirmation pulse and water-fill animation
+ *   3. Water fill animation: 5s (WATER_FILL_MS)
+ *   4. finish() → done phase + result dialog
  *
  * Note: we use a relative path ("chwatzi") for page.goto so that Playwright
  * resolves it against the configured baseURL (http://localhost:5173/KeepScore/)
@@ -75,16 +70,16 @@ test.describe("Chwatzi multi-touch selection", () => {
       }
     });
 
-    // Phase should transition to "counting" after the settle timer (3000ms).
-    await expect(page.locator(".chwatzi-v2-countdown")).toBeVisible({
-      timeout: 6_000,
-    });
+    // The two fingers should show the circular hold-progress indicator.
+    await expect(
+      page.locator(".chwatzi-v2-finger--settling .chwatzi-v2-finger-ring"),
+    ).toHaveCount(2);
 
-    // The countdown starts at 3 and ticks every 1s. After ~3s more the
-    // picking phase begins (1s), then the water-fill animation renders.
-    // Total wait before "wiping": 3s (settle) + 3s (countdown) + 1s (pick).
+    // There is no numeric countdown; the water-fill starts after the
+    // two-second ring completes.
+    await expect(page.locator(".chwatzi-v2-countdown")).toHaveCount(0);
     await expect(page.locator(".chwatzi-v2-water")).toBeVisible({
-      timeout: 9_000,
+      timeout: 5_000,
     });
 
     // The water animation runs for 5s (WATER_FILL_MS), then finish() shows
