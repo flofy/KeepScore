@@ -70,19 +70,6 @@
   z-index: 35;
 }
 
-.chwatzi-v2-countdown {
-  position: absolute;
-  inset: 0;
-  z-index: 20;
-  display: grid;
-  place-items: center;
-  font-size: clamp(120px, 28vw, 240px);
-  font-weight: 900;
-  color: #fff;
-  text-shadow: 0 0 60px rgb(255 255 255 / 0.45);
-  pointer-events: none;
-}
-
 .chwatzi-v2-water {
   position: absolute;
   left: var(--water-x);
