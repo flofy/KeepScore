@@ -17,4 +17,9 @@ describe("game presets", () => {
   it("falls back to the round grouping for the default preset", () => {
     expect(findPreset("default")?.defaultHistoryGrouping).toBe("round");
   });
+
+  it("registers QuixScore as a game preset with round grouping", () => {
+    expect(findPreset("quix-score")?.name).toBe("QuixScore");
+    expect(findPreset("quix-score")?.defaultHistoryGrouping).toBe("round");
+  });
 });

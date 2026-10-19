@@ -7,6 +7,7 @@ type RouteComponents = {
   home: ReactElement;
   setup: ReactElement;
   chwatzi: ReactElement;
+  quixscore: ReactElement;
   game: ReactElement;
   saved: ReactElement;
 };
@@ -26,8 +27,13 @@ export function createAppRouteObjects(
       errorElement: <RouteErrorBoundary />,
     },
     {
-      path: "/chwatzi",
+      path: routes.chwatzi(),
       element: components.chwatzi,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: routes.quixscore(),
+      element: components.quixscore,
       errorElement: <RouteErrorBoundary />,
     },
     {

@@ -2,7 +2,9 @@ import { useState } from "react";
 import { createGame } from "../domain/game/gameFactory";
 import { PLAYER_COLORS, colorForIndex } from "../domain/game/colors";
 import { GAME_PRESETS } from "../domain/game/presets";
+import { DEFAULT_PLAYER_NAMES, defaultPlayerName } from "../domain/game/players";
 import type { Game } from "../domain/game/types";
+import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "./i18n";
 
 type Props = {
@@ -11,13 +13,24 @@ type Props = {
   onDetermineStartingPlayer?: (game: Game) => void;
 };
 
+/*
+ * Prefills the setup with the player names of the most recently saved
+ * game, falling back to the generic default names.
+ */
+function initialPlayerNames(): string[] {
+  const lastGame = localGameRepository.list()[0];
+  const names = lastGame?.players.map((player) => player.name) ?? [];
+  const filled = names.filter((name) => name.trim().length > 0);
+  return filled.length > 0 ? filled : [...DEFAULT_PLAYER_NAMES];
+}
+
 export function GameSetup({
   onCreate,
   onBack,
   onDetermineStartingPlayer,
 }: Props) {
   const { t } = useI18n();
-  const [names, setNames] = useState(["Alice", "Bob"]);
+  const [names, setNames] = useState<string[]>(initialPlayerNames);
   const [colors, setColors] = useState<string[]>(() =>
     names.map((_, index) => colorForIndex(index)),
   );
@@ -31,7 +44,7 @@ export function GameSetup({
     );
   }
   function addPlayer() {
-    setNames((current) => [...current, "Player " + (current.length + 1)]);
+    setNames((current) => [...current, defaultPlayerName(current.length)]);
     setColors((current) => [...current, colorForIndex(current.length)]);
   }
   function removePlayer(index: number) {

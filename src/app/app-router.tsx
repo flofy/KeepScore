@@ -2,6 +2,7 @@ import {
   ChwatziRoute,
   GameRoute,
   GameSetupRoute,
+  QuixScoreRoute,
   RouteShell,
   SavedGamesRoute,
   StartScreenRoute,
@@ -22,6 +23,11 @@ export const router = createAppRouter({
   chwatzi: (
     <RouteShell showBack={false}>
       <ChwatziRoute />
+    </RouteShell>
+  ),
+  quixscore: (
+    <RouteShell showBack={false}>
+      <QuixScoreRoute />
     </RouteShell>
   ),
   game: (

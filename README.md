@@ -15,6 +15,7 @@ A fast, offline-first score keeper designed for playing tabletop and card games 
 - **Fast score entry** — large touch-friendly +/− buttons, quick deltas (+5/+10/+15/+20), long-press shortcuts
 - **Multiple players and games** — from 2 to many, with per-player color and name
 - **Duo mode** — two-player landscape layout for face-to-face play, with flip/rotate support
+- **QuixScore** — Qwixx-style score sheets as a game preset, with an optional collapsible dice roller: cross numbers left to right, lock rows, -5 penalties, automatic totals with undo
 - **Undo/redo and complete score history** — edit or delete any move
 - **Local-first persistence** — games are saved in IndexedDB/localStorage, no account needed
 - **Fullscreen mode** — distraction-free card display
@@ -55,6 +56,7 @@ App icons and splash screens are generated during the Android build from the SVG
 ## Architecture
 
 - `src/domain/game` — pure domain logic (reducer, history, factory), independent from React
+- `src/domain/qwixx` — pure QuixScore (Qwixx-style) scoring logic (dice, mark order, row locking, penalties, totals)
 - Shared domain types live in `src/domain/game/types.ts` (single source of truth)
 - `src/ui` — React components (App, GameSetup, SavedGames, i18n, etc.)
 - `src/infrastructure` — persistence (gameRepository) and portability (export/import)
