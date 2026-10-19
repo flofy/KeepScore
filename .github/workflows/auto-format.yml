@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   format:
-    uses: flofy/pwa-kit/.github/workflows/auto-format.yml@301fdeae8ca5ba4e0acc4114e901433336489286
+    uses: flofy/pwa-kit/.github/workflows/auto-format.yml@784fed5843b3d6c98dd9d4c3fba398c1a6ed8cda
     with:
       node-version: "24"
       pnpm-version: "10.15.1"
