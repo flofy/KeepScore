@@ -3,13 +3,18 @@ name: Auto-format
 on:
   pull_request:
     branches: [main]
-    types: [opened, synchronize, reopened]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: auto-format-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: write
 
 jobs:
   format:
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     uses: flofy/pwa-kit/.github/workflows/auto-format.yml@784fed5843b3d6c98dd9d4c3fba398c1a6ed8cda
     with:
       node-version: "24"
