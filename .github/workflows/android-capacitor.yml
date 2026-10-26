@@ -3,6 +3,7 @@ name: Android Capacitor
 on:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
   workflow_dispatch:
@@ -21,6 +22,7 @@ permissions:
 jobs:
   build:
     name: Capacitor Android APK
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     uses: flofy/pwa-kit/.github/workflows/android-apk.yml@784fed5843b3d6c98dd9d4c3fba398c1a6ed8cda
     with:
       checkout-ref: ${{ inputs.ref || github.sha }}
