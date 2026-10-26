@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
     branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+
+concurrency:
+  group: quality-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -34,7 +39,7 @@ jobs:
   quality:
     name: React quality
     needs: changes
-    if: needs.changes.outputs.react == 'true'
+    if: needs.changes.outputs.react == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.draft == false)
     uses: flofy/pwa-kit/.github/workflows/quality-checks.yml@784fed5843b3d6c98dd9d4c3fba398c1a6ed8cda
     with:
       node-version: "24"
