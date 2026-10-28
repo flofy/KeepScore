@@ -35,9 +35,6 @@ function GlobalMenu() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
 
-  // The game screen already has its own contextual menu with game controls.
-  if (location.pathname === "/game") return null;
-
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
@@ -50,6 +47,9 @@ function GlobalMenu() {
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [open]);
+
+  // The game screen already has its own contextual menu with game controls.
+  if (location.pathname === "/game") return null;
 
   const go = (path: string) => {
     setOpen(false);
