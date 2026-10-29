@@ -1,0 +1,133 @@
+/* Global burger menu, available on every non-game route. */
+.global-menu-trigger {
+  position: fixed;
+  top: calc(14px + env(safe-area-inset-top));
+  right: calc(14px + env(safe-area-inset-right));
+  z-index: 220;
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 14px;
+  background: rgb(15 23 42 / 92%);
+  color: #e2e8f0;
+  box-shadow: 0 8px 22px rgb(0 0 0 / 35%);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+}
+.global-menu-trigger .burger-icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+}
+.global-menu-trigger:active {
+  transform: scale(.94);
+}
+.global-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  background: rgb(2 6 23 / 72%);
+  backdrop-filter: blur(8px);
+}
+.global-menu-panel {
+  position: relative;
+  width: min(360px, 100%);
+  min-height: 0;
+  overflow-y: auto;
+  align-self: stretch;
+  padding: 76px 18px 20px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 24px;
+  background: linear-gradient(155deg, rgb(30 41 72 / 98%), rgb(8 15 31 / 99%));
+  box-shadow: 0 24px 70px rgb(0 0 0 / 45%);
+}
+.global-menu-close {
+  position: absolute;
+  top: max(12px, env(safe-area-inset-top));
+  right: 12px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 13px;
+  background: rgb(255 255 255 / 6%);
+  color: #e2e8f0;
+  font-size: 20px;
+  cursor: pointer;
+}
+.global-menu-eyebrow {
+  margin: 0 0 18px;
+  color: #7dd3fc;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .16em;
+}
+.global-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 50px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 255 255 / 8%);
+  border-radius: 14px;
+  background: rgb(255 255 255 / 4%);
+  color: #f1f5f9;
+  text-align: left;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.global-menu-item > span {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  color: #7dd3fc;
+  font-size: 20px;
+}
+.global-menu-item:hover {
+  background: rgb(255 255 255 / 9%);
+}
+.global-menu-divider {
+  height: 1px;
+  margin: 18px 0;
+  background: rgb(255 255 255 / 12%);
+}
+.global-menu-languages {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 14px;
+}
+.global-menu-language {
+  min-height: 44px;
+  padding: 0 8px;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 12px;
+  background: rgb(255 255 255 / 4%);
+  color: #cbd5e1;
+  font-weight: 700;
+  cursor: pointer;
+}
+.global-menu-language.active {
+  border-color: rgb(125 211 252 / 55%);
+  background: rgb(125 211 252 / 12%);
+  color: #7dd3fc;
+}
+@media (max-width: 620px) {
+  .global-menu-backdrop {
+    padding: 0;
+  }
+  .global-menu-panel {
+    width: 100%;
+    border-radius: 0;
+    padding-top: max(76px, calc(64px + env(safe-area-inset-top)));
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
