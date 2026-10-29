@@ -14,6 +14,8 @@ type Props = {
   playerGridColumns: number;
   onRemovePlayer: (playerId: string) => void;
   onRenamePlayer: (playerId: string, name: string) => void;
+  onChangePlayerColor: (playerId: string, color: string) => void;
+  suggestedPlayerNames?: string[];
   onAddScore: (playerId: string, delta: number) => void;
   onSetScore: (playerId: string, value: number) => void;
   onUpdateMunchkinStats: (playerId: string, stats: MunchkinStats) => void;
@@ -42,6 +44,8 @@ export function GamePlayerArea({
   playerGridColumns,
   onRemovePlayer,
   onRenamePlayer,
+  onChangePlayerColor,
+  suggestedPlayerNames = [],
   onAddScore,
   onSetScore,
   onUpdateMunchkinStats,
@@ -106,6 +110,8 @@ export function GamePlayerArea({
               canRemove={game.players.length > 1}
               onRemove={() => removeMunchkinPlayer(player.id, player.name)}
               onRename={(name) => onRenamePlayer(player.id, name)}
+              onChangeColor={(color) => onChangePlayerColor(player.id, color)}
+              suggestedPlayerNames={suggestedPlayerNames}
               onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
               onCombat={() => onCombat(player.id)}
             />
