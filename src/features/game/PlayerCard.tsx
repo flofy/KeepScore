@@ -196,10 +196,6 @@ export function PlayerCard({
     }
   };
 
-  const cancelScoreEdit = () => {
-    setScoreEditing(false);
-    setScoreDraft(String(player.score));
-  };
 
   const saveCustom = (sign: 1 | -1) => {
     const value = Number(customDraft);
