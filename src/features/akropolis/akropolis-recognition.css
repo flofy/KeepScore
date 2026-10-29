@@ -1,0 +1,63 @@
+.akropolis-recognition {
+  --ak-ink: #f5f2e9;
+  --ak-muted: #a7a9b2;
+  --ak-line: rgba(255, 255, 255, .11);
+  --ak-panel: rgba(23, 27, 39, .92);
+  box-sizing: border-box;
+  min-height: 100dvh;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  color: var(--ak-ink);
+  background: radial-gradient(ellipse at 85% 0%, rgba(73, 91, 139, .25), transparent 38%), #10131c;
+  font-family: inherit;
+}
+.akropolis-recognition * { box-sizing: border-box; }
+.akropolis-recognition__header { display: flex; align-items: flex-start; gap: 1rem; max-width: 1050px; margin: 0 auto 1.5rem; }
+.akropolis-recognition__back { flex: 0 0 2.75rem; height: 2.75rem; border: 1px solid var(--ak-line); border-radius: 50%; background: #202535; color: var(--ak-ink); font-size: 1.5rem; cursor: pointer; }
+.akropolis-recognition__eyebrow { margin: .15rem 0 .4rem; color: #b8c7ff; font-size: .7rem; font-weight: 800; letter-spacing: .17em; }
+.akropolis-recognition h1 { margin: 0; font-size: clamp(1.65rem, 4vw, 2.6rem); letter-spacing: -.045em; line-height: 1.1; }
+.akropolis-recognition__header p:last-child { max-width: 650px; color: var(--ak-muted); line-height: 1.55; }
+.akropolis-recognition__panel { max-width: 1050px; margin: 0 auto 1rem; padding: clamp(1rem, 2.5vw, 1.5rem); border: 1px solid var(--ak-line); border-radius: 1.25rem; background: var(--ak-panel); box-shadow: 0 18px 60px rgba(0,0,0,.16); }
+.akropolis-recognition__section-heading, .akropolis-recognition__section-heading > div { display: flex; align-items: center; gap: .75rem; }
+.akropolis-recognition__section-heading { justify-content: space-between; margin-bottom: 1rem; }
+.akropolis-recognition__section-heading > div { min-width: 0; }
+.akropolis-recognition__section-heading h2 { margin: 0; font-size: 1.05rem; }
+.akropolis-recognition__step { color: #b8c7ff; font-size: .78rem; font-weight: 800; letter-spacing: .08em; }
+.akropolis-recognition__badge, .akropolis-recognition__count { border: 1px solid var(--ak-line); border-radius: 999px; padding: .35rem .65rem; color: var(--ak-muted); font-size: .75rem; white-space: nowrap; }
+.akropolis-recognition__file-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; clip-path: inset(50%); }
+.akropolis-recognition__upload { display: flex; width: 100%; min-height: 3.25rem; align-items: center; justify-content: center; gap: .65rem; border: 1px solid #a9b9ff; border-radius: .8rem; background: #dce4ff; color: #171d32; font: inherit; font-weight: 750; cursor: pointer; }
+.akropolis-recognition__upload span { font-size: 1.4rem; }
+.akropolis-recognition__empty { display: grid; place-items: center; min-height: 240px; padding: 2rem 1rem 1rem; text-align: center; }
+.akropolis-recognition__hex-art { color: #b8c7ff; font-size: 4rem; line-height: 1.2; }
+.akropolis-recognition__empty strong { margin-top: .75rem; }
+.akropolis-recognition__empty p, .akropolis-recognition__hint, .akropolis-recognition__disclaimer { color: var(--ak-muted); font-size: .875rem; line-height: 1.55; }
+.akropolis-recognition__empty p { max-width: 420px; }
+.akropolis-recognition__image-tools { display: flex; justify-content: space-between; gap: .75rem; margin: .8rem 0; color: var(--ak-muted); font-size: .8rem; }
+.akropolis-recognition__image-tools span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.akropolis-recognition__image-tools button { border: 0; background: transparent; color: #d3dbff; cursor: pointer; }
+.akropolis-recognition__image-stage { position: relative; overflow: hidden; width: 100%; border-radius: .85rem; background: #080a10; cursor: crosshair; }
+.akropolis-recognition__image-stage img { display: block; width: 100%; max-height: 68vh; object-fit: contain; }
+.akropolis-recognition__mark { position: absolute; display: grid; place-items: center; width: 2rem; height: 2rem; padding: 0; transform: translate(-50%, -50%); border: 2px solid white; border-radius: 50%; color: #111; font-weight: 850; box-shadow: 0 2px 9px #0009; cursor: pointer; }
+.akropolis-recognition__mark span { font-size: .8rem; }
+.akropolis-recognition__adjustments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin-top: 1rem; }
+.akropolis-recognition__adjustments label { display: grid; grid-template-columns: 1fr auto; gap: .5rem; color: var(--ak-muted); font-size: .85rem; }
+.akropolis-recognition__adjustments output { color: var(--ak-ink); }
+.akropolis-recognition__adjustments input { grid-column: 1 / -1; width: 100%; accent-color: #b8c7ff; }
+.akropolis-recognition__kind-picker { display: flex; flex-wrap: wrap; gap: .5rem; }
+.akropolis-recognition__kind-picker button { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem .7rem; border: 1px solid var(--ak-line); border-radius: 999px; background: #171b27; color: var(--ak-ink); font: inherit; font-size: .8rem; cursor: pointer; }
+.akropolis-recognition__kind-picker button.is-selected { border-color: #b8c7ff; background: #303a59; }
+.akropolis-recognition__kind-picker button span { width: .65rem; height: .65rem; border: 1px solid #ffffff66; border-radius: 50%; }
+.akropolis-recognition__mark-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .6rem; margin-top: 1rem; }
+.akropolis-recognition__mark-list label { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .6rem; border: 1px solid var(--ak-line); border-radius: .65rem; color: var(--ak-muted); font-size: .8rem; }
+.akropolis-recognition__mark-list select { max-width: 60%; padding: .35rem; border: 1px solid var(--ak-line); border-radius: .4rem; background: #202535; color: var(--ak-ink); }
+.akropolis-recognition__footer { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+.akropolis-recognition__secondary { padding: .65rem .85rem; border: 1px solid var(--ak-line); border-radius: .7rem; background: #202535; color: var(--ak-ink); font: inherit; font-size: .85rem; cursor: pointer; }
+.akropolis-recognition__secondary:disabled { opacity: .4; cursor: not-allowed; }
+.akropolis-recognition__disclaimer { max-width: 1050px; margin: 1rem auto; text-align: center; }
+@media (max-width: 560px) {
+  .akropolis-recognition { padding: 1rem .75rem 2rem; }
+  .akropolis-recognition__header { gap: .65rem; }
+  .akropolis-recognition__back { flex-basis: 2.4rem; height: 2.4rem; }
+  .akropolis-recognition__section-heading h2 { font-size: .95rem; }
+  .akropolis-recognition__adjustments, .akropolis-recognition__mark-list { grid-template-columns: 1fr; }
+  .akropolis-recognition__mark { width: 1.75rem; height: 1.75rem; }
+}
