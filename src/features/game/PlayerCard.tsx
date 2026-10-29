@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { Player } from "../../domain/game/types";
+import { PLAYER_COLORS } from "../../domain/game/colors";
 import { getPlayerTileOrientation } from "./player-tile";
 import "./game-controls.css";
 import "./player-tile-rotation.css";
@@ -71,6 +72,8 @@ type PlayerCardProps = {
   tilt?: "a" | "b";
   onRemove?: () => void;
   onRename: (name: string) => void;
+  onChangeColor: (color: string) => void;
+  suggestedPlayerNames?: string[];
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
   onSetScore: (value: number) => void;
@@ -87,6 +90,8 @@ export function PlayerCard({
   tilt,
   onRemove,
   onRename,
+  onChangeColor,
+  suggestedPlayerNames = [],
   onDelta,
   onQuickDelta,
   onSetScore,
@@ -110,6 +115,9 @@ export function PlayerCard({
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
+  const [playerEditorOpen, setPlayerEditorOpen] = useState(false);
+  const [playerNameDraft, setPlayerNameDraft] = useState(player.name);
+  const [playerColorDraft, setPlayerColorDraft] = useState(player.color ?? "#38bdf8");
 
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
@@ -346,12 +354,24 @@ export function PlayerCard({
             ))}
           </div>
         )}
-        <input
-          className="player-name"
-          value={player.name}
-          onChange={(event) => onRename(event.target.value)}
-          aria-label={`${player.name} ${t("playerNameLabel")}`}
-        />
+        <div className="player-name-row">
+          <span className="player-name" title={player.name}>{player.name}</span>
+          {!removeMode && (
+            <button
+              type="button"
+              className="player-name-edit"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setPlayerNameDraft(player.name);
+                setPlayerColorDraft(player.color ?? "#38bdf8");
+                setPlayerEditorOpen(true);
+              }}
+              aria-label={`${t("editPlayer")} — ${player.name}`}
+              title={t("editPlayer")}
+            >✎</button>
+          )}
+        </div>
         <div className="score-row">
           <div className="step-col">
             <button
@@ -589,6 +609,50 @@ export function PlayerCard({
           </div>
         )}
       </div>
+      {playerEditorOpen && (
+        <div className="player-tile-editor" role="dialog" aria-modal="true" aria-labelledby={`player-tile-editor-title-${player.id}`} onPointerDown={(event) => event.stopPropagation()}>
+          <h2 id={`player-tile-editor-title-${player.id}`}>{t("editPlayer")}</h2>
+          <label className="player-tile-editor-label" htmlFor={`player-tile-name-${player.id}`}>{t("playerName")}</label>
+          <input
+            id={`player-tile-name-${player.id}`}
+            className="player-tile-editor-input"
+            autoFocus
+            value={playerNameDraft}
+            onChange={(event) => setPlayerNameDraft(event.target.value)}
+            placeholder={player.name}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
+                onChangeColor(playerColorDraft);
+                setPlayerEditorOpen(false);
+              }
+              if (event.key === "Escape") setPlayerEditorOpen(false);
+            }}
+          />
+          {suggestedPlayerNames.length > 0 && (
+            <div className="player-tile-name-suggestions">
+              <p>{t("savedPlayerSuggestions")}</p>
+              <div>{suggestedPlayerNames.map((name) => (
+                <button key={name} type="button" onClick={() => setPlayerNameDraft(name)}>{name}</button>
+              ))}</div>
+            </div>
+          )}
+          <p className="player-tile-editor-label">{t("colorForPlayer")}</p>
+          <div className="player-tile-color-options" role="radiogroup" aria-label={t("colorForPlayer")}>
+            {PLAYER_COLORS.map((color) => (
+              <button key={color} type="button" role="radio" aria-checked={playerColorDraft === color} className={playerColorDraft === color ? "player-tile-color selected" : "player-tile-color"} style={{ background: color }} onClick={() => setPlayerColorDraft(color)} aria-label={`${t("setPlayerColor")} ${color}`} />
+            ))}
+          </div>
+          <div className="player-tile-editor-actions">
+            <button type="button" onClick={() => setPlayerEditorOpen(false)}>{t("cancel")}</button>
+            <button type="button" onClick={() => {
+              if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
+              onChangeColor(playerColorDraft);
+              setPlayerEditorOpen(false);
+            }}>{t("save")}</button>
+          </div>
+        </div>
+      )}
       {customOpen && (
         <div
           className="custom-score-backdrop"
