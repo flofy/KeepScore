@@ -111,7 +111,6 @@ export function PlayerCard({
   const [forcedSign, setForcedSign] = useState<
     "positive" | "negative" | undefined
   >(undefined);
-  const [scoreEditing, setScoreEditing] = useState(false);
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
@@ -183,13 +182,18 @@ export function PlayerCard({
 
   const openScoreEditor = () => {
     setScoreDraft(String(player.score));
-    setScoreEditing(true);
+    setCustomDraft("");
+    setCustomOpen(true);
   };
 
-  const saveScore = () => {
+  const saveExactScore = () => {
     const value = Number(scoreDraft);
-    if (Number.isFinite(value)) onSetScore(Math.trunc(value));
-    setScoreEditing(false);
+    if (Number.isFinite(value)) {
+      onSetScore(Math.trunc(value));
+      haptic();
+      setCustomOpen(false);
+      setCustomDraft("");
+    }
   };
 
   const cancelScoreEdit = () => {
@@ -430,60 +434,39 @@ export function PlayerCard({
               </button>
             </div>
           </div>
-          {scoreEditing ? (
-            <input
-              ref={scoreInputRef}
-              className="score-value score-input"
-              type="number"
-              inputMode="numeric"
-              value={scoreDraft}
-              onChange={(event) => setScoreDraft(event.target.value)}
-              onBlur={saveScore}
+          <div className="score-center">
+            <div
+              ref={scoreValueRef}
+              className="score-value"
+              onClick={onScoreClick}
+              role="button"
+              tabIndex={0}
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  saveScore();
-                }
-                if (event.key === "Escape") {
-                  event.preventDefault();
-                  cancelScoreEdit();
+                  onScoreClick();
                 }
               }}
-              aria-label={`${t("setScore")} — ${player.name}`}
-            />
-          ) : (
-            <div className="score-center">
-              <div
-                ref={scoreValueRef}
-                className="score-value"
-                onClick={onScoreClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onScoreClick();
-                  }
-                }}
-                aria-label={`${t("setScore")} — ${player.name}`}
-              >
-                {player.score}
-              </div>
-              <button
-                ref={customBtnRef}
-                type="button"
-                className="custom-delta-btn"
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setCustomOpen((current) => !current);
-                }}
-                aria-label={t("customDelta")}
-              >
-                ⋯
-              </button>
+              aria-label={`${t("customDelta")} — ${player.name}`}
+            >
+              {player.score}
             </div>
-          )}
+            <button
+              ref={customBtnRef}
+              type="button"
+              className="custom-delta-btn"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setScoreDraft(String(player.score));
+                setCustomDraft("");
+                setCustomOpen((current) => !current);
+              }}
+              aria-label={t("customDelta")}
+            >
+              ⋯
+            </button>
+          </div>
           <div className="step-col">
             <button
               type="button"
@@ -679,20 +662,41 @@ export function PlayerCard({
               {t("customDelta")}
             </h2>
             <p className="custom-score-subtitle">{player.name}</p>
-            <input
-              ref={scoreInputRef}
-              className="custom-score-input"
-              type="number"
-              inputMode="numeric"
-              value={customDraft}
-              onChange={(event) => setCustomDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") saveCustom(1);
-                if (event.key === "Escape") closeCustom();
-              }}
-              aria-label={t("customDelta")}
-              placeholder="0"
-            />
+            <section className="custom-score-section">
+              <h3 className="custom-score-section-title">{t("setScore")}</h3>
+              <div className="custom-score-exact-row">
+                <input
+                  className="custom-score-input"
+                  type="number"
+                  inputMode="numeric"
+                  value={scoreDraft}
+                  onChange={(event) => setScoreDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") saveExactScore();
+                    if (event.key === "Escape") closeCustom();
+                  }}
+                  aria-label={t("setScore")}
+                />
+                <button type="button" className="custom-score-set" onClick={saveExactScore}>{t("save")}</button>
+              </div>
+            </section>
+            <section className="custom-score-section">
+              <h3 className="custom-score-section-title">{t("customDelta")}</h3>
+              <input
+                ref={scoreInputRef}
+                className="custom-score-input"
+                type="number"
+                inputMode="numeric"
+                value={customDraft}
+                onChange={(event) => setCustomDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") saveCustom(1);
+                  if (event.key === "Escape") closeCustom();
+                }}
+                aria-label={t("customDelta")}
+                placeholder="0"
+              />
+            </section>
             <div className="custom-score-actions">
               <button
                 type="button"
