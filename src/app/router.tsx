@@ -9,6 +9,7 @@ type RouteComponents = {
   chwatzi: ReactElement;
   game: ReactElement;
   saved: ReactElement;
+  akropolis: ReactElement;
 };
 
 export function createAppRouteObjects(
@@ -33,6 +34,11 @@ export function createAppRouteObjects(
     {
       path: "/game",
       element: components.game,
+      errorElement: <RouteErrorBoundary />,
+    },
+    {
+      path: "/akropolis",
+      element: components.akropolis,
       errorElement: <RouteErrorBoundary />,
     },
     {
