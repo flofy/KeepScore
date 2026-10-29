@@ -61,12 +61,14 @@ export function GameScreen({
   onSavedGames,
   onChwatzi,
   onHome,
+  suggestedPlayerNames = [],
 }: {
   initialGame: Game;
   onNewGame: () => void;
   onSavedGames: () => void;
   onChwatzi: () => void;
   onHome: () => void;
+  suggestedPlayerNames?: string[];
 }) {
   const {
     present: game,
@@ -294,6 +296,10 @@ export function GameScreen({
           onRenamePlayer={(playerId, name) =>
             dispatch({ type: "RENAME_PLAYER", playerId, name })
           }
+          onChangePlayerColor={(playerId, color) =>
+            dispatch({ type: "SET_PLAYER_COLOR", playerId, color })
+          }
+          suggestedPlayerNames={suggestedPlayerNames}
           onAddScore={addScore}
           onSetScore={setScore}
           onUpdateMunchkinStats={updateMunchkinStats}
