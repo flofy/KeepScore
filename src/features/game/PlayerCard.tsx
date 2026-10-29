@@ -612,7 +612,10 @@ export function PlayerCard({
           <p className="player-tile-editor-label">{t("colorForPlayer")}</p>
           <div className="player-tile-color-options" role="radiogroup" aria-label={t("colorForPlayer")}>
             {PLAYER_COLORS.map((color) => (
-              <button key={color} type="button" role="radio" aria-checked={playerColorDraft === color} className={playerColorDraft === color ? "player-tile-color selected" : "player-tile-color"} style={{ background: color }} onClick={() => setPlayerColorDraft(color)} aria-label={`${t("setPlayerColor")} ${color}`} />
+              <button key={color} type="button" role="radio" aria-checked={playerColorDraft === color} className={playerColorDraft === color ? "player-tile-color selected" : "player-tile-color"} style={{ background: color }} onClick={() => {
+                setPlayerColorDraft(color);
+                onChangeColor(color);
+              }} aria-label={`${t("setPlayerColor")} ${color}`} />
             ))}
           </div>
           <div className="player-tile-editor-actions">
