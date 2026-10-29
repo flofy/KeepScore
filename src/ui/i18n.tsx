@@ -18,6 +18,8 @@ type TranslationKey =
   | "startGame"
   | "playerNumber"
   | "playerName"
+  | "editPlayer"
+  | "savedPlayerSuggestions"
   | "removePlayer"
   | "removePlayersHint"
   | "playerAdded"
@@ -120,6 +122,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startGame: "Start game",
     playerNumber: "Player",
     playerName: "name",
+    editPlayer: "Edit player",
+    savedPlayerSuggestions: "Names from previous games",
     removePlayer: "Remove player",
     removePlayersHint: "Tap a player card to remove it",
     playerAdded: "Player added",
@@ -222,6 +226,8 @@ const translations: Record<Lang, Record<TranslationKey, string>> = {
     startGame: "Lancer la partie",
     playerNumber: "Joueur",
     playerName: "nom",
+    editPlayer: "Modifier le joueur",
+    savedPlayerSuggestions: "Noms des parties précédentes",
     removePlayer: "Retirer le joueur",
     removePlayersHint: "Touchez une carte pour retirer le joueur",
     playerAdded: "Joueur ajoute",
