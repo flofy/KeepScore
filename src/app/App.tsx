@@ -3,6 +3,7 @@ import { router } from "./app-router";
 import "../ui/saved-games.css";
 import "../ui/chwatzi.css";
 import "../ui/start.css";
+import "../features/akropolis/akropolis-recognition.css";
 
 export function App() {
   return <RouterProvider router={router} />;
