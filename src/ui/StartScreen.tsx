@@ -68,7 +68,7 @@ export function StartScreen({ onNewGame, onChwatzi, onSavedGames, onAkropolis }:
           <button
             type="button"
             className="start-option-btn secondary"
-            onClick={onSavedGames
+            onClick={onSavedGames}
           >
             <span className="option-icon">💾</span>
             <span className="option-label">{t("savedGames")}</span>
