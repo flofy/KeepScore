@@ -246,13 +246,6 @@ export function PlayerCard({
     }
   }, [customOpen]);
 
-  useEffect(() => {
-    if (scoreEditing) {
-      scoreInputRef.current?.focus();
-      scoreInputRef.current?.select();
-    }
-  }, [scoreEditing]);
-
   const scoreValueRef = useFitText<HTMLDivElement>(
     JSON.stringify(player.score),
   );
