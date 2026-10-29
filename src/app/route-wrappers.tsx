@@ -60,7 +60,6 @@ export function GameSetupRoute() {
   const navigate = useNavigate();
   return (
     <GameSetup
-      suggestedPlayerNames={[...new Set(localGameRepository.list().flatMap((game) => game.players.map((player) => player.name.trim())).filter(Boolean))].slice(0, 12)}
       onCreate={(game) => {
         localGameRepository.save(game);
         navigate("/game?gameId=" + game.id);
@@ -94,6 +93,7 @@ export function GameRoute() {
       onSavedGames={() => navigate("/saved")}
       onChwatzi={() => navigate("/chwatzi")}
       onHome={() => navigate("/")}
+      suggestedPlayerNames={[...new Set(localGameRepository.list().flatMap((savedGame) => savedGame.players.map((player) => player.name.trim())).filter(Boolean))].slice(0, 12)}
     />
   );
 }
