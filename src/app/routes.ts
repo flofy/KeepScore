@@ -4,4 +4,5 @@ export const routes = {
   chwatzi: () => "/chwatzi",
   game: (gameId: string) => `/game?gameId=${encodeURIComponent(gameId)}`,
   saved: () => "/saved",
+  akropolis: () => "/akropolis",
 } as const;
