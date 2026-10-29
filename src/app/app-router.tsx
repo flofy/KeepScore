@@ -1,4 +1,5 @@
 import {
+  AkropolisRecognitionRoute,
   ChwatziRoute,
   GameRoute,
   GameSetupRoute,
@@ -27,6 +28,11 @@ export const router = createAppRouter({
   game: (
     <RouteShell showBack={false}>
       <GameRoute />
+    </RouteShell>
+  ),
+  akropolis: (
+    <RouteShell showBack={false}>
+      <AkropolisRecognitionRoute />
     </RouteShell>
   ),
   saved: (

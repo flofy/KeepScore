@@ -5,9 +5,10 @@ type Props = {
   onNewGame: () => void;
   onChwatzi: () => void;
   onSavedGames: () => void;
+  onAkropolis: () => void;
 };
 
-export function StartScreen({ onNewGame, onChwatzi, onSavedGames }: Props) {
+export function StartScreen({ onNewGame, onChwatzi, onSavedGames, onAkropolis }: Props) {
   const { t } = useI18n();
 
   const handleChwatzi = useCallback(() => {
@@ -53,6 +54,16 @@ export function StartScreen({ onNewGame, onChwatzi, onSavedGames }: Props) {
               <span className="option-desc">{t("startChwatzi")}</span>
             </button>
           </div>
+
+          <button
+            type="button"
+            className="start-option-btn secondary"
+            onClick={onAkropolis}
+          >
+            <span className="option-icon">⬡</span>
+            <span className="option-label">Reconnaissance Akropolis</span>
+            <span className="option-desc">Importer une photo de plateau</span>
+          </button>
 
           <button
             type="button"

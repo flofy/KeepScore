@@ -9,6 +9,7 @@ import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
 import { GameScreen } from "../features/game/GameScreen";
+import { AkropolisRecognitionScreen } from "../features/akropolis/AkropolisRecognitionScreen";
 
 function BackButton({ close = false }: { close?: boolean }) {
   const { t } = useI18n();
@@ -52,6 +53,7 @@ export function StartScreenRoute() {
       onNewGame={() => navigate("/setup")}
       onChwatzi={() => navigate("/chwatzi")}
       onSavedGames={() => navigate("/saved")}
+      onAkropolis={() => navigate("/akropolis")}
     />
   );
 }
@@ -116,4 +118,8 @@ export function SavedGamesRoute() {
       onClose={() => navigate(-1)}
     />
   );
+}
+
+export function AkropolisRecognitionRoute() {
+  return <AkropolisRecognitionScreen />;
 }
