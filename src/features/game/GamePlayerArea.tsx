@@ -110,8 +110,6 @@ export function GamePlayerArea({
               canRemove={game.players.length > 1}
               onRemove={() => removeMunchkinPlayer(player.id, player.name)}
               onRename={(name) => onRenamePlayer(player.id, name)}
-              onChangeColor={(color) => onChangePlayerColor(player.id, color)}
-              suggestedPlayerNames={suggestedPlayerNames}
               onChangeStats={(stats) => onUpdateMunchkinStats(player.id, stats)}
               onCombat={() => onCombat(player.id)}
             />
@@ -133,6 +131,8 @@ export function GamePlayerArea({
               haptic();
             }}
             onRename={(name) => onRenamePlayer(player.id, name)}
+            onChangeColor={(color) => onChangePlayerColor(player.id, color)}
+            suggestedPlayerNames={suggestedPlayerNames}
             onDelta={(delta) => {
               onAddScore(player.id, delta);
               haptic();
