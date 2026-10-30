@@ -1153,6 +1153,32 @@ html:fullscreen .menu-drawer .menu-row {
   display: none;
 }
 
+.fullscreen-menu-control {
+  position: fixed;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  z-index: 45;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 14px;
+  background: rgb(15 23 42 / 88%);
+  color: #e2e8f0;
+  box-shadow: 0 8px 22px rgb(0 0 0 / 35%);
+  backdrop-filter: blur(8px);
+  cursor: pointer;
+}
+.fullscreen-menu-control svg {
+  width: 24px;
+  height: 24px;
+}
+.fullscreen-menu-control:hover {
+  background: rgb(30 41 59 / 96%);
+}
+
 .fullscreen-exit-control {
   position: fixed;
   z-index: 40;
