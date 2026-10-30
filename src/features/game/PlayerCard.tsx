@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent as ReactPointerEvent } from "react";
 import type { Player } from "../../domain/game/types";
+import { PLAYER_COLORS } from "../../domain/game/colors";
 import { getPlayerTileOrientation } from "./player-tile";
 import "./game-controls.css";
 import "./player-tile-rotation.css";
@@ -71,6 +72,8 @@ type PlayerCardProps = {
   tilt?: "a" | "b";
   onRemove?: () => void;
   onRename: (name: string) => void;
+  onChangeColor: (color: string) => void;
+  suggestedPlayerNames?: string[];
   onDelta: (delta: number) => void;
   onQuickDelta: (delta: number) => void;
   onSetScore: (value: number) => void;
@@ -87,6 +90,8 @@ export function PlayerCard({
   tilt,
   onRemove,
   onRename,
+  onChangeColor,
+  suggestedPlayerNames = [],
   onDelta,
   onQuickDelta,
   onSetScore,
@@ -106,10 +111,12 @@ export function PlayerCard({
   const [forcedSign, setForcedSign] = useState<
     "positive" | "negative" | undefined
   >(undefined);
-  const [scoreEditing, setScoreEditing] = useState(false);
   const [scoreDraft, setScoreDraft] = useState(String(player.score));
   const [customOpen, setCustomOpen] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
+  const [playerEditorOpen, setPlayerEditorOpen] = useState(false);
+  const [playerNameDraft, setPlayerNameDraft] = useState(player.name);
+  const [playerColorDraft, setPlayerColorDraft] = useState(player.color ?? "#38bdf8");
 
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
@@ -175,19 +182,20 @@ export function PlayerCard({
 
   const openScoreEditor = () => {
     setScoreDraft(String(player.score));
-    setScoreEditing(true);
+    setCustomDraft("");
+    setCustomOpen(true);
   };
 
-  const saveScore = () => {
+  const saveExactScore = () => {
     const value = Number(scoreDraft);
-    if (Number.isFinite(value)) onSetScore(Math.trunc(value));
-    setScoreEditing(false);
+    if (Number.isFinite(value)) {
+      onSetScore(Math.trunc(value));
+      haptic();
+      setCustomOpen(false);
+      setCustomDraft("");
+    }
   };
 
-  const cancelScoreEdit = () => {
-    setScoreEditing(false);
-    setScoreDraft(String(player.score));
-  };
 
   const saveCustom = (sign: 1 | -1) => {
     const value = Number(customDraft);
@@ -233,13 +241,6 @@ export function PlayerCard({
       scoreInputRef.current?.select();
     }
   }, [customOpen]);
-
-  useEffect(() => {
-    if (scoreEditing) {
-      scoreInputRef.current?.focus();
-      scoreInputRef.current?.select();
-    }
-  }, [scoreEditing]);
 
   const scoreValueRef = useFitText<HTMLDivElement>(
     JSON.stringify(player.score),
@@ -316,21 +317,22 @@ export function PlayerCard({
           ✕
         </button>
       )}
-      {onFlip && !removeMode && (
-        <button
-          type="button"
-          className="card-flip-btn"
-          onClick={(event) => {
-            event.stopPropagation();
-            onFlip();
-          }}
-          aria-pressed={rotation > 0}
-          aria-label={t("flipPlayer")}
-        >
-          ↻
-        </button>
-      )}
       <div className={`card-content tile-${tileOrientation}`}>
+        {onFlip && !removeMode && (
+          <button
+            type="button"
+            className="card-flip-btn"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onFlip();
+            }}
+            aria-pressed={rotation > 0}
+            aria-label={t("flipPlayer")}
+          >
+            ↻
+          </button>
+        )}
         {deltas.length > 0 && (
           <div
             className="player-deltas"
@@ -346,12 +348,24 @@ export function PlayerCard({
             ))}
           </div>
         )}
-        <input
-          className="player-name"
-          value={player.name}
-          onChange={(event) => onRename(event.target.value)}
-          aria-label={`${player.name} ${t("playerNameLabel")}`}
-        />
+        <div className="player-name-row">
+          <span className="player-name" title={player.name}>{player.name}</span>
+          {!removeMode && (
+            <button
+              type="button"
+              className="player-name-edit"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setPlayerNameDraft(player.name);
+                setPlayerColorDraft(player.color ?? "#38bdf8");
+                setPlayerEditorOpen(true);
+              }}
+              aria-label={`${t("editPlayer")} — ${player.name}`}
+              title={t("editPlayer")}
+            >✎</button>
+          )}
+        </div>
         <div className="score-row">
           <div className="step-col">
             <button
@@ -410,60 +424,39 @@ export function PlayerCard({
               </button>
             </div>
           </div>
-          {scoreEditing ? (
-            <input
-              ref={scoreInputRef}
-              className="score-value score-input"
-              type="number"
-              inputMode="numeric"
-              value={scoreDraft}
-              onChange={(event) => setScoreDraft(event.target.value)}
-              onBlur={saveScore}
+          <div className="score-center">
+            <div
+              ref={scoreValueRef}
+              className="score-value"
+              onClick={onScoreClick}
+              role="button"
+              tabIndex={0}
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  saveScore();
-                }
-                if (event.key === "Escape") {
-                  event.preventDefault();
-                  cancelScoreEdit();
+                  onScoreClick();
                 }
               }}
-              aria-label={`${t("setScore")} — ${player.name}`}
-            />
-          ) : (
-            <div className="score-center">
-              <div
-                ref={scoreValueRef}
-                className="score-value"
-                onClick={onScoreClick}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onScoreClick();
-                  }
-                }}
-                aria-label={`${t("setScore")} — ${player.name}`}
-              >
-                {player.score}
-              </div>
-              <button
-                ref={customBtnRef}
-                type="button"
-                className="custom-delta-btn"
-                onPointerDown={(event) => event.stopPropagation()}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setCustomOpen((current) => !current);
-                }}
-                aria-label={t("customDelta")}
-              >
-                ⋯
-              </button>
+              aria-label={`${t("customDelta")} — ${player.name}`}
+            >
+              {player.score}
             </div>
-          )}
+            <button
+              ref={customBtnRef}
+              type="button"
+              className="custom-delta-btn"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setScoreDraft(String(player.score));
+                setCustomDraft("");
+                setCustomOpen((current) => !current);
+              }}
+              aria-label={t("customDelta")}
+            >
+              ⋯
+            </button>
+          </div>
           <div className="step-col">
             <button
               type="button"
@@ -589,6 +582,53 @@ export function PlayerCard({
           </div>
         )}
       </div>
+      {playerEditorOpen && (
+        <div className="player-tile-editor" role="dialog" aria-modal="true" aria-labelledby={`player-tile-editor-title-${player.id}`} onPointerDown={(event) => event.stopPropagation()}>
+          <h2 id={`player-tile-editor-title-${player.id}`}>{t("editPlayer")}</h2>
+          <label className="player-tile-editor-label" htmlFor={`player-tile-name-${player.id}`}>{t("playerName")}</label>
+          <input
+            id={`player-tile-name-${player.id}`}
+            className="player-tile-editor-input"
+            autoFocus
+            value={playerNameDraft}
+            onChange={(event) => setPlayerNameDraft(event.target.value)}
+            placeholder={player.name}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
+                onChangeColor(playerColorDraft);
+                setPlayerEditorOpen(false);
+              }
+              if (event.key === "Escape") setPlayerEditorOpen(false);
+            }}
+          />
+          {suggestedPlayerNames.length > 0 && (
+            <div className="player-tile-name-suggestions">
+              <p>{t("savedPlayerSuggestions")}</p>
+              <div>{suggestedPlayerNames.map((name) => (
+                <button key={name} type="button" onClick={() => setPlayerNameDraft(name)}>{name}</button>
+              ))}</div>
+            </div>
+          )}
+          <p className="player-tile-editor-label">{t("colorForPlayer")}</p>
+          <div className="player-tile-color-options" role="radiogroup" aria-label={t("colorForPlayer")}>
+            {PLAYER_COLORS.map((color) => (
+              <button key={color} type="button" role="radio" aria-checked={playerColorDraft === color} className={playerColorDraft === color ? "player-tile-color selected" : "player-tile-color"} style={{ background: color }} onClick={() => {
+                setPlayerColorDraft(color);
+                onChangeColor(color);
+              }} aria-label={`${t("setPlayerColor")} ${color}`} />
+            ))}
+          </div>
+          <div className="player-tile-editor-actions">
+            <button type="button" onClick={() => setPlayerEditorOpen(false)}>{t("cancel")}</button>
+            <button type="button" onClick={() => {
+              if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
+              onChangeColor(playerColorDraft);
+              setPlayerEditorOpen(false);
+            }}>{t("save")}</button>
+          </div>
+        </div>
+      )}
       {customOpen && (
         <div
           className="custom-score-backdrop"
@@ -615,20 +655,41 @@ export function PlayerCard({
               {t("customDelta")}
             </h2>
             <p className="custom-score-subtitle">{player.name}</p>
-            <input
-              ref={scoreInputRef}
-              className="custom-score-input"
-              type="number"
-              inputMode="numeric"
-              value={customDraft}
-              onChange={(event) => setCustomDraft(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") saveCustom(1);
-                if (event.key === "Escape") closeCustom();
-              }}
-              aria-label={t("customDelta")}
-              placeholder="0"
-            />
+            <section className="custom-score-section">
+              <h3 className="custom-score-section-title">{t("setScore")}</h3>
+              <div className="custom-score-exact-row">
+                <input
+                  className="custom-score-input"
+                  type="number"
+                  inputMode="numeric"
+                  value={scoreDraft}
+                  onChange={(event) => setScoreDraft(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") saveExactScore();
+                    if (event.key === "Escape") closeCustom();
+                  }}
+                  aria-label={t("setScore")}
+                />
+                <button type="button" className="custom-score-set" onClick={saveExactScore}>{t("save")}</button>
+              </div>
+            </section>
+            <section className="custom-score-section">
+              <h3 className="custom-score-section-title">{t("customDelta")}</h3>
+              <input
+                ref={scoreInputRef}
+                className="custom-score-input"
+                type="number"
+                inputMode="numeric"
+                value={customDraft}
+                onChange={(event) => setCustomDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") saveCustom(1);
+                  if (event.key === "Escape") closeCustom();
+                }}
+                aria-label={t("customDelta")}
+                placeholder="0"
+              />
+            </section>
             <div className="custom-score-actions">
               <button
                 type="button"

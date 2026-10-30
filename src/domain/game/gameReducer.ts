@@ -6,6 +6,7 @@ export type GameAction =
   | { type: "ADD_SCORE"; playerId: string; delta: number }
   | { type: "UPDATE_MUNCHKIN_STATS"; playerId: string; stats: MunchkinStats }
   | { type: "RENAME_PLAYER"; playerId: string; name: string }
+  | { type: "SET_PLAYER_COLOR"; playerId: string; color: string }
   | { type: "RENAME_GAME"; name: string }
   | { type: "RESET_SCORE"; playerId: string }
   | { type: "ADD_PLAYER"; name?: string }
@@ -63,6 +64,14 @@ export function gameReducer(game: Game, action: GameAction): Game {
           player.id === action.playerId && action.name.trim()
             ? { ...player, name: action.name.trim() }
             : player,
+        ),
+        updatedAt,
+      };
+    case "SET_PLAYER_COLOR":
+      return {
+        ...game,
+        players: game.players.map((player) =>
+          player.id === action.playerId ? { ...player, color: action.color } : player,
         ),
         updatedAt,
       };

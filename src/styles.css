@@ -1152,6 +1152,10 @@ html:fullscreen .menu-drawer .menu-row {
 .app-shell.fullscreen-hide-header .app-header {
   display: none;
 }
+/* The menu is intentionally unavailable while playing in fullscreen. */
+.app-shell.fullscreen .burger-button {
+  display: none;
+}
 
 .fullscreen-exit-control {
   position: fixed;
@@ -1796,4 +1800,32 @@ html:fullscreen .menu-drawer .menu-row {
     margin-bottom: 0;
     border-radius: 12px;
   }
+}
+
+
+/* In-game player tile editor: a small edit control beside the name. */
+.player-name-row { display:flex; align-items:center; justify-content:center; gap:6px; width:100%; min-width:0; }
+.player-name-row .player-name { display:block; flex:0 1 auto; min-width:0; }
+.player-name-edit { display:inline-grid; place-items:center; flex:0 0 auto; width:clamp(28px,8cqw,36px); height:clamp(28px,8cqw,36px); padding:0; border:1px solid rgb(255 255 255 / 20%); border-radius:9px; background:rgb(15 23 42 / 28%); color:#f8fafc; font-size:clamp(14px,4cqw,19px); cursor:pointer; touch-action:manipulation; }
+.player-name-edit:hover { background:rgb(15 23 42 / 55%); border-color:rgb(255 255 255 / 45%); }
+.player-tile-editor { position:fixed; inset:0; z-index:1100; box-sizing:border-box; display:flex; flex-direction:column; justify-content:flex-start; gap:10px; min-height:100dvh; overflow-x:hidden; overflow-y:auto; overscroll-behavior:contain; padding: max(20px, env(safe-area-inset-top)) clamp(20px, 5vw, 40px) max(24px, env(safe-area-inset-bottom)); border:0; border-radius:0; background:rgb(8 15 31 / 99%); color:#f8fafc; box-shadow:none; user-select:text; }
+.player-tile-editor h2 { margin:0; font-size:clamp(17px,5cqw,24px); }
+.player-tile-editor-label { margin:2px 0 0; color:#cbd5e1; font-size:12px; font-weight:700; }
+.player-tile-editor-input { width:100%; min-height:42px; padding:0 10px; border:1px solid rgb(148 163 184 / 35%); border-radius:10px; background:#0f172a; color:#f8fafc; font:inherit; }
+.player-tile-name-suggestions p { margin:0 0 6px; color:#94a3b8; font-size:11px; }
+.player-tile-name-suggestions > div { display:flex; flex-wrap:wrap; gap:5px; max-height:54px; overflow:auto; }
+.player-tile-name-suggestions button { max-width:100%; min-height:28px; padding:3px 8px; overflow:hidden; border:1px solid rgb(125 211 252 / 24%); border-radius:999px; background:rgb(125 211 252 / 8%); color:#bae6fd; font-size:11px; text-overflow:ellipsis; white-space:nowrap; }
+.player-tile-color-options { display:flex; flex-wrap:wrap; gap:8px; }
+.player-tile-color { width:clamp(25px,7cqw,34px); height:clamp(25px,7cqw,34px); padding:0; border:2px solid rgb(255 255 255 / 25%); border-radius:50%; cursor:pointer; }
+.player-tile-color.selected { border-color:white; outline:2px solid rgb(255 255 255 / 40%); outline-offset:2px; }
+.player-tile-editor-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:2px; }
+.player-tile-editor-actions button { min-height:36px; padding:0 12px; border:1px solid rgb(148 163 184 / 28%); border-radius:10px; background:rgb(255 255 255 / 6%); color:#e2e8f0; font-weight:700; cursor:pointer; }
+.player-tile-editor-actions button:last-child { border-color:rgb(125 211 252 / 40%); background:rgb(125 211 252 / 18%); color:#e0f2fe; }
+.player-card.remove-mode .player-name-edit { display:none; }
+
+.player-tile-editor-actions { margin-top: 8px; }
+.player-tile-editor input { scroll-margin-block: 16px; }
+@media (max-height: 520px) {
+  .player-tile-editor { padding-top: max(12px, env(safe-area-inset-top)); gap: 8px; }
+  .player-tile-editor-actions { margin-top: 4px; }
 }
