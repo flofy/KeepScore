@@ -317,21 +317,22 @@ export function PlayerCard({
           ✕
         </button>
       )}
-      {onFlip && !removeMode && (
-        <button
-          type="button"
-          className="card-flip-btn"
-          onClick={(event) => {
-            event.stopPropagation();
-            onFlip();
-          }}
-          aria-pressed={rotation > 0}
-          aria-label={t("flipPlayer")}
-        >
-          ↻
-        </button>
-      )}
       <div className={`card-content tile-${tileOrientation}`}>
+        {onFlip && !removeMode && (
+          <button
+            type="button"
+            className="card-flip-btn"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => {
+              event.stopPropagation();
+              onFlip();
+            }}
+            aria-pressed={rotation > 0}
+            aria-label={t("flipPlayer")}
+          >
+            ↻
+          </button>
+        )}
         {deltas.length > 0 && (
           <div
             className="player-deltas"
