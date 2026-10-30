@@ -93,7 +93,16 @@ export function GameRoute() {
       onSavedGames={() => navigate("/saved")}
       onChwatzi={() => navigate("/chwatzi")}
       onHome={() => navigate("/")}
-      suggestedPlayerNames={[...new Set(localGameRepository.list().flatMap((savedGame) => savedGame.players.map((player) => player.name.trim())).filter(Boolean))].slice(0, 12)}
+      suggestedPlayerNames={[
+        ...new Set(
+          localGameRepository
+            .list()
+            .flatMap((savedGame) =>
+              savedGame.players.map((player) => player.name.trim()),
+            )
+            .filter(Boolean),
+        ),
+      ].slice(0, 12)}
     />
   );
 }

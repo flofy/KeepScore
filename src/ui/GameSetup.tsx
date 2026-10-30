@@ -56,7 +56,9 @@ export function GameSetup({
     const safeStartingScore = Number.isFinite(parsedStartingScore)
       ? Math.trunc(parsedStartingScore)
       : 0;
-    const playerNames = names.map((name, index) => name.trim() || `${t("playerNumber")} ${index + 1}`);
+    const playerNames = names.map(
+      (name, index) => name.trim() || `${t("playerNumber")} ${index + 1}`,
+    );
     const playerColors = colors;
 
     return createGame(

@@ -71,7 +71,9 @@ export function gameReducer(game: Game, action: GameAction): Game {
       return {
         ...game,
         players: game.players.map((player) =>
-          player.id === action.playerId ? { ...player, color: action.color } : player,
+          player.id === action.playerId
+            ? { ...player, color: action.color }
+            : player,
         ),
         updatedAt,
       };
