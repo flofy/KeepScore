@@ -5,7 +5,6 @@ import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
 import { SavedGames } from "../ui/SavedGames";
-import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
 import { InstallButton } from "../ui/InstallButton";
@@ -129,12 +128,35 @@ export function RouteShell({
 
 export function StartScreenRoute() {
   const navigate = useNavigate();
+  const { t } = useI18n();
+
   return (
-    <StartScreen
-      onNewGame={() => navigate("/setup")}
-      onChwatzi={() => navigate("/chwatzi")}
-      onSavedGames={() => navigate("/saved")}
-    />
+    <main className="unified-home">
+      <header className="unified-home-header">
+        <div>
+          <p className="unified-home-eyebrow">KEEP SCORE</p>
+          <h1>KeepScore</h1>
+          <p className="muted">{t("setupTagline")}</p>
+        </div>
+      </header>
+      <GameSetup
+        onCreate={(game) => {
+          localGameRepository.save(game);
+          navigate("/game?gameId=" + game.id);
+        }}
+      />
+      <nav className="home-bottom-nav" aria-label={t("home")}>
+        <button className="active" type="button" onClick={() => navigate("/")} aria-current="page">
+          <span aria-hidden="true">⌂</span><span>{t("home")}</span>
+        </button>
+        <button type="button" onClick={() => navigate("/saved")}>
+          <span aria-hidden="true">▤</span><span>{t("savedGames")}</span>
+        </button>
+        <button type="button" onClick={() => navigate("/chwatzi")}>
+          <span aria-hidden="true">🎲</span><span>{t("whoStarts")}</span>
+        </button>
+      </nav>
+    </main>
   );
 }
 
