@@ -177,6 +177,7 @@ export function GameSetup({
                 <span className="player-number">{index + 1}</span>
                 <input
                   value={name}
+                  placeholder={t("playerNumber") + " " + (index + 1)}
                   onChange={(event) => updateName(index, event.target.value)}
                   aria-label={
                     t("playerNumber") +
