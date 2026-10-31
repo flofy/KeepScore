@@ -131,3 +131,14 @@
     padding-bottom: max(20px, env(safe-area-inset-bottom));
   }
 }
+
+.global-menu-section { margin: 0 0 18px; }
+.global-menu-section-title {
+  margin: 0 0 8px 4px;
+  color: #94a3b8;
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.global-menu-section .global-menu-item { margin-top: 6px; }
