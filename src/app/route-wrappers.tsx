@@ -5,7 +5,6 @@ import type { Game } from "../domain/game/types";
 import { GameSetup } from "../ui/GameSetup";
 import { ChwatziScreenV2 } from "../ui/ChwatziScreenV2";
 import { SavedGames } from "../ui/SavedGames";
-import { StartScreen } from "../ui/StartScreen";
 import { localGameRepository } from "../infrastructure/persistence/gameRepository";
 import { useI18n } from "../ui/i18n";
 import { InstallButton } from "../ui/InstallButton";
@@ -84,20 +83,28 @@ function GlobalMenu() {
           >
             <button className="global-menu-close" type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")}>✕</button>
             <p className="global-menu-eyebrow">KEEPSCORE</p>
-            <button className="global-menu-item" type="button" onClick={() => go("/")}>
-              <span aria-hidden="true">⌂</span>{t("home")}
-            </button>
-            <button className="global-menu-item" type="button" onClick={() => go("/setup")}>
-              <span aria-hidden="true">＋</span>{t("newGameMenuItem")}
-            </button>
-            <button className="global-menu-item" type="button" onClick={() => go("/saved")}>
-              <span aria-hidden="true">▤</span>{t("savedGames")}
-            </button>
-            <button className="global-menu-item" type="button" onClick={() => go("/chwatzi")}>
-              <span aria-hidden="true">🎲</span>{t("whoStarts")}
-            </button>
+            {location.pathname !== "/" && <section className="global-menu-section">
+              <h2 className="global-menu-section-title">{lang === "fr" ? "Navigation" : "Navigation"}</h2>
+              <button className="global-menu-item" type="button" onClick={() => go("/")}>
+                <span aria-hidden="true">⌂</span>{t("home")}
+              </button>
+              <button className="global-menu-item" type="button" onClick={() => go("/setup")}>
+                <span aria-hidden="true">＋</span>{t("newGameMenuItem")}
+              </button>
+              <button className="global-menu-item" type="button" onClick={() => go("/saved")}>
+                <span aria-hidden="true">▤</span>{t("savedGames")}
+              </button>
+              <button className="global-menu-item" type="button" onClick={() => go("/chwatzi")}>
+                <span aria-hidden="true">🎲</span>{t("whoStarts")}
+              </button>
+            </section>}
             <div className="global-menu-divider" />
-            <InstallButton variant="menu" />
+            <section className="global-menu-section">
+              <h2 className="global-menu-section-title">{lang === "fr" ? "Application" : "App"}</h2>
+              <InstallButton variant="menu" />
+            </section>
+            <section className="global-menu-section">
+              <h2 className="global-menu-section-title">{lang === "fr" ? "Préférences" : "Preferences"}</h2>
             <div className="global-menu-languages" role="group" aria-label={lang === "fr" ? "Langue" : "Language"}>
               <button className={lang === "fr" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "fr"} onClick={() => setLang("fr")}>🇫🇷 Français</button>
               <button className={lang === "en" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>🇬🇧 English</button>
@@ -129,12 +136,32 @@ export function RouteShell({
 
 export function StartScreenRoute() {
   const navigate = useNavigate();
+  const { t } = useI18n();
+
   return (
-    <StartScreen
-      onNewGame={() => navigate("/setup")}
-      onChwatzi={() => navigate("/chwatzi")}
-      onSavedGames={() => navigate("/saved")}
-    />
+    <main className="unified-home">
+      <header className="unified-home-header">
+        <div>
+          <p className="unified-home-eyebrow">KEEP SCORE</p>
+          <h1>KeepScore</h1>
+          <p className="muted">{t("setupTagline")}</p>
+        </div>
+      </header>
+      <GameSetup
+        onCreate={(game) => {
+          localGameRepository.save(game);
+          navigate("/game?gameId=" + game.id);
+        }}
+      />
+      <nav className="home-bottom-nav" aria-label={t("menu")}>
+        <button type="button" onClick={() => navigate("/saved")}>
+          <span aria-hidden="true">▤</span><span>{t("savedGames")}</span>
+        </button>
+        <button type="button" onClick={() => navigate("/chwatzi")}>
+          <span aria-hidden="true">🎲</span><span>{t("whoStarts")}</span>
+        </button>
+      </nav>
+    </main>
   );
 }
 

@@ -184,10 +184,17 @@ h2 {
   user-select: none;
   touch-action: pan-y;
 }
-.card-flip-btn {
+.player-card-utility-actions {
   position: absolute;
   top: clamp(6px, 4cqw, 10px);
-  left: clamp(6px, 4cqw, 10px);
+  right: clamp(6px, 4cqw, 10px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.player-card-utility-actions .card-flip-btn {
+  position: static;
   width: clamp(28px, 10cqw, 38px);
   height: clamp(28px, 10cqw, 38px);
   display: flex;
@@ -202,10 +209,23 @@ h2 {
   transition:
     background 0.15s ease,
     color 0.15s ease;
-  z-index: 3;
+  z-index: auto;
   font-size: clamp(13px, 6cqw, 20px);
 }
-.card-flip-btn:hover {
+.player-card-utility-actions .player-name-edit {
+  width: clamp(28px, 10cqw, 38px);
+  height: clamp(28px, 10cqw, 38px);
+  border: 0;
+  border-radius: clamp(7px, 1.5vw, 10px);
+  background: rgb(255 255 255 / 6%);
+  color: #cbd5e1;
+  font-size: clamp(13px, 6cqw, 20px);
+}
+.player-card-utility-actions .player-name-edit:hover {
+  background: rgb(255 255 255 / 12%);
+  color: #f8fafc;
+}
+.player-card-utility-actions .card-flip-btn:hover {
   background: rgb(255 255 255 / 12%);
   color: #f8fafc;
 }
