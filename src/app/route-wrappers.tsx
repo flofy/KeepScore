@@ -109,6 +109,7 @@ function GlobalMenu() {
               <button className={lang === "fr" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "fr"} onClick={() => setLang("fr")}>🇫🇷 Français</button>
               <button className={lang === "en" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>🇬🇧 English</button>
             </div>
+            </section>
           </nav>
         </div>
       )}
