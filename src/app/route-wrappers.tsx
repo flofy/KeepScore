@@ -83,33 +83,34 @@ function GlobalMenu() {
           >
             <button className="global-menu-close" type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")}>✕</button>
             <p className="global-menu-eyebrow">KEEPSCORE</p>
-            {location.pathname !== "/" && <section className="global-menu-section">
-              <h2 className="global-menu-section-title">{lang === "fr" ? "Navigation" : "Navigation"}</h2>
-              <button className="global-menu-item" type="button" onClick={() => go("/")}>
-                <span aria-hidden="true">⌂</span>{t("home")}
-              </button>
-              <button className="global-menu-item" type="button" onClick={() => go("/setup")}>
-                <span aria-hidden="true">＋</span>{t("newGameMenuItem")}
-              </button>
-              <button className="global-menu-item" type="button" onClick={() => go("/saved")}>
-                <span aria-hidden="true">▤</span>{t("savedGames")}
-              </button>
-              <button className="global-menu-item" type="button" onClick={() => go("/chwatzi")}>
-                <span aria-hidden="true">🎲</span>{t("whoStarts")}
-              </button>
-            </section>}
-            <div className="global-menu-divider" />
-            <section className="global-menu-section">
-              <h2 className="global-menu-section-title">{lang === "fr" ? "Application" : "App"}</h2>
+            {location.pathname !== "/" && (
+              <details className="global-menu-section" open>
+                <summary className="global-menu-section-title">{lang === "fr" ? "Navigation" : "Navigation"}</summary>
+                <button className="global-menu-item" type="button" onClick={() => go("/")}>
+                  <span aria-hidden="true">⌂</span>{t("home")}
+                </button>
+                <button className="global-menu-item" type="button" onClick={() => go("/setup")}>
+                  <span aria-hidden="true">＋</span>{t("newGameMenuItem")}
+                </button>
+                <button className="global-menu-item" type="button" onClick={() => go("/saved")}>
+                  <span aria-hidden="true">▤</span>{t("savedGames")}
+                </button>
+                <button className="global-menu-item" type="button" onClick={() => go("/chwatzi")}>
+                  <span aria-hidden="true">🎲</span>{t("whoStarts")}
+                </button>
+              </details>
+            )}
+            <details className="global-menu-section">
+              <summary className="global-menu-section-title">{lang === "fr" ? "Application" : "App"}</summary>
               <InstallButton variant="menu" />
-            </section>
-            <section className="global-menu-section">
-              <h2 className="global-menu-section-title">{lang === "fr" ? "Préférences" : "Preferences"}</h2>
-            <div className="global-menu-languages" role="group" aria-label={lang === "fr" ? "Langue" : "Language"}>
-              <button className={lang === "fr" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "fr"} onClick={() => setLang("fr")}>🇫🇷 Français</button>
-              <button className={lang === "en" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>🇬🇧 English</button>
-            </div>
-            </section>
+            </details>
+            <details className="global-menu-section">
+              <summary className="global-menu-section-title">{lang === "fr" ? "Préférences" : "Preferences"}</summary>
+              <div className="global-menu-languages" role="group" aria-label={lang === "fr" ? "Langue" : "Language"}>
+                <button className={lang === "fr" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "fr"} onClick={() => setLang("fr")}>🇫🇷 Français</button>
+                <button className={lang === "en" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>🇬🇧 English</button>
+              </div>
+            </details>
           </nav>
         </div>
       )}
