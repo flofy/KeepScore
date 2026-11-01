@@ -142,3 +142,60 @@
   text-transform: uppercase;
 }
 .global-menu-section .global-menu-item { margin-top: 6px; }
+
+
+/* Accordion sections span the menu width and keep their content left-aligned. */
+.global-menu-section,
+.menu-section {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  text-align: left;
+}
+
+.global-menu-section-title,
+.menu-section-title {
+  box-sizing: border-box;
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  margin-inline: 0;
+  padding-inline: 10px;
+  text-align: left;
+}
+
+.global-menu-section-title::after,
+.menu-section-title::after {
+  margin-left: auto;
+}
+
+.global-menu-section > .global-menu-item,
+.global-menu-section > .global-menu-languages,
+.global-menu-section > .install-button,
+.menu-section > .menu-item,
+.menu-section > .menu-row,
+.menu-section > .menu-player-grid,
+.menu-section > .menu-setting-toggle,
+.menu-section > .install-button {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  margin-inline: 0;
+  text-align: left;
+}
+
+.global-menu-section > .global-menu-languages {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.menu-section > .menu-row {
+  justify-content: flex-start;
+}
+
+.menu-section .menu-player-grid,
+.menu-section .menu-setting-toggle {
+  justify-content: flex-start;
+  text-align: left;
+}
