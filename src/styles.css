@@ -2011,3 +2011,97 @@ html:fullscreen .menu-drawer .menu-row {
   font-size: 18px;
   cursor: pointer;
 }
+
+
+/* Consistent accordion sections across both burger menus. */
+.global-menu-section,
+.menu-section {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  border: 0;
+}
+.global-menu-section + .global-menu-section,
+.menu-section + .menu-section {
+  margin-top: 4px;
+}
+.global-menu-section-title,
+.menu-section-title {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 10px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: .12em;
+  line-height: 1.35;
+  text-transform: uppercase;
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.global-menu-section-title::-webkit-details-marker,
+.menu-section-title::-webkit-details-marker {
+  display: none;
+}
+.global-menu-section-title::after,
+.menu-section-title::after {
+  content: "+";
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 8px;
+  background: rgb(148 163 184 / 9%);
+  color: #7dd3fc;
+  font-size: 18px;
+  font-weight: 500;
+  letter-spacing: 0;
+  transition: transform .18s ease, background .18s ease;
+}
+.global-menu-section[open] > .global-menu-section-title::after,
+.menu-section[open] > .menu-section-title::after {
+  content: "−";
+  background: rgb(125 211 252 / 12%);
+}
+.global-menu-section-title:hover,
+.menu-section-title:hover {
+  background: rgb(148 163 184 / 7%);
+  color: #f8fafc;
+}
+.global-menu-section > .global-menu-item,
+.global-menu-section > .global-menu-languages,
+.global-menu-section > .install-button,
+.menu-section > .menu-item,
+.menu-section > .menu-row,
+.menu-section > .menu-player-grid,
+.menu-section > .menu-setting-toggle,
+.menu-section > .install-button {
+  margin-top: 5px;
+}
+.menu-section .menu-setting-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.menu-section .menu-setting-label {
+  flex: 1;
+  min-width: 0;
+}
+.global-menu-section[open] > .global-menu-section-title,
+.menu-section[open] > .menu-section-title {
+  color: #7dd3fc;
+}
+@media (prefers-reduced-motion: reduce) {
+  .global-menu-section-title::after,
+  .menu-section-title::after {
+    transition: none;
+  }
+}
