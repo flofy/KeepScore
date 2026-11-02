@@ -318,20 +318,37 @@ export function PlayerCard({
         </button>
       )}
       <div className={`card-content tile-${tileOrientation}`}>
-        {onFlip && !removeMode && (
-          <button
-            type="button"
-            className="card-flip-btn"
-            onPointerDown={(event) => event.stopPropagation()}
-            onClick={(event) => {
-              event.stopPropagation();
-              onFlip();
-            }}
-            aria-pressed={rotation > 0}
-            aria-label={t("flipPlayer")}
-          >
-            ↻
-          </button>
+        {!removeMode && (
+          <div className="player-card-utility-actions">
+            {onFlip && (
+              <button
+                type="button"
+                className="card-flip-btn"
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onFlip();
+                }}
+                aria-pressed={rotation > 0}
+                aria-label={t("flipPlayer")}
+              >
+                ↻
+              </button>
+            )}
+            <button
+              type="button"
+              className="player-name-edit"
+              onPointerDown={(event) => event.stopPropagation()}
+              onClick={(event) => {
+                event.stopPropagation();
+                setPlayerNameDraft(player.name);
+                setPlayerColorDraft(player.color ?? "#38bdf8");
+                setPlayerEditorOpen(true);
+              }}
+              aria-label={`${t("editPlayer")} — ${player.name}`}
+              title={t("editPlayer")}
+            >✎</button>
+          </div>
         )}
         {deltas.length > 0 && (
           <div
@@ -350,21 +367,6 @@ export function PlayerCard({
         )}
         <div className="player-name-row">
           <span className="player-name" title={player.name}>{player.name}</span>
-          {!removeMode && (
-            <button
-              type="button"
-              className="player-name-edit"
-              onPointerDown={(event) => event.stopPropagation()}
-              onClick={(event) => {
-                event.stopPropagation();
-                setPlayerNameDraft(player.name);
-                setPlayerColorDraft(player.color ?? "#38bdf8");
-                setPlayerEditorOpen(true);
-              }}
-              aria-label={`${t("editPlayer")} — ${player.name}`}
-              title={t("editPlayer")}
-            >✎</button>
-          )}
         </div>
         <div className="score-row">
           <div className="step-col">

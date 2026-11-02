@@ -87,160 +87,88 @@ export function GameMenuDrawer({
         </button>
 
         <div className="menu-content">
-          <button
-            className="menu-item"
-            type="button"
-            onClick={() => {
-              onClose();
-              onHome();
-            }}
-          >
-            <span className="menu-icon">🏠</span>
-            {t("home")}
-          </button>
-
-          <button className="menu-item" type="button" onClick={onHistory}>
-            <span className="menu-icon">🕘</span>
-            {t("history")}
-          </button>
-          <div className="menu-separator" />
-          <div className="menu-row">
-            <button
-              className="menu-item"
-              type="button"
-              onClick={onUndo}
-              disabled={!canUndo}
-            >
-              <span className="menu-icon">↩</span>
-              {t("undo")}
+          <details className="menu-section" open>
+            <summary className="menu-section-title">{lang === "fr" ? "Partie" : "Game"}</summary>
+            <button className="menu-item" type="button" onClick={() => { onClose(); onHome(); }}>
+              <span className="menu-icon">🏠</span>{t("home")}
             </button>
-            <button
-              className="menu-item"
-              type="button"
-              onClick={onRedo}
-              disabled={!canRedo}
-            >
-              <span className="menu-icon">↪</span>
-              {t("redo")}
+            <button className="menu-item" type="button" onClick={onHistory}>
+              <span className="menu-icon">🕘</span>{t("history")}
             </button>
-          </div>
-          <div className="menu-separator" />
-          <div className="menu-player-grid">
-            <div className="menu-item menu-player-grid-label">
-              <span className="menu-icon">▦</span>
-              {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
+            <div className="menu-row">
+              <button className="menu-item" type="button" onClick={onUndo} disabled={!canUndo}>
+                <span className="menu-icon">↩</span>{t("undo")}
+              </button>
+              <button className="menu-item" type="button" onClick={onRedo} disabled={!canRedo}>
+                <span className="menu-icon">↪</span>{t("redo")}
+              </button>
             </div>
-            <div
-              className="player-grid-options"
-              role="group"
-              aria-label={lang === "fr" ? "Disposition" : "Layout"}
-            >
-              {gridOptions.map((option) => (
-                <button
-                  key={option.value}
-                  className={
-                    option.value === playerGridLayout
-                      ? "menu-option player-grid-option active"
-                      : "menu-option player-grid-option"
-                  }
-                  type="button"
-                  aria-label={option.label}
-                  aria-pressed={option.value === playerGridLayout}
-                  title={option.label}
-                  onClick={() => onPlayerGridLayoutChange(option.value)}
-                >
-                  <span
-                    className="menu-grid-icon"
-                    data-columns={option.value}
-                    aria-hidden="true"
-                  >
-                    <span />
-                    <span />
-                    <span />
-                    <span />
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
+          </details>
 
-          <div className="menu-separator" />
-          <div className="menu-setting">
+          <details className="menu-section">
+            <summary className="menu-section-title">{lang === "fr" ? "Disposition" : "Layout"}</summary>
+            <div className="menu-player-grid">
+              <div className="menu-item menu-player-grid-label">
+                <span className="menu-icon">▦</span>
+                {lang === "fr" ? "Disposition des joueurs" : "Player layout"}
+              </div>
+              <div className="player-grid-options" role="group" aria-label={lang === "fr" ? "Disposition" : "Layout"}>
+                {gridOptions.map((option) => (
+                  <button key={option.value}
+                    className={option.value === playerGridLayout ? "menu-option player-grid-option active" : "menu-option player-grid-option"}
+                    type="button" aria-label={option.label} aria-pressed={option.value === playerGridLayout}
+                    title={option.label} onClick={() => onPlayerGridLayoutChange(option.value)}>
+                    <span className="menu-grid-icon" data-columns={option.value} aria-hidden="true">
+                      <span /><span /><span /><span />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="menu-setting-toggle">
               <span className="menu-item menu-setting-label">
-                <span className="menu-icon">▣</span>
-                {t("keepHeaderInFullscreen")}
+                <span className="menu-icon">▣</span>{t("keepHeaderInFullscreen")}
               </span>
-              <input
-                type="checkbox"
-                checked={keepHeaderInFullscreen}
-                onChange={(event) =>
-                  onKeepHeaderInFullscreenChange(event.target.checked)
-                }
-              />
-              <span className="menu-toggle-track" aria-hidden="true">
-                <span className="menu-toggle-thumb" />
-              </span>
+              <input type="checkbox" checked={keepHeaderInFullscreen}
+                onChange={(event) => onKeepHeaderInFullscreenChange(event.target.checked)} />
+              <span className="menu-toggle-track" aria-hidden="true"><span className="menu-toggle-thumb" /></span>
             </label>
-          </div>
+          </details>
 
-          <div className="menu-separator" />
-          <div className="menu-row player-count-row">
-            <button
-              className="menu-stepper-btn"
-              type="button"
-              aria-label={t("addPlayerMenuItem")}
-              onClick={onAddPlayer}
-            >
-              +
+          <details className="menu-section">
+            <summary className="menu-section-title">{lang === "fr" ? "Joueurs" : "Players"}</summary>
+            <div className="menu-row player-count-row">
+              <button className="menu-stepper-btn" type="button" aria-label={t("addPlayerMenuItem")} onClick={onAddPlayer}>+</button>
+              <span className="menu-stepper-count">{playerCount} {t("playersPlural")}</span>
+              <button className="menu-stepper-btn" type="button" aria-label={t("removePlayer")} disabled={playerCount <= 1} onClick={onRemovePlayerMode}>−</button>
+            </div>
+          </details>
+
+          <details className="menu-section">
+            <summary className="menu-section-title">{lang === "fr" ? "Navigation" : "Navigation"}</summary>
+            <button className="menu-item" type="button" onClick={() => { onClose(); onSavedGames(); }}>
+              <span className="menu-icon">💾</span>{t("savedGames")}
             </button>
-            <span className="menu-stepper-count">
-              {playerCount} {t("playersPlural")}
-            </span>
-            <button
-              className="menu-stepper-btn"
-              type="button"
-              aria-label={t("removePlayer")}
-              disabled={playerCount <= 1}
-              onClick={onRemovePlayerMode}
-            >
-              −
+            <button className="menu-item" type="button" onClick={() => { onClose(); onNewGame(); }}>
+              <span className="menu-icon">🎮</span>{t("newGameMenuItem")}
             </button>
-          </div>
-          <button className="menu-item" type="button" onClick={onSavedGames}>
-            <span className="menu-icon">💾</span>
-            {t("savedGames")}
-          </button>
-          <button className="menu-item" type="button" onClick={onNewGame}>
-            <span className="menu-icon">🎮</span>
-            {t("newGameMenuItem")}
-          </button>
-          <button className="menu-item" type="button" onClick={onChwatzi}>
-            <span className="menu-icon">🎲</span>
-            {t("whoStarts")}
-          </button>
-          <div className="menu-separator" />
-          <InstallButton variant="menu" />
-          <div className="menu-row lang-row">
-            <button
-              type="button"
-              className={
-                lang === "fr" ? "menu-item lang active" : "menu-item lang"
-              }
-              onClick={() => onLanguageChange("fr")}
-            >
-              <span className="menu-icon">🇫🇷</span>Français
+            <button className="menu-item" type="button" onClick={() => { onClose(); onChwatzi(); }}>
+              <span className="menu-icon">🎲</span>{t("whoStarts")}
             </button>
-            <button
-              type="button"
-              className={
-                lang === "en" ? "menu-item lang active" : "menu-item lang"
-              }
-              onClick={() => onLanguageChange("en")}
-            >
-              <span className="menu-icon">🇬🇧</span>English
-            </button>
-          </div>
+          </details>
+
+          <details className="menu-section">
+            <summary className="menu-section-title">{lang === "fr" ? "Système et préférences" : "System & preferences"}</summary>
+            <InstallButton variant="menu" />
+            <div className="menu-row lang-row">
+              <button type="button" className={lang === "fr" ? "menu-item lang active" : "menu-item lang"} aria-pressed={lang === "fr"} onClick={() => onLanguageChange("fr")}>
+                <span className="menu-icon">🇫🇷</span>Français
+              </button>
+              <button type="button" className={lang === "en" ? "menu-item lang active" : "menu-item lang"} aria-pressed={lang === "en"} onClick={() => onLanguageChange("en")}>
+                <span className="menu-icon">🇬🇧</span>English
+              </button>
+            </div>
+          </details>
         </div>
       </nav>
     </div>
