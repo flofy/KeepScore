@@ -17,7 +17,10 @@ export function GameSetup({
   onDetermineStartingPlayer,
 }: Props) {
   const { t } = useI18n();
-  const [names, setNames] = useState([t("playerNumber") + " 1", t("playerNumber") + " 2"]);
+  const [names, setNames] = useState([
+    t("playerNumber") + " 1",
+    t("playerNumber") + " 2",
+  ]);
   const [colors, setColors] = useState<string[]>(() =>
     names.map((_, index) => colorForIndex(index)),
   );
@@ -31,7 +34,10 @@ export function GameSetup({
     );
   }
   function addPlayer() {
-    setNames((current) => [...current, t("playerNumber") + " " + (current.length + 1)]);
+    setNames((current) => [
+      ...current,
+      t("playerNumber") + " " + (current.length + 1),
+    ]);
     setColors((current) => [...current, colorForIndex(current.length)]);
   }
   function removePlayer(index: number) {
@@ -56,7 +62,9 @@ export function GameSetup({
     const safeStartingScore = Number.isFinite(parsedStartingScore)
       ? Math.trunc(parsedStartingScore)
       : 0;
-    const playerNames = names.map((name, index) => name.trim() || `${t("playerNumber")} ${index + 1}`);
+    const playerNames = names.map(
+      (name, index) => name.trim() || `${t("playerNumber")} ${index + 1}`,
+    );
     const playerColors = colors;
 
     return createGame(

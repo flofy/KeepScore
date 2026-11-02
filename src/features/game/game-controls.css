@@ -117,10 +117,37 @@
   }
 }
 
-
-.custom-score-section { display: flex; flex-direction: column; gap: 8px; }
-.custom-score-section-title { margin: 8px 0 0; color: #cbd5e1; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
-.custom-score-exact-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: stretch; }
-.custom-score-set { min-width: 92px; padding: 0 16px; border: 0; border-radius: 14px; background: var(--player-color, #38bdf8); color: #07111f; font-weight: 800; }
-.custom-score-actions { margin-top: 0; }
-.custom-score-cancel { margin-top: auto; }
+.custom-score-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.custom-score-section-title {
+  margin: 8px 0 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.custom-score-exact-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: stretch;
+}
+.custom-score-set {
+  min-width: 92px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--player-color, #38bdf8);
+  color: #07111f;
+  font-weight: 800;
+}
+.custom-score-actions {
+  margin-top: 0;
+}
+.custom-score-cancel {
+  margin-top: auto;
+}

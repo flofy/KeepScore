@@ -116,7 +116,9 @@ export function PlayerCard({
   const [customDraft, setCustomDraft] = useState("");
   const [playerEditorOpen, setPlayerEditorOpen] = useState(false);
   const [playerNameDraft, setPlayerNameDraft] = useState(player.name);
-  const [playerColorDraft, setPlayerColorDraft] = useState(player.color ?? "#38bdf8");
+  const [playerColorDraft, setPlayerColorDraft] = useState(
+    player.color ?? "#38bdf8",
+  );
 
   const clearLongPress = () => {
     if (longPressTimer.current !== null) {
@@ -195,7 +197,6 @@ export function PlayerCard({
       setCustomDraft("");
     }
   };
-
 
   const saveCustom = (sign: 1 | -1) => {
     const value = Number(customDraft);
@@ -347,7 +348,9 @@ export function PlayerCard({
               }}
               aria-label={`${t("editPlayer")} — ${player.name}`}
               title={t("editPlayer")}
-            >✎</button>
+            >
+              ✎
+            </button>
           </div>
         )}
         {deltas.length > 0 && (
@@ -366,7 +369,9 @@ export function PlayerCard({
           </div>
         )}
         <div className="player-name-row">
-          <span className="player-name" title={player.name}>{player.name}</span>
+          <span className="player-name" title={player.name}>
+            {player.name}
+          </span>
         </div>
         <div className="score-row">
           <div className="step-col">
@@ -585,9 +590,22 @@ export function PlayerCard({
         )}
       </div>
       {playerEditorOpen && (
-        <div className="player-tile-editor" role="dialog" aria-modal="true" aria-labelledby={`player-tile-editor-title-${player.id}`} onPointerDown={(event) => event.stopPropagation()}>
-          <h2 id={`player-tile-editor-title-${player.id}`}>{t("editPlayer")}</h2>
-          <label className="player-tile-editor-label" htmlFor={`player-tile-name-${player.id}`}>{t("playerName")}</label>
+        <div
+          className="player-tile-editor"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={`player-tile-editor-title-${player.id}`}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+          <h2 id={`player-tile-editor-title-${player.id}`}>
+            {t("editPlayer")}
+          </h2>
+          <label
+            className="player-tile-editor-label"
+            htmlFor={`player-tile-name-${player.id}`}
+          >
+            {t("playerName")}
+          </label>
           <input
             id={`player-tile-name-${player.id}`}
             className="player-tile-editor-input"
@@ -607,27 +625,59 @@ export function PlayerCard({
           {suggestedPlayerNames.length > 0 && (
             <div className="player-tile-name-suggestions">
               <p>{t("savedPlayerSuggestions")}</p>
-              <div>{suggestedPlayerNames.map((name) => (
-                <button key={name} type="button" onClick={() => setPlayerNameDraft(name)}>{name}</button>
-              ))}</div>
+              <div>
+                {suggestedPlayerNames.map((name) => (
+                  <button
+                    key={name}
+                    type="button"
+                    onClick={() => setPlayerNameDraft(name)}
+                  >
+                    {name}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
           <p className="player-tile-editor-label">{t("colorForPlayer")}</p>
-          <div className="player-tile-color-options" role="radiogroup" aria-label={t("colorForPlayer")}>
+          <div
+            className="player-tile-color-options"
+            role="radiogroup"
+            aria-label={t("colorForPlayer")}
+          >
             {PLAYER_COLORS.map((color) => (
-              <button key={color} type="button" role="radio" aria-checked={playerColorDraft === color} className={playerColorDraft === color ? "player-tile-color selected" : "player-tile-color"} style={{ background: color }} onClick={() => {
-                setPlayerColorDraft(color);
-                onChangeColor(color);
-              }} aria-label={`${t("setPlayerColor")} ${color}`} />
+              <button
+                key={color}
+                type="button"
+                role="radio"
+                aria-checked={playerColorDraft === color}
+                className={
+                  playerColorDraft === color
+                    ? "player-tile-color selected"
+                    : "player-tile-color"
+                }
+                style={{ background: color }}
+                onClick={() => {
+                  setPlayerColorDraft(color);
+                  onChangeColor(color);
+                }}
+                aria-label={`${t("setPlayerColor")} ${color}`}
+              />
             ))}
           </div>
           <div className="player-tile-editor-actions">
-            <button type="button" onClick={() => setPlayerEditorOpen(false)}>{t("cancel")}</button>
-            <button type="button" onClick={() => {
-              if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
-              onChangeColor(playerColorDraft);
-              setPlayerEditorOpen(false);
-            }}>{t("save")}</button>
+            <button type="button" onClick={() => setPlayerEditorOpen(false)}>
+              {t("cancel")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (playerNameDraft.trim()) onRename(playerNameDraft.trim());
+                onChangeColor(playerColorDraft);
+                setPlayerEditorOpen(false);
+              }}
+            >
+              {t("save")}
+            </button>
           </div>
         </div>
       )}
@@ -672,7 +722,13 @@ export function PlayerCard({
                   }}
                   aria-label={t("setScore")}
                 />
-                <button type="button" className="custom-score-set" onClick={saveExactScore}>{t("save")}</button>
+                <button
+                  type="button"
+                  className="custom-score-set"
+                  onClick={saveExactScore}
+                >
+                  {t("save")}
+                </button>
               </div>
             </section>
             <section className="custom-score-section">

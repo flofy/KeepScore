@@ -23,7 +23,7 @@
   height: 22px;
 }
 .global-menu-trigger:active {
-  transform: scale(.94);
+  transform: scale(0.94);
 }
 .global-menu-backdrop {
   position: fixed;
@@ -32,7 +32,9 @@
   display: flex;
   justify-content: flex-end;
   align-items: stretch;
-  padding: max(10px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  padding: max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
   background: rgb(2 6 23 / 72%);
   backdrop-filter: blur(8px);
 }
@@ -66,7 +68,7 @@
   color: #7dd3fc;
   font-size: 11px;
   font-weight: 800;
-  letter-spacing: .16em;
+  letter-spacing: 0.16em;
 }
 .global-menu-item {
   display: flex;
@@ -132,17 +134,20 @@
   }
 }
 
-.global-menu-section { margin: 0 0 18px; }
+.global-menu-section {
+  margin: 0 0 18px;
+}
 .global-menu-section-title {
   margin: 0 0 8px 4px;
   color: #94a3b8;
-  font-size: .72rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: .12em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
 }
-.global-menu-section .global-menu-item { margin-top: 6px; }
-
+.global-menu-section .global-menu-item {
+  margin-top: 6px;
+}
 
 /* Accordion sections span the menu width and keep their content left-aligned. */
 .global-menu-section,

@@ -67,9 +67,21 @@ function GlobalMenu() {
       >
         <svg className="burger-icon" viewBox="0 0 24 24" aria-hidden="true">
           {open ? (
-            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            <path
+              d="M6 6l12 12M18 6L6 18"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+            />
           ) : (
-            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+            <path
+              d="M4 6h16M4 12h16M4 18h16"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              fill="none"
+            />
           )}
         </svg>
       </button>
@@ -81,34 +93,93 @@ function GlobalMenu() {
             aria-label={t("menu")}
             onClick={(event) => event.stopPropagation()}
           >
-            <button className="global-menu-close" type="button" onClick={() => setOpen(false)} aria-label={t("closeMenu")}>✕</button>
+            <button
+              className="global-menu-close"
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label={t("closeMenu")}
+            >
+              ✕
+            </button>
             <p className="global-menu-eyebrow">KEEPSCORE</p>
             {location.pathname !== "/" && (
               <details className="global-menu-section" open>
-                <summary className="global-menu-section-title">{lang === "fr" ? "Navigation" : "Navigation"}</summary>
-                <button className="global-menu-item" type="button" onClick={() => go("/")}>
-                  <span aria-hidden="true">⌂</span>{t("home")}
+                <summary className="global-menu-section-title">
+                  {lang === "fr" ? "Navigation" : "Navigation"}
+                </summary>
+                <button
+                  className="global-menu-item"
+                  type="button"
+                  onClick={() => go("/")}
+                >
+                  <span aria-hidden="true">⌂</span>
+                  {t("home")}
                 </button>
-                <button className="global-menu-item" type="button" onClick={() => go("/setup")}>
-                  <span aria-hidden="true">＋</span>{t("newGameMenuItem")}
+                <button
+                  className="global-menu-item"
+                  type="button"
+                  onClick={() => go("/setup")}
+                >
+                  <span aria-hidden="true">＋</span>
+                  {t("newGameMenuItem")}
                 </button>
-                <button className="global-menu-item" type="button" onClick={() => go("/saved")}>
-                  <span aria-hidden="true">▤</span>{t("savedGames")}
+                <button
+                  className="global-menu-item"
+                  type="button"
+                  onClick={() => go("/saved")}
+                >
+                  <span aria-hidden="true">▤</span>
+                  {t("savedGames")}
                 </button>
-                <button className="global-menu-item" type="button" onClick={() => go("/chwatzi")}>
-                  <span aria-hidden="true">🎲</span>{t("whoStarts")}
+                <button
+                  className="global-menu-item"
+                  type="button"
+                  onClick={() => go("/chwatzi")}
+                >
+                  <span aria-hidden="true">🎲</span>
+                  {t("whoStarts")}
                 </button>
               </details>
             )}
             <details className="global-menu-section">
-              <summary className="global-menu-section-title">{lang === "fr" ? "Application" : "App"}</summary>
+              <summary className="global-menu-section-title">
+                {lang === "fr" ? "Application" : "App"}
+              </summary>
               <InstallButton variant="menu" />
             </details>
             <details className="global-menu-section">
-              <summary className="global-menu-section-title">{lang === "fr" ? "Préférences" : "Preferences"}</summary>
-              <div className="global-menu-languages" role="group" aria-label={lang === "fr" ? "Langue" : "Language"}>
-                <button className={lang === "fr" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "fr"} onClick={() => setLang("fr")}>🇫🇷 Français</button>
-                <button className={lang === "en" ? "global-menu-language active" : "global-menu-language"} type="button" aria-pressed={lang === "en"} onClick={() => setLang("en")}>🇬🇧 English</button>
+              <summary className="global-menu-section-title">
+                {lang === "fr" ? "Préférences" : "Preferences"}
+              </summary>
+              <div
+                className="global-menu-languages"
+                role="group"
+                aria-label={lang === "fr" ? "Langue" : "Language"}
+              >
+                <button
+                  className={
+                    lang === "fr"
+                      ? "global-menu-language active"
+                      : "global-menu-language"
+                  }
+                  type="button"
+                  aria-pressed={lang === "fr"}
+                  onClick={() => setLang("fr")}
+                >
+                  🇫🇷 Français
+                </button>
+                <button
+                  className={
+                    lang === "en"
+                      ? "global-menu-language active"
+                      : "global-menu-language"
+                  }
+                  type="button"
+                  aria-pressed={lang === "en"}
+                  onClick={() => setLang("en")}
+                >
+                  🇬🇧 English
+                </button>
               </div>
             </details>
           </nav>
@@ -157,10 +228,12 @@ export function StartScreenRoute() {
       />
       <nav className="home-bottom-nav" aria-label={t("menu")}>
         <button type="button" onClick={() => navigate("/saved")}>
-          <span aria-hidden="true">▤</span><span>{t("savedGames")}</span>
+          <span aria-hidden="true">▤</span>
+          <span>{t("savedGames")}</span>
         </button>
         <button type="button" onClick={() => navigate("/chwatzi")}>
-          <span aria-hidden="true">🎲</span><span>{t("whoStarts")}</span>
+          <span aria-hidden="true">🎲</span>
+          <span>{t("whoStarts")}</span>
         </button>
       </nav>
     </main>
@@ -204,7 +277,16 @@ export function GameRoute() {
       onSavedGames={() => navigate("/saved")}
       onChwatzi={() => navigate("/chwatzi")}
       onHome={() => navigate("/")}
-      suggestedPlayerNames={[...new Set(localGameRepository.list().flatMap((savedGame) => savedGame.players.map((player) => player.name.trim())).filter(Boolean))].slice(0, 12)}
+      suggestedPlayerNames={[
+        ...new Set(
+          localGameRepository
+            .list()
+            .flatMap((savedGame) =>
+              savedGame.players.map((player) => player.name.trim()),
+            )
+            .filter(Boolean),
+        ),
+      ].slice(0, 12)}
     />
   );
 }
